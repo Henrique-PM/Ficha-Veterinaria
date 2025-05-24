@@ -1,0 +1,153 @@
+<nav>
+    <ul>
+        <li><a href="#">Dashboard</a></li>
+        <li><a href="#">Animais</a></li>
+        <li><a href="#">Vacinas</a></li>
+        <li><a href="#">Relatórios</a></li>
+        <li><a href="#">Sair</a></li>
+    </ul>
+</nav>
+
+<div class="parallax">
+    <div class="content">
+        <div class="animal-header">
+            <img src="https://images.unsplash.com/photo-1552053831-71594a27632d" alt="Rex" class="animal-photo">
+            <div class="animal-info">
+                <h1 class="animal-name">Rex</h1>
+                <div class="animal-details">
+                    <div class="detail-item">
+                        <strong>Espécie:</strong> Cão
+                    </div>
+                    <div class="detail-item">
+                        <strong>Raça:</strong> Labrador
+                    </div>
+                    <div class="detail-item">
+                        <strong>Idade:</strong> 3 anos
+                    </div>
+                    <div class="detail-item">
+                        <strong>Sexo:</strong> Macho
+                    </div>
+                    <div class="detail-item">
+                        <strong>Status:</strong> <span class="status status-hospital">Hospitalizado</span>
+                    </div>
+                    <div class="detail-item">
+                        <strong>Entrada:</strong> 15/03/2023
+                    </div>
+                </div>
+                <div>
+                    <button class="btn btn-edit">Editar Ficha</button>
+                    <button class="btn">Nova Consulta</button>
+                    <button class="btn">Registrar Vacina</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="health">Saúde</div>
+            <div class="tab" data-tab="vaccines">Vacinas</div>
+            <div class="tab" data-tab="history">Histórico</div>
+        </div>
+        
+        <div class="tab-content active" id="health">
+            <h2>Condição Atual</h2>
+            <p><strong>Diagnóstico:</strong> Fratura na pata traseira direita</p>
+            <p><strong>Tratamento:</strong> Repouso, anti-inflamatório e acompanhamento semanal</p>
+            <p><strong>Observações:</strong> Animal está respondendo bem ao tratamento, mas ainda manca ao caminhar.</p>
+            
+            <h2>Doenças Registradas</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Doença</th>
+                        <th>Data Diagnóstico</th>
+                        <th>Status</th>
+                        <th>Veterinário</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Fratura pata traseira</td>
+                        <td>10/05/2023</td>
+                        <td><span class="status status-hospital">Em tratamento</span></td>
+                        <td>Dr. Silva</td>
+                    </tr>
+                    <tr>
+                        <td>Leishmaniose</td>
+                        <td>15/03/2023</td>
+                        <td><span class="status status-ok">Controlada</span></td>
+                        <td>Dra. Oliveira</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="tab-content" id="vaccines">
+            <h2>Cartão de Vacinação</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Vacina</th>
+                        <th>Data</th>
+                        <th>Próxima Dose</th>
+                        <th>Veterinário</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Antirrábica</td>
+                        <td>20/04/2023</td>
+                        <td>20/04/2024</td>
+                        <td>Dr. Silva</td>
+                    </tr>
+                    <tr>
+                        <td>V8</td>
+                        <td>15/03/2023</td>
+                        <td>15/03/2024</td>
+                        <td>Dra. Oliveira</td>
+                    </tr>
+                    <tr>
+                        <td>Giárdia</td>
+                        <td>15/03/2023</td>
+                        <td>15/09/2023</td>
+                        <td>Dra. Oliveira</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="tab-content" id="history">
+            <h2>Histórico de Atendimentos</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Procedimento</th>
+                        <th>Observações</th>
+                        <th>Veterinário</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>10/05/2023</td>
+                        <td>Raio-X e imobilização</td>
+                        <td>Fratura identificada na pata traseira</td>
+                        <td>Dr. Silva</td>
+                    </tr>
+                    <tr>
+                        <td>25/04/2023</td>
+                        <td>Consulta de rotina</td>
+                        <td>Animal saudável, peso ideal</td>
+                        <td>Dra. Oliveira</td>
+                    </tr>
+                    <tr>
+                        <td>15/03/2023</td>
+                        <td>Primeira consulta</td>
+                        <td>Resgatado com sinais de leishmaniose</td>
+                        <td>Dra. Oliveira</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+

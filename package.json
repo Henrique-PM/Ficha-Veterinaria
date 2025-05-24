@@ -1,0 +1,29 @@
+{
+  "name": "ficha-veterin-ria",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Henrique-PM/Ficha-Veterin-ria.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Henrique-PM/Ficha-Veterin-ria/issues"
+  },
+  "homepage": "https://github.com/Henrique-PM/Ficha-Veterin-ria#readme",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "body-parser": "^2.2.0",
+    "express": "^5.1.0",
+    "express-handlebars": "^8.0.3",
+    "express-session": "^1.18.1",
+    "hbs": "^4.2.0",
+    "sqlite3": "^5.1.7"
+  }
+}

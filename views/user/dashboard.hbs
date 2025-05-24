@@ -1,0 +1,50 @@
+<nav>
+    <ul>
+        <li><a href="#">Dashboard</a></li>
+        <li><a href="#">Animais</a></li>
+        <li><a href="/auth/logout">Sair</a></li>
+    </ul>
+</nav>
+<div class="parallax">
+    <div class="content">
+        <header>
+            {{!-- <h1>Bem-vindo, {{}}</h1> --}}
+            <div class="user-info">
+                <img src="https://via.placeholder.com/40" alt="Usuário">
+                <span>Veterinário</span>
+            </div>
+        </header>
+        
+        <div class="search-bar">
+            <input type="text" placeholder="Pesquisar animal...">
+        </div>
+        
+        <div class="cards">
+            <div class="card">
+                <div class="card-icon">🐕</div>
+                <h3>Total de Animais</h3>
+                {{!-- <p>{{}}</p> --}}
+            </div>
+            
+            <div class="card">
+                <div class="card-icon">🏥</div>
+                <h3>Em Tratamento</h3>
+                {{!-- <p>{{}}</p> --}}
+            </div>
+            
+            <div class="card">
+                <div class="card-icon">💉</div>
+                <h3>Vacinas Pendentes</h3>
+                {{!-- <p>{{}}</p> --}}
+            </div>
+            
+            <div class="card">
+                <div class="card-icon">❤️</div>
+                <h3>Adotados</h3>
+                {{!-- <p>{{}}</p> --}}
+            </div>
+        </div>
+    </div>
+</div>
+
+

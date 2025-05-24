@@ -1,0 +1,8 @@
+<form method="POST" action="/auth/login">
+  <input type="email" name="email" placeholder="E-mail" required>
+  <input type="password" name="password" placeholder="Senha" required>
+  <button type="submit">Entrar</button>
+  {{#if erro}}<p style="color:red;">{{erro}}</p>{{/if}}
+</form>
+
+<p>Não tem conta? <a href="/register">Cadastre-se</a></p>

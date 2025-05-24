@@ -1,0 +1,15 @@
+<h2>Registrar</h2>
+{{#if erro}}<p style="color:red;">{{erro}}</p>{{/if}}
+<form action="/auth/register" method="POST">
+  <label>Nome: <input type="text" name="name" required></label><br>
+  <label>Email: <input type="email" name="email" required></label><br>
+  <label>Senha: <input type="password" name="password" required></label><br>
+  <label>Tipo: 
+    <select name="type" required>
+      <option value="veterinario">Veterinário</option>
+      <option value="visualizador">Visualizador</option>
+    </select>
+  </label><br>
+  <button type="submit">Registrar</button>
+</form>
+<p>Já tem conta? <a href="/login">Login</a></p>
