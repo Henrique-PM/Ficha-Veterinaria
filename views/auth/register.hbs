@@ -1,15 +1,45 @@
-<h2>Registrar</h2>
-{{#if erro}}<p style="color:red;">{{erro}}</p>{{/if}}
-<form action="/auth/register" method="POST">
-  <label>Nome: <input type="text" name="name" required></label><br>
-  <label>Email: <input type="email" name="email" required></label><br>
-  <label>Senha: <input type="password" name="password" required></label><br>
-  <label>Tipo: 
-    <select name="type" required>
-      <option value="veterinario">Veterinário</option>
-      <option value="visualizador">Visualizador</option>
-    </select>
-  </label><br>
-  <button type="submit">Registrar</button>
-</form>
-<p>Já tem conta? <a href="/login">Login</a></p>
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="auth-logo">🐾</div>
+            <h1>Criar Conta</h1>
+            <p>Registre-se para acessar o painel</p>
+        </div>
+
+        {{#if erro}}
+        <div class="error-message">{{erro}}</div>
+        {{/if}}
+
+        <form method="POST" action="/auth/register">
+            <div class="form-group">
+                <label for="name">Nome Completo</label>
+                <input type="text" id="name" name="name" class="form-control" placeholder="Seu nome" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">E-mail</label>
+                <input type="email" id="email" name="email" class="form-control" placeholder="Seu e-mail" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Senha</label>
+                <input type="password" id="password" name="password" class="form-control" placeholder="Sua senha" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="type">Tipo de Usuário</label>
+                <select id="type" name="type" class="form-control" required>
+                    <option value="">Selecione...</option>
+                    <option value="veterinario">Veterinário</option>
+                    <option value="visualizador">Visualizador</option>
+                </select>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Registrar</button>
+        </form>
+
+        <div class="auth-footer">
+            <p>Já tem uma conta? <a href="/auth/login">Faça login</a></p>
+        </div>
+    </div>
+</div>

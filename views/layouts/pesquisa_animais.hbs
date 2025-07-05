@@ -1,0 +1,277 @@
+<div class="container-fluid photo-library dark-theme">
+  <div class="row">
+    <div class="col-12">
+      <h2 class="mb-4 text-light">
+        <i class="fas fa-camera-retro me-2"></i> Biblioteca de Fotos
+      </h2>
+      
+      <!-- Barra de Filtros -->
+      <div class="card filters-card mb-4 bg-dark border-secondary">
+        <div class="card-body">
+          <form class="row g-3">
+            <div class="col-md-3">
+              <label for="filter-species" class="form-label text-light">Espécie</label>
+              <select id="filter-species" class="form-select bg-dark text-light border-secondary">
+                <option selected>Todas</option>
+                <option>Cachorro</option>
+                <option>Gato</option>
+                <option>Outros</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label for="filter-status" class="form-label text-light">Status</label>
+              <select id="filter-status" class="form-select bg-dark text-light border-secondary">
+                <option selected>Todos</option>
+                <option>Abrigo</option>
+                <option>Adotado</option>
+                <option>Tratamento</option>
+              </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+              <button class="btn btn-primary w-100">
+                <i class="fas fa-filter me-2"></i> Filtrar
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+      
+      <!-- Grid de Fotos -->
+      <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4 photo-grid">
+        {{#each animals}}
+        <div class="col">
+          <div class="card animal-card h-100 bg-dark border-secondary">
+            <div class="photo-container">
+              {{#if this.photo}}
+                <img src="/vet/animal/photo/{{this.id}}" 
+                    class="card-img-top animal-photo" 
+                    alt="{{this.name}}"
+                    data-animal-id="{{this.id}}">
+              {{else}}
+                <div class="no-photo-placeholder">
+                  <i class="fas fa-paw"></i>
+                </div>
+              {{/if}}
+              <span class="badge status-badge bg-{{this.status}}">
+                {{this.status}}
+              </span>
+            </div>
+            <div class="card-body">
+              <h5 class="card-title text-light">{{this.name}}</h5>
+              <p class="card-text">
+                <small class="text-muted">
+                  <i class="fas fa-dog me-1"></i> {{this.species}} • {{this.breed}}<br>
+                  <i class="fas fa-birthday-cake me-1"></i> {{this.age}} anos • <i class="fas fa-{{this.sex}} me-1"></i> {{this.sex}}
+                </small>
+              </p>
+            </div>
+            <div class="card-footer bg-transparent border-secondary">
+              <a href="/vet/animal/{{this.id}}" class="btn btn-sm btn-outline-primary me-2">
+                <i class="fas fa-file-alt me-1"></i> Ficha
+              </a>
+              <button class="btn btn-sm btn-outline-info view-photo-btn" 
+                      data-photo-id="{{this.id}}">
+                <i class="fas fa-expand me-1"></i> Ampliar
+              </button>
+            </div>
+          </div>
+        </div>
+        {{/each}}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para Visualização Ampliada -->
+<div class="modal fade" id="photoModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content bg-dark text-light">
+      <div class="modal-header border-secondary">
+        <h5 class="modal-title" id="photoModalLabel">
+          <i class="fas fa-camera me-2"></i>Foto de <span id="modalAnimalName" class="text-primary"></span>
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center bg-darker">
+        <img id="modalPhoto" src="" class="img-fluid rounded" alt="">
+      </div>
+      <div class="modal-footer border-secondary justify-content-between">
+        <div>
+          <span id="modalAnimalInfo" class="text-muted">
+            <i class="fas fa-info-circle text-primary me-2"></i>
+            <span id="modalAnimalDetails"></span>
+          </span>
+        </div>
+        <div>
+          <a id="modalAnimalLink" href="#" class="btn btn-sm btn-primary me-2">
+            <i class="fas fa-file-alt me-1"></i> Ficha Completa
+          </a>
+          <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">
+            <i class="fas fa-times me-1"></i> Fechar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Estilos Customizados -->
+<style>
+  :root {
+    --dark-bg: #1a1a1a;
+    --darker-bg: #121212;
+    --dark-border: #333;
+    --dark-text: #e0e0e0;
+    --darker-text: #b0b0b0;
+  }
+  
+  body.dark-mode {
+    background-color: var(--dark-bg);
+    color: var(--dark-text);
+  }
+  
+  .dark-theme {
+    background-color: var(--dark-bg);
+    color: var(--dark-text);
+  }
+  
+  .photo-library {
+    padding: 20px;
+    min-height: 100vh;
+  }
+  
+  .animal-card {
+    transition: transform 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+    overflow: hidden;
+    border-radius: 12px;
+  }
+  
+  .animal-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+  }
+  
+  .photo-container {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+    background-color: var(--darker-bg);
+  }
+  
+  .animal-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s;
+  }
+  
+  .animal-card:hover .animal-photo {
+    transform: scale(1.05);
+  }
+  
+  .no-photo-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #444;
+    font-size: 3rem;
+  }
+  
+  .status-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 0.8rem;
+    text-transform: capitalize;
+    padding: 5px 10px;
+    border-radius: 20px;
+  }
+  
+  .filters-card {
+    background-color: var(--darker-bg);
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  }
+  
+  /* Cores para os status */
+  .bg-abrigo { background-color: #0d6efd !important; }
+  .bg-adotado { background-color: #198754 !important; }
+  .bg-tratamento { background-color: #fd7e14 !important; }
+  .bg-falecido { background-color: #6c757d !important; }
+  
+  /* Modal styles */
+  .bg-darker {
+    background-color: var(--darker-bg);
+  }
+  
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: var(--darker-bg);
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: #444;
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+  
+  /* Input focus styles */
+  .form-control:focus, .form-select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    background-color: var(--darker-bg);
+    color: white;
+  }
+  
+  /* Hover effects for buttons */
+  .btn-outline-primary:hover {
+    background-color: #0d6efd;
+    color: white;
+  }
+  
+  .btn-outline-secondary:hover {
+    background-color: #6c757d;
+    color: white;
+  }
+</style>
+
+<script>
+  // Script para o modal
+  document.querySelectorAll('.view-photo-btn').forEach(button => {
+    button.addEventListener('click', function() {
+      const animalId = this.getAttribute('data-photo-id');
+      const animalCard = this.closest('.animal-card');
+      const animalName = animalCard.querySelector('.card-title').textContent;
+      const animalInfo = animalCard.querySelector('.card-text small').textContent;
+      
+      // Preenche o modal com os dados
+      document.getElementById('modalAnimalName').textContent = animalName;
+      document.getElementById('modalAnimalDetails').textContent = animalInfo.trim().replace(/\s+/g, ' ');
+      document.getElementById('modalPhoto').src = `/vet/animal/photo/${animalId}`;
+      document.getElementById('modalAnimalLink').href = `/vet/animal/${animalId}`;
+      
+      // Mostra o modal
+      const photoModal = new bootstrap.Modal(document.getElementById('photoModal'));
+      photoModal.show();
+    });
+  });
+  
+  // Adiciona hover effect nas fotos
+  document.querySelectorAll('.animal-photo').forEach(img => {
+    img.addEventListener('mouseenter', function() {
+      this.style.transform = 'scale(1.05)';
+    });
+    img.addEventListener('mouseleave', function() {
+      this.style.transform = 'scale(1)';
+    });
+  });
+</script>

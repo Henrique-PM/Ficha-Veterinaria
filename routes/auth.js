@@ -26,7 +26,7 @@ router.post('/login', (req, res) => {
         req.session.user = user;
         
         if (user.type === 'veterinario') {
-          return res.redirect('/vet/animais');
+          return res.redirect('/vet/dashboard');
         } else {
           return res.redirect('/user/dashboard');
         }

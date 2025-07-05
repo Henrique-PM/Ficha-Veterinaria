@@ -24,6 +24,7 @@
     "express-handlebars": "^8.0.3",
     "express-session": "^1.18.1",
     "hbs": "^4.2.0",
+    "multer": "^2.0.1",
     "sqlite3": "^5.1.7"
   }
 }

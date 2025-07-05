@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../database');
+const multer = require('multer');
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 // Middleware para verificar se o usuário está autenticado e é do tipo veterinario
 router.use((req, res, next) => {
@@ -12,24 +15,44 @@ router.use((req, res, next) => {
 
 // Dashboard do veterinário
 router.get('/dashboard', (req, res) => {
-  db.all(`
-    SELECT a.*, 
-           (SELECT COUNT(*) FROM health_records WHERE animal_id = a.id) as records_count,
-           (SELECT COUNT(*) FROM vaccines WHERE animal_id = a.id) as vaccines_count
-    FROM animals a
-    WHERE a.status != "adotado" AND a.status != "falecido"
-  `, [], (err, animals) => {
+  res.render('vet/animais', {
+    user: req.session.user,
+  });
+});
+
+
+router.get('/animal/photo/:id', (req, res) => {
+  const { id } = req.params;
+
+  db.get('SELECT photo FROM animals WHERE id = ?', [id], (err, row) => {
+    if (err || !row || !row.photo) {
+      return res.status(404).send('Imagem não encontrada');
+    }
+    res.setHeader('Content-Type', 'image');
+    res.send(row.photo);
+  });
+});
+
+router.get('/search', (req, res) => {
+  const { name } = req.query;
+
+  if (!name) {
+    return res.redirect('/vet/dashboard'); // Redireciona se a busca estiver vazia
+  }
+
+  const query = `SELECT * FROM animals WHERE name LIKE ?`;
+  const params = [`%${name}%`];
+
+  db.all(query, params, (err, rows) => {
     if (err) {
       console.error(err);
       return res.status(500).send('Erro ao buscar animais');
     }
-    
-    res.render('vet/animais', { 
-      user: req.session.user,
-      animals 
-    });
+
+    res.render('vet/animais', { user: req.session.user, animals: rows });
   });
 });
+
 
 // Gerenciar animal
 router.get('/animal/:id', (req, res) => {
@@ -122,5 +145,59 @@ router.post('/animal/:id/hospitalization', (req, res) => {
     }
   );
 });
+
+router.get('/cadastrar-animal', (req, res) => {
+  if (!req.session.user) {
+    return res.redirect('/auth/login');
+  }
+  
+  res.render('vet/cadastra_animal', { 
+    user: req.session.user
+  });
+});
+
+router.post('/cadastrar-animal', upload.single('photo'), (req, res) => {
+  const { name, species, breed, age, sex, description, characteristics, chip_number, status } = req.body;
+  const veterinarian_id = req.session.user.id;
+
+  const photoBuffer = req.file ? req.file.buffer : null;
+//ta faltando preencher alguns campos como status 
+  db.run(
+    `INSERT INTO animals (name, species, breed, age, sex, photo, chip_number, status, characteristics, description, created_by)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [name, species, breed, age, sex, photoBuffer, chip_number, status, characteristics, description, veterinarian_id],
+    function(err) {
+      if (err) {
+        console.error(err);
+        return res.status(500).send('Erro ao cadastrar animal');
+      }
+
+      res.redirect(`/vet/animal/${this.lastID}`);
+    }
+  );
+});
+
+
+router.get('/biblioteca', (req, res) => {
+  const query = `
+    SELECT id, name, species, breed, age, sex, photo, status
+    FROM animals
+    ORDER BY entry_date DESC
+  `;
+
+  db.all(query, [], (err, animals) => {
+    if (err) {
+      console.error('Erro ao buscar animais:', err);
+      return res.status(500).render('error', { error: 'Erro ao carregar biblioteca de animais.' });
+    }
+
+    res.render('layouts/pesquisa_animais', {
+      title: 'Biblioteca de Fotos',
+      animals,
+      user: req.session.user || null
+    });
+  });
+});
+
 
 module.exports = router;

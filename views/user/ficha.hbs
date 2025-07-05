@@ -1,9 +1,6 @@
 <nav>
     <ul>
         <li><a href="#">Dashboard</a></li>
-        <li><a href="#">Animais</a></li>
-        <li><a href="#">Vacinas</a></li>
-        <li><a href="#">Relatórios</a></li>
         <li><a href="#">Sair</a></li>
     </ul>
 </nav>
@@ -11,27 +8,27 @@
 <div class="parallax">
     <div class="content">
         <div class="animal-header">
-            <img src="https://images.unsplash.com/photo-1552053831-71594a27632d" alt="Rex" class="animal-photo">
+            <!--<img src="https://images.unsplash.com/photo-1552053831-71594a27632d" alt="Rex" class="animal-photo">-->
             <div class="animal-info">
-                <h1 class="animal-name">Rex</h1>
+                <h1 class="animal-name">{{animal.name}}</h1>
                 <div class="animal-details">
                     <div class="detail-item">
-                        <strong>Espécie:</strong> Cão
+                        <strong>Espécie:</strong> {{animal.species}}
                     </div>
                     <div class="detail-item">
-                        <strong>Raça:</strong> Labrador
+                        <strong>Raça:</strong> {{animal.breed}}
                     </div>
                     <div class="detail-item">
-                        <strong>Idade:</strong> 3 anos
+                        <strong>Idade:</strong> {{animal.age}} anos
                     </div>
                     <div class="detail-item">
-                        <strong>Sexo:</strong> Macho
+                        <strong>Sexo:</strong> {{animal.sex}}
                     </div>
                     <div class="detail-item">
-                        <strong>Status:</strong> <span class="status status-hospital">Hospitalizado</span>
+                        <strong>Status:</strong> <span class="status status-hospital">{{animal.status}}</span>
                     </div>
                     <div class="detail-item">
-                        <strong>Entrada:</strong> 15/03/2023
+                        <strong>Entrada:</strong> {{animal.entry_date}}
                     </div>
                 </div>
                 <div>

@@ -44,4 +44,22 @@ router.get('/animal/:id', (req, res) => {
   });
 });
 
+router.get('/biblioteca-fotos', async (req, res) => {
+  try {
+    const animais = await db.all(`
+      SELECT id, name, species, breed, age, sex, photo, status 
+      FROM animals 
+      ORDER BY entry_date DESC
+    `);
+    
+    res.render('layouts/pesquisa_animal', {
+      title: 'Biblioteca de Fotos',
+      animais
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).render('error', { error: 'Erro ao carregar fotos' });
+  }
+});
+
 module.exports = router;

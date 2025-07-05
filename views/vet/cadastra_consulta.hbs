@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{animal.name}} | VetCare</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #121212;
+            --darker-bg: #0a0a0a;
+            --card-dark: #1e1e1e;
+            --text-dark: #e0e0e0;
+            --text-light: #b0b0b0;
+            --primary: #4e73df;
+            --primary-hover: #3a5bd9;
+            --success: #1cc88a;
+            --warning: #f6c23e;
+            --danger: #e74a3b;
+            --info: #36b9cc;
+            --border-dark: #333;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-dark);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            color: var(--primary);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 15px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background-color: rgba(78, 115, 223, 0.1);
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+            border: none;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+        /* Animal Info */
+        .animal-header {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+            background-color: var(--card-dark);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .animal-photo {
+            width: 300px;
+            height: 300px;
+            background-size: cover;
+            background-position: center;
+            flex-shrink: 0;
+        }
+
+        .animal-info {
+            padding: 20px;
+            flex-grow: 1;
+        }
+
+        .animal-name {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: var(--text-dark);
+        }
+
+        .animal-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .detail-item {
+            font-size: 0.95rem;
+        }
+
+        .detail-item strong {
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .status {
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            display: inline-block;
+        }
+
+        .status-abrigo { background-color: var(--info); color: white; }
+        .status-hospital { background-color: var(--warning); color: black; }
+        .status-adotado { background-color: var(--success); color: white; }
+        .status-falecido { background-color: var(--danger); color: white; }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-dark);
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--text-light);
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            color: var(--text-dark);
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-dark);
+        }
+
+        th {
+            background-color: var(--darker-bg);
+            color: var(--primary);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+
+        tr:hover {
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 0.8rem;
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px 15px;
+            background-color: var(--darker-bg);
+            border: 1px solid var(--border-dark);
+            border-radius: 6px;
+            color: var(--text-dark);
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        /* Responsivo */
+        @media (max-width: 992px) {
+            .animal-header {
+                flex-direction: column;
+            }
+            
+            .animal-photo {
+                width: 100%;
+                height: 250px;
+            }
+            
+            .animal-details {
+                grid-template-columns: 1fr;
+            }
+            
+            .tabs {
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .header-actions {
+                width: 100%;
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-paw"></i> Ficha do Animal</h1>
+            <div class="header-actions">
+                <a href="/vet/animais" class="btn btn-outline">
+                    <i class="fas fa-arrow-left"></i> Voltar
+                </a>
+                <a href="/vet/animal/{{animal.id}}/editar" class="btn btn-primary">
+                    <i class="fas fa-edit"></i> Editar
+                </a>
+                <button class="btn btn-danger" id="delete-animal">
+                    <i class="fas fa-trash"></i> Excluir
+                </button>
+            </div>
+        </div>
+
+        <div class="animal-header">
+            <div class="animal-photo" style="background-image: url('/vet/animal/photo/{{animal.id}}');">
+                {{#unless animal.photo}}
+                <div style="background-color: var(--darker-bg); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-paw" style="font-size: 4rem; color: var(--border-dark);"></i>
+                </div>
+                {{/unless}}
+            </div>
+            <div class="animal-info">
+                <h2 class="animal-name">{{animal.name}}</h2>
+                <div class="animal-details">
+                    <div class="detail-item">
+                        <strong>Espécie:</strong> {{animal.species}}
+                    </div>
+                    <div class="detail-item">
+                        <strong>Raça:</strong> {{animal.breed}}
+                    </div>
+                    <div class="detail-item">
+                        <strong>Idade:</strong> {{animal.age}} anos
+                    </div>
+                    <div class="detail-item">
+                        <strong>Sexo:</strong> {{animal.sex}}
+                    </div>
+                    <div class="detail-item">
+                        <strong>Status:</strong> <span class="status status-{{animal.status}}">{{animal.status}}</span>
+                    </div>
+                    <div class="detail-item">
+                        <strong>Entrada:</strong> {{animal.entry_date}}
+                    </div>
+                    <div class="detail-item">
+                        <strong>Chip:</strong> {{animal.chip_number}}
+                    </div>
+                    <div class="detail-item">
+                        <strong>Cadastrado por:</strong> {{animal.created_by_name}}
+                    </div>
+                </div>
+                <div class="animal-actions">
+                    <a href="/vet/animal/{{animal.id}}/consulta" class="btn btn-primary">
+                        <i class="fas fa-calendar-plus"></i> Nova Consulta
+                    </a>
+                    <a href="/vet/animal/{{animal.id}}/vacina" class="btn btn-primary">
+                        <i class="fas fa-syringe"></i> Nova Vacina
+                    </a>
+                    <a href="/vet/animal/{{animal.id}}/internacao" class="btn btn-primary">
+                        <i class="fas fa-hospital"></i> Nova Internação
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" data-tab="saude">Saúde</div>
+            <div class="tab" data-tab="vacinas">Vacinas</div>
+            <div class="tab" data-tab="historico">Histórico</div>
+            <div class="tab" data-tab="documentos">Documentos</div>
+        </div>
+
+        <!-- Saúde -->
+        <div class="tab-content active" id="saude">
+            <h3><i class="fas fa-heartbeat"></i> Condição Atual</h3>
+            {{#if healthRecord}}
+            <div class="health-record" style="background-color: var(--card-dark); padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+                <div class="detail-item"><strong>Peso:</strong> {{healthRecord.weight}} kg</div>
+                <div class="detail-item"><strong>Condição Corporal:</strong> {{healthRecord.body_condition}}</div>
+                <div class="detail-item"><strong>Alergias:</strong> {{healthRecord.allergies}}</div>
+                <div class="detail-item"><strong>Observações:</strong> {{healthRecord.observations}}</div>
+                <div class="detail-item"><strong>Atualizado em:</strong> {{healthRecord.updated_at}}</div>
+            </div>
+            {{else}}
+            <div class="alert" style="background-color: var(--darker-bg); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                Nenhum registro de saúde encontrado.
+            </div>
+            {{/if}}
+
+            <h3><i class="fas fa-prescription-bottle-alt"></i> Medicação Atual</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Medicamento</th>
+                        <th>Dosagem</th>
+                        <th>Frequência</th>
+                        <th>Período</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Dados dinâmicos seriam inseridos aqui -->
+                    <tr>
+                        <td>Carprofeno</td>
+                        <td>50mg</td>
+                        <td>12/12h</td>
+                        <td>10/05 - 24/05</td>
+                        <td><span class="status status-abrigo">Ativo</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3 style="margin-top: 30px;"><i class="fas fa-plus-circle"></i> Atualizar Saúde</h3>
+            <form action="/vet/animal/{{animal.id}}/health-record" method="POST" style="background-color: var(--card-dark); padding: 20px; border-radius: 8px;">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="weight">Peso (kg)</label>
+                        <input type="number" id="weight" name="weight" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label for="body_condition">Condição Corporal</label>
+                        <select id="body_condition" name="body_condition">
+                            <option value="">Selecione...</option>
+                            <option value="Muito magro">Muito magro</option>
+                            <option value="Magro">Magro</option>
+                            <option value="Ideal" selected>Ideal</option>
+                            <option value="Acima do peso">Acima do peso</option>
+                            <option value="Obeso">Obeso</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="allergies">Alergias</label>
+                    <input type="text" id="allergies" name="allergies">
+                </div>
+                <div class="form-group">
+                    <label for="observations">Observações</label>
+                    <textarea id="observations" name="observations"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Salvar Registro
+                </button>
+            </form>
+        </div>
+
+        <!-- Vacinas -->
+        <div class="tab-content" id="vacinas">
+            <h3><i class="fas fa-syringe"></i> Cartão de Vacinação</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Vacina</th>
+                        <th>Data</th>
+                        <th>Próxima Dose</th>
+                        <th>Lote</th>
+                        <th>Veterinário</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each vaccines}}
+                    <tr>
+                        <td>{{this.name}}</td>
+                        <td>{{this.application_date}}</td>
+                        <td>{{this.next_dose}}</td>
+                        <td>{{this.batch}}</td>
+                        <td>{{this.veterinarian_id}}</td>
+                        <td class="table-actions">
+                            <button class="btn btn-sm btn-outline">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+
+            <h3 style="margin-top: 30px;"><i class="fas fa-plus-circle"></i> Registrar Nova Vacina</h3>
+            <form action="/vet/animal/{{animal.id}}/vaccine" method="POST" style="background-color: var(--card-dark); padding: 20px; border-radius: 8px;">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="name">Vacina</label>
+                        <select id="name" name="name" required>
+                            <option value="">Selecione...</option>
+                            <option value="Antirrábica">Antirrábica</option>
+                            <option value="V8">V8</option>
+                            <option value="V10">V10</option>
+                            <option value="Giárdia">Giárdia</option>
+                            <option value="Leishmaniose">Leishmaniose</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="application_date">Data de Aplicação</label>
+                        <input type="date" id="application_date" name="application_date" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="next_dose">Próxima Dose</label>
+                        <input type="date" id="next_dose" name="next_dose">
+                    </div>
+                    <div class="form-group">
+                        <label for="batch">Lote</label>
+                        <input type="text" id="batch" name="batch">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="observations">Observações</label>
+                    <textarea id="observations" name="observations"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Registrar Vacina
+                </button>
+            </form>
+        </div>
+
+        <!-- Histórico -->
+        <div class="tab-content" id="historico">
+            <h3><i class="fas fa-history"></i> Histórico de Atendimentos</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Tipo</th>
+                        <th>Descrição</th>
+                        <th>Veterinário</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each hospitalizations}}
+                    <tr>
+                        <td>{{this.entry_date}}</td>
+                        <td>Internação</td>
+                        <td>{{this.reason}}</td>
+                        <td>{{this.responsible_vet}}</td>
+                        <td class="table-actions">
+                            <button class="btn btn-sm btn-outline">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Documentos -->
+        <div class="tab-content" id="documentos">
+            <h3><i class="fas fa-file-alt"></i> Documentos</h3>
+            <div style="background-color: var(--card-dark); padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                <form action="/vet/animal/{{animal.id}}/document" method="POST" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="document">Enviar Documento</label>
+                        <input type="file" id="document" name="document" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Descrição</label>
+                        <input type="text" id="description" name="description" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-upload"></i> Enviar
+                    </button>
+                </form>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Documento</th>
+                        <th>Descrição</th>
+                        <th>Data</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Raio-X - Pata traseira</td>
+                        <td>Fratura identificada</td>
+                        <td>10/05/2023</td>
+                        <td class="table-actions">
+                            <button class="btn btn-sm btn-outline">
+                                <i class="fas fa-download"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Tab functionality
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Remove active class from all tabs and contents
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked tab
+                this.classList.add('active');
+                
+                // Show corresponding content
+                const tabId = this.getAttribute('data-tab');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+
+        // Delete animal confirmation
+        document.getElementById('delete-animal').addEventListener('click', function() {
+            if (confirm('Tem certeza que deseja excluir este animal? Esta ação não pode ser desfeita.')) {
+                fetch(`/vet/animal/{{animal.id}}`, {
+                    method: 'DELETE',
+                }).then(response => {
+                    if (response.ok) {
+                        window.location.href = '/vet/animais';
+                    }
+                });
+            }
+        });
+
+        // Form validation
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                const requiredFields = this.querySelectorAll('[required]');
+                let valid = true;
+                
+                requiredFields.forEach(field => {
+                    if (!field.value.trim()) {
+                        field.style.borderColor = 'var(--danger)';
+                        valid = false;
+                    } else {
+                        field.style.borderColor = '';
+                    }
+                });
+                
+                if (!valid) {
+                    e.preventDefault();
+                    alert('Por favor, preencha todos os campos obrigatórios.');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

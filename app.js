@@ -37,7 +37,7 @@ app.use('/vet', vetRoutes);
 app.get('/', (req, res) => {
   if (req.session.user) {
     if (req.session.user.type === 'veterinario') {
-      return res.redirect('/vet/animais');
+      return res.redirect('/vet/dashboard');
     } else {
       return res.redirect('/user/dashboard');
     }
