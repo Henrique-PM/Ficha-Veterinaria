@@ -241,25 +241,12 @@ router.get('/cadastrar-animal', (req, res) => {
   });
 });
 
-router.post('/cadastrar-animal', uploadAnimalPhoto.single('photo'), [
-  body('name').trim().isLength({ min: 2, max: 100 }).withMessage('Nome inválido').escape(),
-  body('species').isIn(['cachorro','gato','outro','cavalo']).withMessage('Espécie inválida'),
-  body('breed').optional({ values: 'falsy' }).trim().isLength({ max: 100 }).escape(),
-  body('age').isInt({ min: 0, max: 60 }).withMessage('Idade inválida'),
-  body('sex').isIn(['macho','fêmea','indeterminado']).withMessage('Sexo inválido'),
-  body('chip_number').optional({ values: 'falsy' }).trim().isLength({ max: 100 }).escape(),
-  body('status').isIn(['abrigo','hospital','clinica','adotado','falecido']).withMessage('Status inválido'),
-  body('characteristics').optional({ values: 'falsy' }).trim().isLength({ max: 1000 }).escape(),
-  body('description').optional({ values: 'falsy' }).trim().isLength({ max: 2000 }).escape(),
-], (req, res) => {
+router.post('/cadastrar-animal', uploadAnimalPhoto.single('photo'), (req, res) => {
   const { name, species, breed, age, sex, description, characteristics, chip_number, status } = req.body;
   const veterinarian_id = req.session.user.id;
 
   const photoBuffer = req.file ? req.file.buffer : null;
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).render('vet/cadastra_animal', { user: req.session.user, error: errors.array()[0].msg });
-  }
+  
   db.run(
     `INSERT INTO animals (name, species, breed, age, sex, photo, chip_number, status, characteristics, description, created_by)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
