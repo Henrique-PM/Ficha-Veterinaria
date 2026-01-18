@@ -4,6 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "node app.js",
+    "dev": "NODE_ENV=development node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -17,14 +19,22 @@
     "url": "https://github.com/Henrique-PM/Ficha-Veterin-ria/issues"
   },
   "homepage": "https://github.com/Henrique-PM/Ficha-Veterin-ria#readme",
+  "overrides": {
+    "cookie": "^0.7.2",
+    "tar": "^7.5.3"
+  },
   "dependencies": {
     "bcrypt": "^6.0.0",
     "body-parser": "^2.2.0",
+    "csurf": "^1.2.2",
     "express": "^5.1.0",
     "express-handlebars": "^8.0.3",
+    "express-rate-limit": "^7.3.1",
     "express-session": "^1.18.1",
+    "express-validator": "^7.0.1",
     "hbs": "^4.2.0",
+    "helmet": "^7.0.0",
     "multer": "^2.0.1",
-    "sqlite3": "^5.1.7"
+    "sqlite3": "^5.0.2"
   }
 }

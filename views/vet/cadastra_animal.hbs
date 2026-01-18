@@ -311,6 +311,7 @@ textarea {
     </div>
     
     <form action="/vet/cadastrar-animal" method="POST" id="animalForm" enctype="multipart/form-data">
+        <input type="hidden" name="_csrf" value="{{csrfToken}}">
         <div class="form-grid">
             <!-- Seção de Informações Básicas -->
             <div class="form-group">

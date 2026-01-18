@@ -331,7 +331,7 @@
         </div>
 
         <div class="animal-header">
-            <div class="animal-photo" style="background-image: url('/vet/animal/photo/{{animal.id}}');">
+            <div class="animal-photo" style="background-image: url('/animal/photo/{{animal.id}}');">
                 {{#unless animal.photo}}
                 <div style="background-color: var(--darker-bg); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
                     <i class="fas fa-paw" style="font-size: 4rem; color: var(--border-dark);"></i>
@@ -429,6 +429,7 @@
 
             <h3 style="margin-top: 30px;"><i class="fas fa-plus-circle"></i> Atualizar Saúde</h3>
             <form action="/vet/animal/{{animal.id}}/health-record" method="POST" style="background-color: var(--card-dark); padding: 20px; border-radius: 8px;">
+                <input type="hidden" name="_csrf" value="{{csrfToken}}">
                 <div class="form-row">
                     <div class="form-group">
                         <label for="weight">Peso (kg)</label>
@@ -497,6 +498,7 @@
 
             <h3 style="margin-top: 30px;"><i class="fas fa-plus-circle"></i> Registrar Nova Vacina</h3>
             <form action="/vet/animal/{{animal.id}}/vaccine" method="POST" style="background-color: var(--card-dark); padding: 20px; border-radius: 8px;">
+                <input type="hidden" name="_csrf" value="{{csrfToken}}">
                 <div class="form-row">
                     <div class="form-group">
                         <label for="name">Vacina</label>
@@ -570,6 +572,7 @@
             <h3><i class="fas fa-file-alt"></i> Documentos</h3>
             <div style="background-color: var(--card-dark); padding: 20px; border-radius: 8px; margin-bottom: 20px;">
                 <form action="/vet/animal/{{animal.id}}/document" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="_csrf" value="{{csrfToken}}">
                     <div class="form-group">
                         <label for="document">Enviar Documento</label>
                         <input type="file" id="document" name="document" required>

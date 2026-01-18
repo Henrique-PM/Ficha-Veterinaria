@@ -6,11 +6,12 @@
             <p>Registre-se para acessar o painel</p>
         </div>
 
-        {{#if erro}}
-        <div class="error-message">{{erro}}</div>
+        {{#if error}}
+        <div class="error-message">{{error}}</div>
         {{/if}}
 
         <form method="POST" action="/auth/register">
+            <input type="hidden" name="_csrf" value="{{csrfToken}}">
             <div class="form-group">
                 <label for="name">Nome Completo</label>
                 <input type="text" id="name" name="name" class="form-control" placeholder="Seu nome" required>

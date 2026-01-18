@@ -1,117 +1,37 @@
-<nav>
-    <ul>
-        <li><a href="/vet/dashboard">Dashboard</a></li>
-        <li><a href="/auth/logout">Sair</a></li>
-    </ul>
-</nav>
-
-<div class="parallax">
-    <div class="content">
-        <header>
-            <h1>Painel Veterinário</h1>
-            <div class="user-info">
-                <img src="https://via.placeholder.com/40" alt="Usuário">
-                <span>Veterinário</span>
-            </div>
-        </header>
-        
-        <div class="search-bar">
-            <form>
-                <input type="text" placeholder="Pesquisar animal...">
-                <button class="btn btn-primary">Pesquisar</button>
-            </form>
+<style>
+  .user-container{max-width:1200px;margin:20px auto;padding:0 16px;color:#e0e0e0}
+  .header{display:flex;justify-content:space-between;align-items:center;margin:16px 0}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+  .card{background:#1e1e1e;border:1px solid #333;border-radius:10px;overflow:hidden}
+  .photo{height:180px;background:#0a0a0a;background-size:cover;background-position:center}
+  .body{padding:12px}
+  .meta{display:flex;gap:8px;flex-wrap:wrap;color:#adb5bd;font-size:.85rem}
+  .badge{padding:2px 8px;border-radius:12px;background:#2c2c2c}
+  a.btn{display:inline-block;margin-top:10px;padding:8px 12px;border-radius:6px;background:#4e73df;color:#fff;text-decoration:none}
+</style>
+<div class="user-container">
+  <div class="header">
+    <h2>Animais Disponíveis</h2>
+    <a href="/auth/logout" class="btn">Sair</a>
+  </div>
+  <div class="grid">
+    {{#each animals}}
+      <div class="card">
+        <div class="photo" style="background-image:url('/animal/photo/{{this.id}}')"></div>
+        <div class="body">
+          <h4>{{this.name}}</h4>
+          <div class="meta">
+            <span class="badge">{{this.species}}</span>
+            <span class="badge">{{this.sex}}</span>
+            <span class="badge">{{this.age}} anos</span>
+            <span class="badge">{{this.status}}</span>
+          </div>
+          <a href="/user/animal/{{this.id}}" class="btn">Ver Ficha</a>
         </div>
-        
-        <div class="cards">
-            <div class="card">
-                <div class="card-icon">🐕</div>
-                <h3>Total de Animais</h3>
-                <p>{{total_animais}}</p>
-            </div>
-            
-            <div class="card">
-                <div class="card-icon">🏥</div>
-                <h3>Em Tratamento</h3>
-                <p>{{em_tratamento}}</p>
-            </div>
-            
-            <div class="card">
-                <div class="card-icon">💉</div>
-                <h3>Vacinas Pendentes</h3>
-                <p>{{vacinas_pendentes}}</p>
-            </div>
-            
-            <div class="card">
-                <div class="card-icon">❤️</div>
-                <h3>Adotados</h3>
-                <p>{{animais_adotados}}</p>
-            </div>
-            
-            <div class="card">
-                <div class="card-icon">🐴</div>
-                <h3>Cavalos Atendidos</h3>
-                <p>{{total_cavalos}}</p>
-            </div>
-            
-            <div class="card">
-                <div class="card-icon">🐱</div>
-                <h3>Gatos Atendidos</h3>
-                <p>{{total_gatos}}</p>
-            </div>
-
-            <div class="card">
-                <div class="card-icon">📅</div>
-                <h3>Consultas Hoje</h3>
-                <p>{{consultas_hoje}}</p>
-            </div>
-
-            <div class="card">
-                <div class="card-icon">📂</div>
-                <h3>Fichas Atualizadas</h3>
-                <p>{{fichas_atualizadas_hoje}}</p>
-            </div>
-
-            <div class="card">
-                <div class="card-icon">🧪</div>
-                <h3>Medicamentos Baixos</h3>
-                <p>{{medicamentos_baixos}}</p>
-            </div>
-        </div>
-        
-        <div class="animals-section">
-            <h2 class="section-title">Animais Recentes</h2>
-            
-            <div class="animals-grid">
-                <div class="animal-card">
-                    <div class="animal-image" style="background-image: url('https://images.unsplash.com/photo-1586671267731-da2cf3ceeb80?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');">
-                        <!--<span class="animal-status status-treatment">Em Tratamento</span>-->
-                        <span class="animal-status status-treatment">{animal.status}</span>
-                    </div>
-                    <div class="animal-info">
-                        {{!-- <h3 class="animal-name">Rex</h3> --}}
-                        <h3 class="animal-name">{animal.nome}</h3>
-                        <div class="animal-details">
-                            {{!-- <span class="animal-detail">🐕 Cachorro</span>
-                            <span class="animal-detail">♂ Macho</span>
-                            <span class="animal-detail">5 anos</span>
-                            <span class="animal-detail">#CHIP12345</span> --}}
-                            <span class="animal-detail">🐕 {animal.especime}</span>
-                            <span class="animal-detail">♂ {animal.genero}</span>
-                            <span class="animal-detail">{animal.idade} anos</span>
-                            <span class="animal-detail">#CHIP{animal.chip}</span>
-                        </div>
-                        <div class="animal-actions">
-                             <!-- tem q passar o id do animal tb na url -->
-                            <a href="/vet/animal{}"><div class="btn btn-primary">Ver Ficha</div></a>
-                            <!-- aba dentro da pagina ficha -->
-                            <a href="/vet/animal{}"><div class="btn btn-outline">Histórico</div></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-        </div>
-    </div>
+      </div>
+    {{/each}}
+  </div>
 </div>
+                <p>{{em_tratamento}}</p>
 
-   
+            </div>

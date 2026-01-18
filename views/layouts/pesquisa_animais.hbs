@@ -43,7 +43,7 @@
           <div class="card animal-card h-100 bg-dark border-secondary">
             <div class="photo-container">
               {{#if this.photo}}
-                <img src="/vet/animal/photo/{{this.id}}" 
+                <img src="/animal/photo/{{this.id}}" 
                     class="card-img-top animal-photo" 
                     alt="{{this.name}}"
                     data-animal-id="{{this.id}}">
@@ -256,7 +256,7 @@
       // Preenche o modal com os dados
       document.getElementById('modalAnimalName').textContent = animalName;
       document.getElementById('modalAnimalDetails').textContent = animalInfo.trim().replace(/\s+/g, ' ');
-      document.getElementById('modalPhoto').src = `/vet/animal/photo/${animalId}`;
+      document.getElementById('modalPhoto').src = `/animal/photo/${animalId}`;
       document.getElementById('modalAnimalLink').href = `/vet/animal/${animalId}`;
       
       // Mostra o modal

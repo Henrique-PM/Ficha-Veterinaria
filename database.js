@@ -141,6 +141,19 @@ db.serialize(() => {
     FOREIGN KEY (animal_id) REFERENCES animals(id) ON DELETE CASCADE,
     FOREIGN KEY (uploaded_by) REFERENCES users(id)
   )`);
+
+  db.run(`CREATE TABLE IF NOT EXISTS animal_documents (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    animal_id INTEGER NOT NULL,
+    filename TEXT NOT NULL,
+    mimetype TEXT NOT NULL,
+    data BLOB NOT NULL,
+    description TEXT,
+    uploaded_by INTEGER NOT NULL,
+    upload_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (animal_id) REFERENCES animals(id) ON DELETE CASCADE,
+    FOREIGN KEY (uploaded_by) REFERENCES users(id)
+  )`);
 });
 
 module.exports = db;

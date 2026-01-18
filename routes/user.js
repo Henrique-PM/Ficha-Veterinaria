@@ -1,14 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../database');
+const { param, validationResult } = require('express-validator');
+const { ensureRole } = require('../middleware/auth');
 
-// Middleware para verificar se o usuário está autenticado e é do tipo visualizador
-router.use((req, res, next) => {
-  if (!req.session.user || req.session.user.type !== 'visualizador') {
-    return res.redirect('/auth/login');
-  }
-  next();
-});
+// Middleware: apenas visualizador
+router.use(ensureRole('visualizador'));
 
 // Dashboard do usuário
 router.get('/dashboard', (req, res) => {
@@ -26,7 +23,12 @@ router.get('/dashboard', (req, res) => {
 });
 
 // Visualizar animal específico
-router.get('/animal/:id', (req, res) => {
+router.get('/animal/:id', [param('id').isInt({ min: 1 }).toInt()], (req, res) => {
+  const validationErrors = validationResult(req);
+  if (!validationErrors.isEmpty()) {
+    return res.status(400).send('Parâmetros inválidos');
+  }
+
   const animalId = req.params.id;
   
   db.get('SELECT * FROM animals WHERE id = ?', [animalId], (err, animal) => {
@@ -44,22 +46,18 @@ router.get('/animal/:id', (req, res) => {
   });
 });
 
-router.get('/biblioteca-fotos', async (req, res) => {
-  try {
-    const animais = await db.all(`
-      SELECT id, name, species, breed, age, sex, photo, status 
-      FROM animals 
-      ORDER BY entry_date DESC
-    `);
-    
-    res.render('layouts/pesquisa_animal', {
+router.get('/biblioteca-fotos', (req, res) => {
+  const query = `SELECT id, name, species, breed, age, sex, photo, status FROM animals ORDER BY entry_date DESC`;
+  db.all(query, [], (err, animals) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).render('error', { error: 'Erro ao carregar fotos' });
+    }
+    res.render('layouts/pesquisa_animais', {
       title: 'Biblioteca de Fotos',
-      animais
+      animals
     });
-  } catch (err) {
-    console.error(err);
-    res.status(500).render('error', { error: 'Erro ao carregar fotos' });
-  }
+  });
 });
 
 module.exports = router;
