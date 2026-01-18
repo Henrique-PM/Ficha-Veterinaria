@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../database');
-const { param, validationResult } = require('express-validator');
 const { ensureRole } = require('../middleware/auth');
 
 // Middleware: apenas visualizador
@@ -23,12 +22,7 @@ router.get('/dashboard', (req, res) => {
 });
 
 // Visualizar animal específico
-router.get('/animal/:id', [param('id').isInt({ min: 1 }).toInt()], (req, res) => {
-  const validationErrors = validationResult(req);
-  if (!validationErrors.isEmpty()) {
-    return res.status(400).send('Parâmetros inválidos');
-  }
-
+router.get('/animal/:id', (req, res) => {
   const animalId = req.params.id;
   
   db.get('SELECT * FROM animals WHERE id = ?', [animalId], (err, animal) => {

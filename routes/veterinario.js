@@ -2,31 +2,11 @@ const express = require('express');
 const router = express.Router();
 const db = require('../database');
 const multer = require('multer');
-const { body, validationResult, param } = require('express-validator');
 const { ensureRole } = require('../middleware/auth');
 const storage = multer.memoryStorage();
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-const allowedImages = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-const allowedDocs = [...allowedImages, 'application/pdf'];
-
-const uploadAnimalPhoto = multer({
-  storage,
-  limits: { fileSize: MAX_FILE_SIZE },
-  fileFilter: (req, file, cb) => {
-    if (allowedImages.includes(file.mimetype)) return cb(null, true);
-    return cb(new Error('Tipo de arquivo não permitido'));
-  }
-});
-
-const uploadDocument = multer({
-  storage,
-  limits: { fileSize: MAX_FILE_SIZE },
-  fileFilter: (req, file, cb) => {
-    if (allowedDocs.includes(file.mimetype)) return cb(null, true);
-    return cb(new Error('Tipo de arquivo não permitido'));
-  }
-});
+const uploadAnimalPhoto = multer({ storage });
+const uploadDocument = multer({ storage });
 
 // Middleware: apenas veterinário
 router.use(ensureRole('veterinario'));
@@ -62,12 +42,7 @@ router.get('/dashboard', (req, res) => {
 });
 
 
-router.get('/animal/photo/:id', [param('id').isInt({ min: 1 }).toInt()], (req, res) => {
-  const validationErrors = validationResult(req);
-  if (!validationErrors.isEmpty()) {
-    return res.status(400).send('Parâmetros inválidos');
-  }
-
+router.get('/animal/photo/:id', (req, res) => {
   const { id } = req.params;
 
   db.get('SELECT photo FROM animals WHERE id = ?', [id], (err, row) => {
@@ -101,12 +76,7 @@ router.get('/search', (req, res) => {
 
 
 // Gerenciar animal
-router.get('/animal/:id', [param('id').isInt({ min: 1 }).toInt()], (req, res) => {
-  const validationErrors = validationResult(req);
-  if (!validationErrors.isEmpty()) {
-    return res.status(400).send('Parâmetros inválidos');
-  }
-
+router.get('/animal/:id', (req, res) => {
   const animalId = req.params.id;
 
   db.get('SELECT * FROM animals WHERE id = ?', [animalId], (err, animal) => {
@@ -140,19 +110,9 @@ router.get('/animal/:id', [param('id').isInt({ min: 1 }).toInt()], (req, res) =>
 });
 
 // Adicionar/Atualizar ficha de saúde
-router.post('/animal/:id/health-record', [
-  param('id').isInt({ min: 1 }).toInt(),
-  body('weight').optional({ values: 'falsy' }).isFloat({ min: 0 }).withMessage('Peso inválido'),
-  body('body_condition').trim().isLength({ min: 0, max: 100 }).escape(),
-  body('observations').trim().isLength({ min: 0, max: 1000 }).escape(),
-  body('allergies').trim().isLength({ min: 0, max: 500 }).escape(),
-], (req, res) => {
+router.post('/animal/:id/health-record', (req, res) => {
   const animalId = req.params.id;
   const { weight, body_condition, observations, allergies } = req.body;
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).redirect(`/vet/animal/${animalId}`);
-  }
   
   db.run(
     `INSERT INTO health_records 
@@ -171,20 +131,9 @@ router.post('/animal/:id/health-record', [
 });
 
 // Adicionar vacina
-router.post('/animal/:id/vaccine', [
-  param('id').isInt({ min: 1 }).toInt(),
-  body('name').trim().isLength({ min: 2, max: 100 }).withMessage('Nome da vacina inválido').escape(),
-  body('application_date').isISO8601().withMessage('Data inválida'),
-  body('next_dose').optional({ values: 'falsy' }).isISO8601().withMessage('Data inválida'),
-  body('batch').optional({ values: 'falsy' }).trim().isLength({ max: 100 }).escape(),
-  body('observations').optional({ values: 'falsy' }).trim().isLength({ max: 1000 }).escape()
-], (req, res) => {
+router.post('/animal/:id/vaccine', (req, res) => {
   const animalId = req.params.id;
   const { name, application_date, next_dose, batch, observations } = req.body;
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).redirect(`/vet/animal/${animalId}`);
-  }
   
   db.run(
     `INSERT INTO vaccines 
@@ -203,21 +152,9 @@ router.post('/animal/:id/vaccine', [
 });
 
 // Registrar internação
-router.post('/animal/:id/hospitalization', [
-  param('id').isInt({ min: 1 }).toInt(),
-  body('entry_date').isISO8601().withMessage('Data de entrada inválida'),
-  body('reason').trim().isLength({ min: 2, max: 255 }).escape(),
-  body('diagnosis').optional({ values: 'falsy' }).trim().isLength({ max: 1000 }).escape(),
-  body('treatment').optional({ values: 'falsy' }).trim().isLength({ max: 1000 }).escape(),
-  body('procedures').optional({ values: 'falsy' }).trim().isLength({ max: 1000 }).escape(),
-  body('observations').optional({ values: 'falsy' }).trim().isLength({ max: 1000 }).escape()
-], (req, res) => {
+router.post('/animal/:id/hospitalization', (req, res) => {
   const animalId = req.params.id;
   const { entry_date, reason, diagnosis, treatment, procedures, observations } = req.body;
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).redirect(`/vet/animal/${animalId}`);
-  }
   
   db.run(
     `INSERT INTO hospitalizations 
@@ -240,19 +177,9 @@ router.post('/animal/:id/hospitalization', [
 });
 
 // Registrar procedimento/exame
-router.post('/animal/:id/procedure', [
-  param('id').isInt({ min: 1 }).toInt(),
-  body('name').trim().isLength({ min: 2, max: 120 }).withMessage('Nome do procedimento inválido').escape(),
-  body('procedure_date').isISO8601().withMessage('Data inválida'),
-  body('description').optional({ values: 'falsy' }).trim().isLength({ max: 1000 }).escape(),
-  body('observations').optional({ values: 'falsy' }).trim().isLength({ max: 1000 }).escape()
-], (req, res) => {
+router.post('/animal/:id/procedure', (req, res) => {
   const animalId = req.params.id;
   const { name, procedure_date, description, observations } = req.body;
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).redirect(`/vet/animal/${animalId}`);
-  }
 
   db.run(
     `INSERT INTO procedures (animal_id, name, procedure_date, description, veterinarian_id, observations)
@@ -269,15 +196,8 @@ router.post('/animal/:id/procedure', [
 });
 
 // Upload de documento
-router.post('/animal/:id/document', uploadDocument.single('document'), [
-  param('id').isInt({ min: 1 }).toInt(),
-  body('description').optional({ values: 'falsy' }).trim().isLength({ max: 500 }).escape()
-], (req, res) => {
+router.post('/animal/:id/document', uploadDocument.single('document'), (req, res) => {
   const animalId = req.params.id;
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).redirect(`/vet/animal/${animalId}`);
-  }
 
   if (!req.file) {
     return res.status(400).redirect(`/vet/animal/${animalId}`);
