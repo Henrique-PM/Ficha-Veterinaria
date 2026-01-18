@@ -221,15 +221,7 @@ router.post('/animal/:id/document', uploadDocument.single('document'), (req, res
 });
 
 // Download de documento
-router.get('/animal/:animalId/document/:docId', [
-  param('animalId').isInt({ min: 1 }).toInt(),
-  param('docId').isInt({ min: 1 }).toInt()
-], (req, res) => {
-  const validationErrors = validationResult(req);
-  if (!validationErrors.isEmpty()) {
-    return res.status(400).send('Parâmetros inválidos');
-  }
-
+router.get('/animal/:animalId/document/:docId', (req, res) => {
   const { animalId, docId } = req.params;
   db.get('SELECT filename, mimetype, data FROM animal_documents WHERE id = ? AND animal_id = ?', [docId, animalId], (err, row) => {
     if (err || !row) return res.status(404).send('Documento não encontrado');
