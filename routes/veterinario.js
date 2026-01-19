@@ -195,6 +195,44 @@ router.post('/animal/:id/photo', uploadAnimalPhoto.single('photo'), (req, res) =
   });
 });
 
+// Atualizar informações básicas do animal
+router.post('/animal/:id/info', (req, res) => {
+  const animalId = req.params.id;
+  const { name, species, breed, age, sex, chip_number, description, characteristics } = req.body;
+
+  if (!name || !name.trim() || !species || !species.trim()) {
+    return res.status(400).send('Nome e espécie são obrigatórios');
+  }
+
+  const allowedSex = ['macho', 'fêmea', 'indeterminado'];
+  const normalizedSex = allowedSex.includes(sex) ? sex : null;
+  const normalizedAge = age ? parseInt(age, 10) : null;
+
+  db.run(
+    `UPDATE animals
+       SET name = ?, species = ?, breed = ?, age = ?, sex = ?, chip_number = ?, description = ?, characteristics = ?
+     WHERE id = ?`,
+    [
+      name.trim(),
+      species.trim(),
+      breed || null,
+      isNaN(normalizedAge) ? null : normalizedAge,
+      normalizedSex,
+      chip_number || null,
+      description || null,
+      characteristics || null,
+      animalId
+    ],
+    function (err) {
+      if (err) {
+        console.error('Erro ao atualizar informações do animal:', err);
+        return res.status(500).send('Erro ao atualizar informações');
+      }
+      return res.redirect(`/vet/animal/${animalId}`);
+    }
+  );
+});
+
 // Gerenciar animal - rota genérica por último
 router.get('/animal/:id', (req, res) => {
   const animalId = req.params.id;
@@ -206,8 +244,9 @@ router.get('/animal/:id', (req, res) => {
 
     const result = { user: req.session.user, animal };
 
-    db.get('SELECT * FROM health_records WHERE animal_id = ? ORDER BY updated_at DESC LIMIT 1', [animalId], (err, healthRecord) => {
-      result.healthRecord = healthRecord || null;
+    db.all('SELECT * FROM health_records WHERE animal_id = ? ORDER BY updated_at DESC', [animalId], (err, healthRecords) => {
+      result.healthRecords = healthRecords || [];
+      result.healthRecord = healthRecords?.[0] || null;
 
       db.all('SELECT * FROM vaccines WHERE animal_id = ? ORDER BY application_date DESC', [animalId], (err, vaccines) => {
         result.vaccines = vaccines || [];
@@ -243,16 +282,39 @@ router.get('/animal/:id', (req, res) => {
   });
 });
 
+// Atualizar status do animal
+router.post('/animal/:id/status', (req, res) => {
+  const animalId = req.params.id;
+  const { status } = req.body;
+
+  if (!status || !['abrigo', 'hospital', 'clinica', 'adotado', 'falecido'].includes(status)) {
+    return res.status(400).send('Status inválido');
+  }
+
+  db.run('UPDATE animals SET status = ? WHERE id = ?', [status, animalId], function (err) {
+    if (err) {
+      console.error('Erro ao atualizar status:', err);
+      return res.status(500).send('Erro ao atualizar status');
+    }
+    return res.redirect(`/vet/animal/${animalId}`);
+  });
+});
+
 // Adicionar/Atualizar ficha de saúde
 router.post('/animal/:id/health-record', (req, res) => {
   const animalId = req.params.id;
   const { weight, body_condition, observations, allergies } = req.body;
+  const createdBy = req.session?.user?.id;
+
+  if (!createdBy) {
+    return res.status(401).send('Usuário não autenticado');
+  }
   
   db.run(
     `INSERT INTO health_records 
-     (animal_id, weight, body_condition, observations, allergies) 
-     VALUES (?, ?, ?, ?, ?)`,
-    [animalId, weight, body_condition, observations, allergies],
+     (animal_id, weight, body_condition, observations, allergies, created_by) 
+     VALUES (?, ?, ?, ?, ?, ?)`,
+    [animalId, weight, body_condition, observations, allergies, createdBy],
     function(err) {
       if (err) {
         console.error(err);
@@ -268,12 +330,21 @@ router.post('/animal/:id/health-record', (req, res) => {
 router.post('/animal/:id/vaccine', (req, res) => {
   const animalId = req.params.id;
   const { name, application_date, next_dose, batch, observations } = req.body;
+  const vetId = req.session?.user?.id;
+
+  if (!vetId) {
+    return res.status(401).send('Usuário não autenticado');
+  }
+
+  if (!name || !name.trim() || !application_date) {
+    return res.status(400).send('Vacina e data de aplicação são obrigatórias');
+  }
   
   db.run(
     `INSERT INTO vaccines 
      (animal_id, name, application_date, next_dose, batch, veterinarian_id, observations) 
      VALUES (?, ?, ?, ?, ?, ?, ?)`,
-    [animalId, name, application_date, next_dose, batch, req.session.user.id, observations],
+    [animalId, name.trim(), application_date, next_dose, batch, vetId, observations],
     function(err) {
       if (err) {
         console.error(err);
@@ -289,12 +360,21 @@ router.post('/animal/:id/vaccine', (req, res) => {
 router.post('/animal/:id/hospitalization', (req, res) => {
   const animalId = req.params.id;
   const { entry_date, reason, diagnosis, treatment, procedures, observations } = req.body;
+  const vetId = req.session?.user?.id;
+
+  if (!vetId) {
+    return res.status(401).send('Usuário não autenticado');
+  }
+
+  if (!entry_date || !reason || !reason.trim()) {
+    return res.status(400).send('Data de entrada e motivo são obrigatórios');
+  }
   
   db.run(
     `INSERT INTO hospitalizations 
      (animal_id, entry_date, reason, diagnosis, treatment, procedures, observations, responsible_vet) 
      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-    [animalId, entry_date, reason, diagnosis, treatment, procedures, observations, req.session.user.id],
+    [animalId, entry_date, reason.trim(), diagnosis, treatment, procedures, observations, vetId],
     function(err) {
       if (err) {
         console.error(err);
@@ -314,11 +394,20 @@ router.post('/animal/:id/hospitalization', (req, res) => {
 router.post('/animal/:id/procedure', (req, res) => {
   const animalId = req.params.id;
   const { name, procedure_date, description, observations } = req.body;
+  const vetId = req.session?.user?.id;
+
+  if (!vetId) {
+    return res.status(401).send('Usuário não autenticado');
+  }
+
+  if (!name || !name.trim() || !procedure_date) {
+    return res.status(400).send('Nome e data do procedimento são obrigatórios');
+  }
 
   db.run(
     `INSERT INTO procedures (animal_id, name, procedure_date, description, veterinarian_id, observations)
      VALUES (?, ?, ?, ?, ?, ?)`,
-    [animalId, name, procedure_date, description, req.session.user.id, observations],
+    [animalId, name.trim(), procedure_date, description, vetId, observations],
     function(err) {
       if (err) {
         console.error(err);

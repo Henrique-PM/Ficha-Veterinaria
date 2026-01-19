@@ -25,9 +25,23 @@
             <div style="display: flex; gap: 15px; align-items: center;">
                 <a href="/vet/dashboard" class="btn btn-primary btn-sm">← Voltar</a>
                 <h1 style="margin: 0;">{{animal.name}}</h1>
-                <span class="badge badge-primary">{{animal.status}}</span>
+                <form action="/vet/animal/{{animal.id}}/status" method="POST" style="display: flex; gap: 10px; align-items: center;">
+                    <select id="statusSelect" name="status" class="form-control" style="width: 150px; padding: 6px 10px;">
+                        <option value="abrigo">Abrigo</option>
+                        <option value="hospital">Hospital</option>
+                        <option value="clinica">Clínica</option>
+                        <option value="adotado">Adotado</option>
+                        <option value="falecido">Falecido</option>
+                    </select>
+                    <button type="submit" class="btn btn-success btn-sm">Atualizar</button>
+                </form>
             </div>
         </div>
+        <script>
+            document.getElementById('statusSelect').value = '{{animal.status}}';
+            const sexEl = document.getElementById('sexSelect');
+            if (sexEl) sexEl.value = '{{animal.sex}}';
+        </script>
 
         <!-- Info Principal -->
         <div class="shell">
@@ -42,30 +56,54 @@
                 <div>
                     <div class="card">
                         <h3>Informações Básicas</h3>
-                        <div style="display: grid; gap: 15px;">
-                            <div>
-                                <label class="form-label">Espécie</label>
-                                <p style="margin: 0; font-weight: 500;">{{animal.species}}</p>
-                            </div>
-                            <div>
-                                <label class="form-label">Raça</label>
-                                <p style="margin: 0; font-weight: 500;">{{animal.breed}}</p>
-                            </div>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <form method="POST" action="/vet/animal/{{animal.id}}/info" style="display: grid; gap: 12px;">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                                 <div>
-                                    <label class="form-label">Idade</label>
-                                    <p style="margin: 0; font-weight: 500;">{{animal.age}} anos</p>
+                                    <label class="form-label">Nome *</label>
+                                    <input type="text" name="name" class="form-control" value="{{animal.name}}" required>
+                                </div>
+                                <div>
+                                    <label class="form-label">Espécie *</label>
+                                    <input type="text" name="species" class="form-control" value="{{animal.species}}" required>
+                                </div>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                                <div>
+                                    <label class="form-label">Raça</label>
+                                    <input type="text" name="breed" class="form-control" value="{{animal.breed}}">
+                                </div>
+                                <div>
+                                    <label class="form-label">Número do chip</label>
+                                    <input type="text" name="chip_number" class="form-control" value="{{animal.chip_number}}">
+                                </div>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                                <div>
+                                    <label class="form-label">Idade (anos)</label>
+                                    <input type="number" name="age" class="form-control" value="{{animal.age}}" min="0">
                                 </div>
                                 <div>
                                     <label class="form-label">Sexo</label>
-                                    <p style="margin: 0; font-weight: 500;">{{animal.sex}}</p>
+                                    <select id="sexSelect" name="sex" class="form-control">
+                                        <option value="">Selecione...</option>
+                                        <option value="macho">Macho</option>
+                                        <option value="fêmea">Fêmea</option>
+                                        <option value="indeterminado">Indeterminado</option>
+                                    </select>
                                 </div>
                             </div>
                             <div>
-                                <label class="form-label">Cor/Marcações</label>
-                                <p style="margin: 0; font-weight: 500;">{{animal.color}}</p>
+                                <label class="form-label">Descrição</label>
+                                <textarea name="description" class="form-control" style="min-height: 70px;">{{animal.description}}</textarea>
                             </div>
-                        </div>
+                            <div>
+                                <label class="form-label">Características</label>
+                                <textarea name="characteristics" class="form-control" style="min-height: 70px;">{{animal.characteristics}}</textarea>
+                            </div>
+                            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 4px;">
+                                <button type="submit" class="btn btn-success btn-sm">Salvar alterações</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -118,23 +156,25 @@
                         <i class="fas fa-plus"></i> Adicionar
                     </button>
                 </div>
-                {{#if health_records.length}}
+                {{#if healthRecords.length}}
                 <table>
                     <thead>
                         <tr>
                             <th>Data</th>
-                            <th>Diagnóstico</th>
-                            <th>Tratamento</th>
-                            <th>Veterinário</th>
+                            <th>Peso (kg)</th>
+                            <th>Condição Corporal</th>
+                            <th>Alergias</th>
+                            <th>Observações</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {{#each health_records}}
+                        {{#each healthRecords}}
                         <tr>
-                            <td>{{this.date}}</td>
-                            <td>{{this.diagnosis}}</td>
-                            <td>{{this.treatment}}</td>
-                            <td>{{this.vet_name}}</td>
+                            <td>{{this.updated_at}}</td>
+                            <td>{{this.weight}}</td>
+                            <td>{{this.body_condition}}</td>
+                            <td>{{this.allergies}}</td>
+                            <td>{{this.observations}}</td>
                         </tr>
                         {{/each}}
                     </tbody>
@@ -161,16 +201,16 @@
                             <th>Vacina</th>
                             <th>Data</th>
                             <th>Próxima Dose</th>
-                            <th>Veterinário</th>
+                            <th>Lote</th>
                         </tr>
                     </thead>
                     <tbody>
                         {{#each vaccines}}
                         <tr>
-                            <td><strong>{{this.vaccine_name}}</strong></td>
+                            <td><strong>{{this.name}}</strong></td>
                             <td>{{this.application_date}}</td>
-                            <td>{{this.next_dose_date}}</td>
-                            <td>{{this.vet_name}}</td>
+                            <td>{{this.next_dose}}</td>
+                            <td>{{this.batch}}</td>
                         </tr>
                         {{/each}}
                     </tbody>
@@ -203,10 +243,9 @@
                     <tbody>
                         {{#each procedures}}
                         <tr>
-                            <td><strong>{{this.procedure_name}}</strong></td>
+                            <td><strong>{{this.name}}</strong></td>
                             <td>{{this.procedure_date}}</td>
-                            <td>{{this.result}}</td>
-                            <td>{{this.vet_name}}</td>
+                            <td>{{this.description}}</td>
                         </tr>
                         {{/each}}
                     </tbody>
@@ -355,7 +394,7 @@
             <form id="form-vaccine" method="POST" action="/vet/animal/{{animal.id}}/vaccine">
                 <div class="form-group">
                     <label class="form-label">Vacina *</label>
-                    <input type="text" name="vaccine_name" class="form-control" required>
+                    <input type="text" name="name" class="form-control" required>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Data Aplicação *</label>
@@ -363,11 +402,15 @@
                 </div>
                 <div class="form-group">
                     <label class="form-label">Próxima Dose</label>
-                    <input type="date" name="next_dose_date" class="form-control">
+                    <input type="date" name="next_dose" class="form-control">
                 </div>
                 <div class="form-group">
                     <label class="form-label">Lote</label>
                     <input type="text" name="batch" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Observações</label>
+                    <textarea name="observations" class="form-control"></textarea>
                 </div>
                 <button type="submit" class="btn btn-success w-full">Salvar</button>
             </form>
@@ -384,7 +427,7 @@
             <form id="form-procedure" method="POST" action="/vet/animal/{{animal.id}}/procedure">
                 <div class="form-group">
                     <label class="form-label">Nome *</label>
-                    <input type="text" name="procedure_name" class="form-control" required>
+                    <input type="text" name="name" class="form-control" required>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Data *</label>
@@ -395,8 +438,8 @@
                     <textarea name="description" class="form-control" style="min-height: 100px;"></textarea>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Resultado</label>
-                    <input type="text" name="result" class="form-control">
+                    <label class="form-label">Observações</label>
+                    <textarea name="observations" class="form-control" style="min-height: 80px;"></textarea>
                 </div>
                 <button type="submit" class="btn btn-success w-full">Salvar</button>
             </form>
@@ -467,6 +510,14 @@
                         <label class="form-label">Tratamento</label>
                         <textarea name="treatment" class="form-control" style="min-height: 80px;"></textarea>
                     </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Procedimentos Realizados</label>
+                    <textarea name="procedures" class="form-control" style="min-height: 80px;"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Observações</label>
+                    <textarea name="observations" class="form-control" style="min-height: 80px;"></textarea>
                 </div>
                 <button type="submit" class="btn btn-success w-full">Salvar</button>
             </form>
