@@ -55,20 +55,40 @@ router.get('/register', (req, res) => {
 
 router.post('/register', (req, res) => {
   const { name, email, password, type } = req.body;
-  bcrypt.hash(password, saltRounds, (err, hash) => {
-    if (err) {
-      return res.status(500).render('auth/register', { error: 'Erro ao criar usuário' });
+
+  // Validações básicas
+  if (!name || !email || !password || !type) {
+    return res.status(400).render('auth/register', { error: 'Todos os campos são obrigatórios' });
+  }
+
+  // Verificar se email já existe
+  db.get('SELECT id FROM users WHERE email = ?', [email], (checkErr, existingUser) => {
+    if (checkErr) {
+      return res.status(500).render('auth/register', { error: 'Erro no servidor' });
     }
-    db.run(
-      'INSERT INTO users (name, email, password, type) VALUES (?, ?, ?, ?)',
-      [name, email, hash, type],
-      function (err) {
-        if (err) {
-          return res.status(400).render('auth/register', { error: 'Email já cadastrado' });
-        }
-        res.redirect('/auth/login');
+    if (existingUser) {
+      return res.status(400).render('auth/register', { error: 'Email já cadastrado' });
+    }
+
+    // Hash da senha
+    bcrypt.hash(password, saltRounds, (hashErr, hash) => {
+      if (hashErr) {
+        return res.status(500).render('auth/register', { error: 'Erro ao criar usuário' });
       }
-    );
+
+      // Inserir novo usuário
+      db.run(
+        'INSERT INTO users (name, email, password, type, active) VALUES (?, ?, ?, ?, 1)',
+        [name, email, hash, type],
+        function (insertErr) {
+          if (insertErr) {
+            console.error('Erro ao inserir usuário:', insertErr);
+            return res.status(500).render('auth/register', { error: 'Erro ao criar usuário' });
+          }
+          res.redirect('/auth/login');
+        }
+      );
+    });
   });
 });
 

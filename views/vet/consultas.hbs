@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consultas - VetCare</title>
+    <link rel="stylesheet" href="/css/minimal.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="logo">🐾 VetCare</div>
+        <ul class="nav">
+            <li><a href="/vet/dashboard"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+            <li><a href="/vet/biblioteca"><i class="fas fa-paw"></i><span>Animais</span></a></li>
+            <li><a href="/vet/consultas" class="active"><i class="fas fa-stethoscope"></i><span>Consultas</span></a></li>
+            <li><a href="/vet/medicamentos"><i class="fas fa-pills"></i><span>Medicamentos</span></a></li>
+            <li><a href="/vet/relatorios"><i class="fas fa-chart-line"></i><span>Relatórios</span></a></li>
+            <li style="margin-top: auto;"><a href="/auth/logout"><i class="fas fa-sign-out-alt"></i><span>Sair</span></a></li>
+        </ul>
+    </nav>
+
+    <div class="main">
+        <div class="topbar">
+            <h1>Consultas e Internações</h1>
+        </div>
+
+        <div class="card">
+            <h2>Internações Ativas</h2>
+            {{#if hospitalizations.length}}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Animal</th>
+                        <th>Espécie</th>
+                        <th>Data</th>
+                        <th>Motivo</th>
+                        <th>Veterinário</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each hospitalizations}}
+                    <tr>
+                        <td><strong>{{this.animal_name}}</strong></td>
+                        <td><span class="badge badge-primary">{{this.species}}</span></td>
+                        <td>{{this.entry_date}}</td>
+                        <td>{{this.reason}}</td>
+                        <td>{{this.vet_name}}</td>
+                        <td>
+                            <a href="/vet/animal/{{this.animal_id}}" class="btn btn-primary btn-sm">Ficha</a>
+                            <button onclick="openModal({{this.animal_id}}, '{{this.animal_name}}')" class="btn btn-success btn-sm">Receita</button>
+                        </td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+            {{else}}
+            <div class="empty">
+                <div style="font-size: 3rem; margin-bottom: 10px;">📭</div>
+                <p>Nenhuma internação ativa</p>
+            </div>
+            {{/if}}
+        </div>
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Prescrever Medicamento</h2>
+                <button class="close" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="form" method="POST">
+                <input type="hidden" id="animalId">
+                <div class="form-group">
+                    <label class="form-label">Animal</label>
+                    <input type="text" id="animalName" class="form-control" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Medicamento *</label>
+                    <input type="text" name="medication_name" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Dosagem *</label>
+                    <input type="text" name="dosage" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Frequência *</label>
+                    <input type="text" name="frequency" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Data Início *</label>
+                    <input type="date" name="start_date" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Data Fim</label>
+                    <input type="date" name="end_date" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Observações</label>
+                    <textarea name="notes" class="form-control"></textarea>
+                </div>
+                <button type="submit" class="btn btn-success w-full">Salvar Receita</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openModal(id, name) {
+            document.getElementById('animalId').value = id;
+            document.getElementById('animalName').value = name;
+            document.getElementById('form').action = '/vet/animal/' + id + '/receita';
+            document.getElementById('modal').style.display = 'block';
+        }
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+        window.onclick = function(e) {
+            if (e.target.id === 'modal') closeModal();
+        }
+    </script>
+</body>
+</html>

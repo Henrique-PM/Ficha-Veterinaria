@@ -1,0 +1,51 @@
+<style>
+  :root { --dark-bg:#121212; --dark-card:#1e1e1e; --text:#f8f9fa; --muted:#adb5bd; --primary:#4e73df; }
+  body { background:var(--dark-bg); color:var(--text); font-family:Segoe UI,Tahoma,Geneva,Verdana,sans-serif; }
+  .container { max-width:1100px; margin:30px auto; padding:0 20px; }
+  .card { background:var(--dark-card); border-radius:10px; padding:20px; box-shadow:0 0 10px rgba(0,0,0,.3); }
+  .title { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+  .pill { background:#222; border:1px solid #333; padding:6px 12px; border-radius:20px; font-size:.85rem; color:var(--muted); }
+  table { width:100%; border-collapse:collapse; }
+  th, td { padding:12px; border-bottom:1px solid #2b2b2b; }
+  th { text-align:left; color:var(--text); font-weight:600; }
+  tbody tr:hover { background:#191919; }
+  .btn { background:var(--primary); border:none; padding:8px 12px; border-radius:6px; color:#fff; text-decoration:none; }
+</style>
+<div class="container">
+  <div class="title">
+    <h2>Fichas Atualizadas Hoje</h2>
+    <span class="pill">{{fichas.length}} registros</span>
+  </div>
+  <div class="card">
+    {{#if fichas.length}}
+    <table>
+      <thead>
+        <tr>
+          <th>Animal</th>
+          <th>Espécie</th>
+          <th>Peso</th>
+          <th>Condição Corporal</th>
+          <th>Atualizado em</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each fichas}}
+          <tr>
+            <td>{{this.animal_name}}</td>
+            <td>{{this.species}}</td>
+            <td>{{this.weight}}</td>
+            <td>{{this.body_condition}}</td>
+            <td>{{this.updated_at}}</td>
+            <td>
+              <a class="btn" href="/vet/animal/{{this.animal_id}}">Ver ficha</a>
+            </td>
+          </tr>
+        {{/each}}
+      </tbody>
+    </table>
+    {{else}}
+      <p style="color:var(--muted)">Nenhuma ficha atualizada hoje.</p>
+    {{/if}}
+  </div>
+</div>

@@ -70,6 +70,18 @@ app.get('/animal/photo/:id', (req, res) => {
   });
 });
 
+// Rota pública para servir fotos adicionais (galeria)
+app.get('/animal/photo-extra/:photoId', (req, res) => {
+  const { photoId } = req.params;
+  db.get('SELECT photo FROM animal_photos WHERE id = ?', [photoId], (err, row) => {
+    if (err || !row || !row.photo) {
+      return res.status(404).send('Imagem não encontrada');
+    }
+    res.setHeader('Content-Type', 'image/jpeg');
+    res.send(row.photo);
+  });
+});
+
 // Middleware de erro
 app.use((err, req, res, next) => {
   console.error(err.stack);

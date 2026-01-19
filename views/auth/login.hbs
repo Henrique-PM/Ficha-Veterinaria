@@ -1,33 +1,40 @@
-<div class="auth-container">
-    <div class="auth-card">
-        <div class="auth-header">
-            <div class="auth-logo">🐾</div>
-            <h1>Painel Veterinário</h1>
-            <p>Faça login para acessar o sistema</p>
-        </div>
-
-        {{#if error}}
-        <div class="error-message">{{error}}</div>
-        {{/if}}
-
-        <form method="POST" action="/auth/login">
-            <input type="hidden" name="_csrf" value="{{csrfToken}}">
-            <div class="form-group">
-                <label for="email">E-mail</label>
-                <input type="email" id="email" name="email" class="form-control" placeholder="Seu e-mail" required>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - VetCare</title>
+    <link rel="stylesheet" href="/css/minimal.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="auth-logo">🐾</div>
+                <h1 class="auth-title">VetCare</h1>
+                <p class="auth-subtitle">Sistema Veterinário</p>
             </div>
-            
-            <div class="form-group">
-                <label for="password">Senha</label>
-                <input type="password" id="password" name="password" class="form-control" placeholder="Sua senha" required>
-            </div>
-            
-            <button type="submit" class="btn btn-primary">Entrar</button>
-        </form>
 
-        <div class="auth-footer">
-            <p>Não tem conta? <a href="/auth/register">Cadastre-se</a></p>
+            {{#if error}}
+            <div class="alert alert-danger">{{error}}</div>
+            {{/if}}
+
+            <form action="/auth/login" method="POST">
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" name="email" class="form-control" required autofocus>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Senha</label>
+                    <input type="password" name="password" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-full">Entrar</button>
+            </form>
+
+            <div class="auth-footer">
+                <a href="/auth/register">Criar conta →</a>
+            </div>
         </div>
     </div>
-</div>
-
+</body>
+</html>

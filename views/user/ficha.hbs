@@ -1,150 +1,121 @@
-<nav>
-    <ul>
-        <li><a href="#">Dashboard</a></li>
-        <li><a href="#">Sair</a></li>
-    </ul>
-</nav>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{animal.name}} - Ficha</title>
+    <link rel="stylesheet" href="/css/minimal.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="logo">🐾 VetCare</div>
+        <ul class="nav">
+            <li><a href="/user/dashboard"><i class="fas fa-paw"></i><span>Animais</span></a></li>
+            <li style="margin-top: auto;"><a href="/auth/logout"><i class="fas fa-sign-out-alt"></i><span>Sair</span></a></li>
+        </ul>
+    </nav>
 
-<div class="parallax">
-    <div class="content">
-        <div class="animal-header">
-            <!--<img src="https://images.unsplash.com/photo-1552053831-71594a27632d" alt="Rex" class="animal-photo">-->
-            <div class="animal-info">
-                <h1 class="animal-name">{{animal.name}}</h1>
-                <div class="animal-details">
-                    <div class="detail-item">
-                        <strong>Espécie:</strong> {{animal.species}}
-                    </div>
-                    <div class="detail-item">
-                        <strong>Raça:</strong> {{animal.breed}}
-                    </div>
-                    <div class="detail-item">
-                        <strong>Idade:</strong> {{animal.age}} anos
-                    </div>
-                    <div class="detail-item">
-                        <strong>Sexo:</strong> {{animal.sex}}
-                    </div>
-                    <div class="detail-item">
-                        <strong>Status:</strong> <span class="status status-hospital">{{animal.status}}</span>
-                    </div>
-                    <div class="detail-item">
-                        <strong>Entrada:</strong> {{animal.entry_date}}
-                    </div>
+    <div class="main">
+        <div class="topbar">
+            <div style="display:flex; gap: 10px; align-items:center;">
+                <a href="/user/dashboard" class="btn btn-primary btn-sm">← Voltar</a>
+                <h1 style="margin:0;">{{animal.name}}</h1>
+                <span class="badge badge-primary">{{animal.status}}</span>
+            </div>
+        </div>
+
+        <!-- Header com foto principal + info básica -->
+        <div class="shell">
+            <div style="display:grid; grid-template-columns: 260px 1fr; gap: 20px; margin-bottom: 20px;">
+                <div>
+                    <div class="animal-img" style="background-image: url('/animal/photo/{{animal.id}}'); height: 240px; margin-bottom: 15px;"></div>
                 </div>
                 <div>
-                    <button class="btn btn-edit">Editar Ficha</button>
-                    <button class="btn">Nova Consulta</button>
-                    <button class="btn">Registrar Vacina</button>
+                    <div class="card">
+                        <h3>Informações Básicas</h3>
+                        <div style="display:grid; gap: 12px;">
+                            <div>
+                                <label class="form-label">Espécie</label>
+                                <p style="margin:0; font-weight:500;">{{animal.species}}</p>
+                            </div>
+                            <div>
+                                <label class="form-label">Raça</label>
+                                <p style="margin:0; font-weight:500;">{{animal.breed}}</p>
+                            </div>
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                                <div>
+                                    <label class="form-label">Idade</label>
+                                    <p style="margin:0; font-weight:500;">{{animal.age}} anos</p>
+                                </div>
+                                <div>
+                                    <label class="form-label">Sexo</label>
+                                    <p style="margin:0; font-weight:500;">{{animal.sex}}</p>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="form-label">Entrada</label>
+                                <p style="margin:0; font-weight:500;">{{animal.entry_date}}</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        
-        <div class="tabs">
-            <div class="tab active" data-tab="health">Saúde</div>
-            <div class="tab" data-tab="vaccines">Vacinas</div>
-            <div class="tab" data-tab="history">Histórico</div>
+
+        <!-- Galeria de Fotos (visualizador pode adicionar) -->
+        <div class="card">
+            <div style="display:flex; justify-content: space-between; align-items:center;">
+                <h3><i class="fas fa-images"></i> Fotos do Animal</h3>
+            </div>
+            {{#if photos.length}}
+            <div class="grid" style="grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));">
+                {{#each photos}}
+                <div class="animal-card">
+                    <div class="animal-img" style="background-image: url('/animal/photo-extra/{{this.id}}'); height: 160px;"></div>
+                    <div class="animal-info" style="padding: 10px;">
+                        <div class="animal-name" style="font-size: 0.95rem;">{{this.description}}</div>
+                        <div class="animal-tags">
+                            <span class="tag">{{this.upload_date}}</span>
+                        </div>
+                    </div>
+                </div>
+                {{/each}}
+            </div>
+            {{else}}
+            <p class="empty">Nenhuma foto adicional</p>
+            {{/if}}
+
+            <form action="/user/animal/{{animal.id}}/photo" method="POST" enctype="multipart/form-data" style="margin-top: 15px; display: grid; grid-template-columns: 1fr auto; gap: 10px;">
+                <input type="file" name="photo" accept="image/*" class="form-control" required>
+                <input type="text" name="description" placeholder="Descrição (opcional)" class="form-control">
+                <button type="submit" class="btn btn-success">Enviar Foto</button>
+            </form>
         </div>
-        
-        <div class="tab-content active" id="health">
-            <h2>Condição Atual</h2>
-            <p><strong>Diagnóstico:</strong> Fratura na pata traseira direita</p>
-            <p><strong>Tratamento:</strong> Repouso, anti-inflamatório e acompanhamento semanal</p>
-            <p><strong>Observações:</strong> Animal está respondendo bem ao tratamento, mas ainda manca ao caminhar.</p>
-            
-            <h2>Doenças Registradas</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Doença</th>
-                        <th>Data Diagnóstico</th>
-                        <th>Status</th>
-                        <th>Veterinário</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Fratura pata traseira</td>
-                        <td>10/05/2023</td>
-                        <td><span class="status status-hospital">Em tratamento</span></td>
-                        <td>Dr. Silva</td>
-                    </tr>
-                    <tr>
-                        <td>Leishmaniose</td>
-                        <td>15/03/2023</td>
-                        <td><span class="status status-ok">Controlada</span></td>
-                        <td>Dra. Oliveira</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        
-        <div class="tab-content" id="vaccines">
-            <h2>Cartão de Vacinação</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Vacina</th>
-                        <th>Data</th>
-                        <th>Próxima Dose</th>
-                        <th>Veterinário</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Antirrábica</td>
-                        <td>20/04/2023</td>
-                        <td>20/04/2024</td>
-                        <td>Dr. Silva</td>
-                    </tr>
-                    <tr>
-                        <td>V8</td>
-                        <td>15/03/2023</td>
-                        <td>15/03/2024</td>
-                        <td>Dra. Oliveira</td>
-                    </tr>
-                    <tr>
-                        <td>Giárdia</td>
-                        <td>15/03/2023</td>
-                        <td>15/09/2023</td>
-                        <td>Dra. Oliveira</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        
-        <div class="tab-content" id="history">
-            <h2>Histórico de Atendimentos</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Data</th>
-                        <th>Procedimento</th>
-                        <th>Observações</th>
-                        <th>Veterinário</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>10/05/2023</td>
-                        <td>Raio-X e imobilização</td>
-                        <td>Fratura identificada na pata traseira</td>
-                        <td>Dr. Silva</td>
-                    </tr>
-                    <tr>
-                        <td>25/04/2023</td>
-                        <td>Consulta de rotina</td>
-                        <td>Animal saudável, peso ideal</td>
-                        <td>Dra. Oliveira</td>
-                    </tr>
-                    <tr>
-                        <td>15/03/2023</td>
-                        <td>Primeira consulta</td>
-                        <td>Resgatado com sinais de leishmaniose</td>
-                        <td>Dra. Oliveira</td>
-                    </tr>
-                </tbody>
-            </table>
+
+        <!-- Saúde (somente leitura) -->
+        <div class="card">
+            <h3><i class="fas fa-heartbeat"></i> Saúde</h3>
+            {{#if healthRecord}}
+            <div style="display:grid; gap: 10px;">
+                <div>
+                    <label class="form-label">Condição corporal</label>
+                    <p style="margin:0; font-weight:500;">{{healthRecord.body_condition}}</p>
+                </div>
+                <div>
+                    <label class="form-label">Observações</label>
+                    <p style="margin:0; font-weight:500;">{{healthRecord.observations}}</p>
+                </div>
+                <div>
+                    <label class="form-label">Alergias</label>
+                    <p style="margin:0; font-weight:500;">{{healthRecord.allergies}}</p>
+                </div>
+            </div>
+            {{else}}
+            <p class="empty">Nenhum registro de saúde</p>
+            {{/if}}
         </div>
     </div>
-</div>
+</body>
+</html>
 

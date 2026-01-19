@@ -318,10 +318,10 @@
         <div class="header">
             <h1><i class="fas fa-paw"></i> Ficha do Animal</h1>
             <div class="header-actions">
-                <a href="/vet/animais" class="btn btn-outline">
+                <a href="/vet/dashboard" class="btn btn-outline">
                     <i class="fas fa-arrow-left"></i> Voltar
                 </a>
-                <a href="/vet/animal/{{animal.id}}/editar" class="btn btn-primary">
+                <a href="/vet/animal/{{animal.id}}" class="btn btn-primary">
                     <i class="fas fa-edit"></i> Editar
                 </a>
                 <button class="btn btn-danger" id="delete-animal">
@@ -639,7 +639,7 @@
                     method: 'DELETE',
                 }).then(response => {
                     if (response.ok) {
-                        window.location.href = '/vet/animais';
+                        window.location.href = '/vet/dashboard';
                     }
                 });
             }

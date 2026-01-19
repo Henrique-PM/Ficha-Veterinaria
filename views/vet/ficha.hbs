@@ -1,578 +1,527 @@
-<style>
-        :root {
-            --dark-bg: #121212;
-            --darker-bg: #0a0a0a;
-            --dark-card: #1e1e1e;
-            --dark-border: #333;
-            --primary-color: #4e73df;
-            --primary-hover: #3a5bd9;
-            --text-light: #f8f9fa;
-            --text-muted: #adb5bd;
-            --success-color: #1cc88a;
-            --warning-color: #f6c23e;
-            --danger-color: #e74a3b;
-            --info-color: #36b9cc;
-        }
-
-        body {
-            background-color: var(--dark-bg);
-            color: var(--text-light);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-
-        /* Navbar */
-        .top-nav {
-            background-color: var(--darker-bg);
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 20px;
-        }
-
-        .nav-links a {
-            color: var(--text-muted);
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        .nav-links a:hover {
-            color: var(--primary-color);
-        }
-
-        /* Main Content */
-        .container {
-            max-width: 1200px;
-            margin: 30px auto;
-            padding: 0 20px;
-        }
-
-        /* Animal Header */
-        .animal-header {
-            display: flex;
-            gap: 30px;
-            margin-bottom: 40px;
-            background-color: var(--dark-card);
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .animal-image {
-            width: 350px;
-            height: 350px;
-            background-size: cover;
-            background-position: center;
-            position: relative;
-            flex-shrink: 0;
-        }
-
-        .animal-info {
-            padding: 30px;
-            flex-grow: 1;
-        }
-
-        .animal-name {
-            font-size: 2.2rem;
-            margin-bottom: 20px;
-            color: var(--text-light);
-            font-weight: 600;
-        }
-
-        .animal-details {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-
-        .detail-item {
-            font-size: 1rem;
-        }
-
-        .detail-item strong {
-            color: var(--primary-color);
-            font-weight: 500;
-        }
-
-        .status {
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .status-hospital {
-            background-color: var(--warning-color);
-            color: #000;
-        }
-
-        .status-ok {
-            background-color: var(--success-color);
-            color: #fff;
-        }
-
-        .status-danger {
-            background-color: var(--danger-color);
-            color: #fff;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 15px;
-            margin-top: 30px;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            border-radius: 6px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s;
-            border: none;
-        }
-
-        .btn-edit {
-            background-color: var(--primary-color);
-            color: white;
-        }
-
-        .btn-edit:hover {
-            background-color: var(--primary-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 10px rgba(78, 115, 223, 0.3);
-        }
-
-        .btn-secondary {
-            background-color: var(--dark-border);
-            color: var(--text-light);
-        }
-
-        .btn-secondary:hover {
-            background-color: #444;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Tabs */
-        .tabs {
-            display: flex;
-            border-bottom: 1px solid var(--dark-border);
-            margin-bottom: 30px;
-        }
-
-        .tab {
-            padding: 12px 25px;
-            cursor: pointer;
-            font-weight: 500;
-            color: var(--text-muted);
-            border-bottom: 3px solid transparent;
-            transition: all 0.3s;
-        }
-
-        .tab:hover {
-            color: var(--text-light);
-        }
-
-        .tab.active {
-            color: var(--primary-color);
-            border-bottom: 3px solid var(--primary-color);
-        }
-
-        .tab-content {
-            display: none;
-            animation: fadeIn 0.5s;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        /* Tables */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 30px;
-        }
-
-        th, td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid var(--dark-border);
-        }
-
-        th {
-            background-color: var(--darker-bg);
-            color: var(--primary-color);
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 0.85rem;
-        }
-
-        tr:hover {
-            background-color: rgba(255, 255, 255, 0.03);
-        }
-
-        /* Sections */
-        h2 {
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-            color: var(--primary-color);
-            font-weight: 600;
-            padding-bottom: 10px;
-            border-bottom: 1px solid var(--dark-border);
-        }
-
-        p {
-            margin-bottom: 15px;
-            line-height: 1.6;
-        }
-
-        p strong {
-            color: var(--text-light);
-        }
-
-        /* Responsive */
-        @media (max-width: 992px) {
-            .animal-header {
-                flex-direction: column;
-            }
-            
-            .animal-image {
-                width: 100%;
-                height: 300px;
-            }
-            
-            .animal-details {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .tabs {
-                overflow-x: auto;
-                white-space: nowrap;
-                padding-bottom: 5px;
-            }
-            
-            .action-buttons {
-                flex-wrap: wrap;
-            }
-            
-            .btn {
-                flex-grow: 1;
-            }
-        }
-    </style>
-
-    <!-- Top Navigation -->
-    <nav class="top-nav">
-        <h3><i class="fas fa-paw me-2"></i> VetCare System</h3>
-        <div class="nav-links">
-            <a href="/vet/dashboard"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a>
-            <a href="/auth/logout"><i class="fas fa-sign-out-alt me-2"></i>Sair</a>
-        </div>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ficha de {{animal.name}} - VetCare</title>
+    <link rel="stylesheet" href="/css/minimal.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="logo">🐾 VetCare</div>
+        <ul class="nav">
+            <li><a href="/vet/dashboard"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+            <li><a href="/vet/biblioteca"><i class="fas fa-image"></i><span>Biblioteca</span></a></li>
+            <li><a href="/vet/consultas"><i class="fas fa-stethoscope"></i><span>Consultas</span></a></li>
+            <li><a href="/vet/medicamentos"><i class="fas fa-pills"></i><span>Medicamentos</span></a></li>
+            <li><a href="/vet/relatorios"><i class="fas fa-chart-line"></i><span>Relatórios</span></a></li>
+            <li style="margin-top: auto;"><a href="/auth/logout"><i class="fas fa-sign-out-alt"></i><span>Sair</span></a></li>
+        </ul>
     </nav>
 
-    <!-- Main Content -->
-    <div class="container">
-        <!-- Animal Header -->
-        <div class="animal-header">
-            <div class="animal-image" style="background-image: url('/animal/photo/{{animal.id}}');">
-                {{#unless animal.photo}}
-                <div style="background-color: var(--darker-bg); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-paw" style="font-size: 5rem; color: var(--dark-border);"></i>
-                </div>
-                {{/unless}}
-            </div>
-            <div class="animal-info">
-                <h1 class="animal-name">{{animal.name}}</h1>
-                <div class="animal-details">
-                    <div class="detail-item">
-                        <strong>Espécie:</strong> {{animal.species}}
-                    </div>
-                    <div class="detail-item">
-                        <strong>Raça:</strong> {{animal.breed}}
-                    </div>
-                    <div class="detail-item">
-                        <strong>Idade:</strong> {{animal.age}} anos
-                    </div>
-                    <div class="detail-item">
-                        <strong>Sexo:</strong> {{animal.sex}}
-                    </div>
-                    <div class="detail-item">
-                        <strong>Status:</strong> <span class="status status-hospital">{{animal.status}}</span>
-                    </div>
-                    <div class="detail-item">
-                        <strong>Entrada:</strong> {{animal.entry_date}}
-                    </div>
-                    <div class="detail-item">
-                        <strong>Chip:</strong> #{{animal.chip_number}}
-                    </div>
-                    <div class="detail-item">
-                        <strong>Tutor:</strong> {{animal.owner_name}}
-                    </div>
-                </div>
-                <div class="action-buttons">
-                    <button class="btn btn-edit"><i class="fas fa-edit me-2"></i>Editar Ficha</button>
-                    <button class="btn btn-secondary"><i class="fas fa-calendar-plus me-2"></i>Nova Consulta</button>
-                    <button class="btn btn-secondary"><i class="fas fa-syringe me-2"></i>Registrar Vacina</button>
-                </div>
+    <div class="main">
+        <div class="topbar">
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <a href="/vet/dashboard" class="btn btn-primary btn-sm">← Voltar</a>
+                <h1 style="margin: 0;">{{animal.name}}</h1>
+                <span class="badge badge-primary">{{animal.status}}</span>
             </div>
         </div>
-        
-        <!-- Tabs -->
-        <div class="tabs">
-            <div class="tab active" data-tab="health">Saúde</div>
-            <div class="tab" data-tab="vaccines">Vacinas</div>
-            <div class="tab" data-tab="history">Histórico</div>
-            <div class="tab" data-tab="documents">Documentos</div>
-        </div>
-        
-        <!-- Health Tab -->
-        <div class="tab-content active" id="health">
-            <h2><i class="fas fa-heartbeat me-2"></i>Condição Atual</h2>
-            <p><strong>Diagnóstico:</strong> Fratura na pata traseira direita</p>
-            <p><strong>Tratamento:</strong> Repouso, anti-inflamatório e acompanhamento semanal</p>
-            <p><strong>Observações:</strong> Animal está respondendo bem ao tratamento, mas ainda manca ao caminhar.</p>
-            
-            <h2><i class="fas fa-disease me-2"></i>Doenças Registradas</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Doença</th>
-                        <th>Data Diagnóstico</th>
-                        <th>Status</th>
-                        <th>Veterinário</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Fratura pata traseira</td>
-                        <td>10/05/2023</td>
-                        <td><span class="status status-hospital">Em tratamento</span></td>
-                        <td>Dr. Silva</td>
-                        <td>
-                            <button class="btn btn-sm btn-secondary"><i class="fas fa-eye"></i></button>
-                            <button class="btn btn-sm btn-edit"><i class="fas fa-edit"></i></button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Leishmaniose</td>
-                        <td>15/03/2023</td>
-                        <td><span class="status status-ok">Controlada</span></td>
-                        <td>Dra. Oliveira</td>
-                        <td>
-                            <button class="btn btn-sm btn-secondary"><i class="fas fa-eye"></i></button>
-                            <button class="btn btn-sm btn-edit"><i class="fas fa-edit"></i></button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            
-            <h2><i class="fas fa-prescription-bottle-alt me-2"></i>Medicação Atual</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Medicamento</th>
-                        <th>Dosagem</th>
-                        <th>Frequência</th>
-                        <th>Início</th>
-                        <th>Término</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Carprofeno</td>
-                        <td>50mg</td>
-                        <td>12/12 horas</td>
-                        <td>10/05/2023</td>
-                        <td>24/05/2023</td>
-                    </tr>
-                    <tr>
-                        <td>Dipirona</td>
-                        <td>100mg</td>
-                        <td>8/8 horas</td>
-                        <td>10/05/2023</td>
-                        <td>17/05/2023</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        
-        <!-- Vaccines Tab -->
-        <div class="tab-content" id="vaccines">
-            <h2><i class="fas fa-syringe me-2"></i>Cartão de Vacinação</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Vacina</th>
-                        <th>Data</th>
-                        <th>Próxima Dose</th>
-                        <th>Veterinário</th>
-                        <th>Comprovante</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Antirrábica</td>
-                        <td>20/04/2023</td>
-                        <td>20/04/2024</td>
-                        <td>Dr. Silva</td>
-                        <td><button class="btn btn-sm btn-secondary"><i class="fas fa-download"></i></button></td>
-                    </tr>
-                    <tr>
-                        <td>V8</td>
-                        <td>15/03/2023</td>
-                        <td>15/03/2024</td>
-                        <td>Dra. Oliveira</td>
-                        <td><button class="btn btn-sm btn-secondary"><i class="fas fa-download"></i></button></td>
-                    </tr>
-                    <tr>
-                        <td>Giárdia</td>
-                        <td>15/03/2023</td>
-                        <td>15/09/2023</td>
-                        <td>Dra. Oliveira</td>
-                        <td><button class="btn btn-sm btn-secondary"><i class="fas fa-download"></i></button></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        
-        <!-- History Tab -->
-        <div class="tab-content" id="history">
-            <h2><i class="fas fa-history me-2"></i>Histórico de Atendimentos</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Data</th>
-                        <th>Procedimento</th>
-                        <th>Observações</th>
-                        <th>Veterinário</th>
-                        <th>Relatório</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>10/05/2023</td>
-                        <td>Raio-X e imobilização</td>
-                        <td>Fratura identificada na pata traseira</td>
-                        <td>Dr. Silva</td>
-                        <td><button class="btn btn-sm btn-secondary"><i class="fas fa-file-pdf"></i></button></td>
-                    </tr>
-                    <tr>
-                        <td>25/04/2023</td>
-                        <td>Consulta de rotina</td>
-                        <td>Animal saudável, peso ideal</td>
-                        <td>Dra. Oliveira</td>
-                        <td><button class="btn btn-sm btn-secondary"><i class="fas fa-file-pdf"></i></button></td>
-                    </tr>
-                    <tr>
-                        <td>15/03/2023</td>
-                        <td>Primeira consulta</td>
-                        <td>Resgatado com sinais de leishmaniose</td>
-                        <td>Dra. Oliveira</td>
-                        <td><button class="btn btn-sm btn-secondary"><i class="fas fa-file-pdf"></i></button></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        
-        <!-- Documents Tab -->
-        <div class="tab-content" id="documents">
-            <h2><i class="fas fa-file-alt me-2"></i>Documentos</h2>
-            <div class="action-buttons" style="margin-bottom: 20px;">
-                <button class="btn btn-edit"><i class="fas fa-upload me-2"></i>Enviar Documento</button>
+
+        <!-- Info Principal -->
+        <div class="shell">
+            <div style="display: grid; grid-template-columns: 260px 1fr; gap: 20px; margin-bottom: 20px;">
+                <div>
+                    <div class="animal-img" style="background-image: url('/animal/photo/{{animal.id}}'); height: 240px; margin-bottom: 15px;"></div>
+                    <form action="/vet/animal/{{animal.id}}/photo" method="POST" enctype="multipart/form-data" style="display:flex; gap:10px; align-items:center;">
+                        <input type="file" name="photo" accept="image/*" class="form-control" required>
+                        <button type="submit" class="btn btn-primary btn-sm">Alterar foto</button>
+                    </form>
+                </div>
+                <div>
+                    <div class="card">
+                        <h3>Informações Básicas</h3>
+                        <div style="display: grid; gap: 15px;">
+                            <div>
+                                <label class="form-label">Espécie</label>
+                                <p style="margin: 0; font-weight: 500;">{{animal.species}}</p>
+                            </div>
+                            <div>
+                                <label class="form-label">Raça</label>
+                                <p style="margin: 0; font-weight: 500;">{{animal.breed}}</p>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                <div>
+                                    <label class="form-label">Idade</label>
+                                    <p style="margin: 0; font-weight: 500;">{{animal.age}} anos</p>
+                                </div>
+                                <div>
+                                    <label class="form-label">Sexo</label>
+                                    <p style="margin: 0; font-weight: 500;">{{animal.sex}}</p>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="form-label">Cor/Marcações</label>
+                                <p style="margin: 0; font-weight: 500;">{{animal.color}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Tipo</th>
-                        <th>Nome</th>
-                        <th>Data</th>
-                        <th>Tamanho</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><i class="fas fa-file-pdf"></i> PDF</td>
-                        <td>Exame de sangue</td>
-                        <td>10/05/2023</td>
-                        <td>2.4 MB</td>
-                        <td>
-                            <button class="btn btn-sm btn-secondary"><i class="fas fa-eye"></i></button>
-                            <button class="btn btn-sm btn-secondary"><i class="fas fa-download"></i></button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><i class="fas fa-file-image"></i> Imagem</td>
-                        <td>Raio-X pata traseira</td>
-                        <td>10/05/2023</td>
-                        <td>3.1 MB</td>
-                        <td>
-                            <button class="btn btn-sm btn-secondary"><i class="fas fa-eye"></i></button>
-                            <button class="btn btn-sm btn-secondary"><i class="fas fa-download"></i></button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+        </div>
+
+        <!-- Galeria de Fotos (somente visualização) -->
+        <div class="card">
+            <h3><i class="fas fa-images"></i> Fotos do Animal</h3>
+            {{#if photos.length}}
+            <div class="grid" style="grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));">
+                {{#each photos}}
+                <div class="animal-card">
+                    <div class="animal-img" style="background-image: url('/animal/photo-extra/{{this.id}}'); height: 160px;"></div>
+                    <div class="animal-info" style="padding: 10px;">
+                        <div class="animal-name" style="font-size: 0.95rem;">{{this.description}}</div>
+                        <div class="animal-tags">
+                            <span class="tag">{{this.upload_date}}</span>
+                        </div>
+                    </div>
+                </div>
+                {{/each}}
+            </div>
+            {{else}}
+            <p class="empty">Nenhuma foto adicional</p>
+            {{/if}}
+        </div>
+
+        <!-- Abas de Conteúdo -->
+        <div style="display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">
+            <button onclick="switchTab('health')" id="tab-health" class="btn btn-primary btn-sm" style="border: none; background: transparent; color: var(--primary); border-bottom: 2px solid var(--primary); padding: 10px 0;">
+                Saúde
+            </button>
+            <button onclick="switchTab('vaccines')" id="tab-vaccines" class="btn btn-primary btn-sm" style="border: none; background: transparent; color: var(--muted); padding: 10px 0;">
+                Vacinação
+            </button>
+            <button onclick="switchTab('procedures')" id="tab-procedures" class="btn btn-primary btn-sm" style="border: none; background: transparent; color: var(--muted); padding: 10px 0;">
+                Procedimentos
+            </button>
+            <button onclick="switchTab('hospitalizations')" id="tab-hospitalizations" class="btn btn-primary btn-sm" style="border: none; background: transparent; color: var(--muted); padding: 10px 0;">
+                Internações
+            </button>
+        </div>
+
+        <!-- Tab: Saúde -->
+        <div id="content-health" class="tab-content">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3>Histórico de Saúde</h3>
+                    <button onclick="openModal('health')" class="btn btn-success btn-sm">
+                        <i class="fas fa-plus"></i> Adicionar
+                    </button>
+                </div>
+                {{#if health_records.length}}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Diagnóstico</th>
+                            <th>Tratamento</th>
+                            <th>Veterinário</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each health_records}}
+                        <tr>
+                            <td>{{this.date}}</td>
+                            <td>{{this.diagnosis}}</td>
+                            <td>{{this.treatment}}</td>
+                            <td>{{this.vet_name}}</td>
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+                {{else}}
+                <p class="empty">Nenhum registro de saúde</p>
+                {{/if}}
+            </div>
+        </div>
+
+        <!-- Tab: Vacinação -->
+        <div id="content-vaccines" class="tab-content" style="display: none;">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3>Histórico de Vacinação</h3>
+                    <button onclick="openModal('vaccine')" class="btn btn-success btn-sm">
+                        <i class="fas fa-plus"></i> Adicionar
+                    </button>
+                </div>
+                {{#if vaccines.length}}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Vacina</th>
+                            <th>Data</th>
+                            <th>Próxima Dose</th>
+                            <th>Veterinário</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each vaccines}}
+                        <tr>
+                            <td><strong>{{this.vaccine_name}}</strong></td>
+                            <td>{{this.application_date}}</td>
+                            <td>{{this.next_dose_date}}</td>
+                            <td>{{this.vet_name}}</td>
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+                {{else}}
+                <p class="empty">Nenhuma vacinação registrada</p>
+                {{/if}}
+            </div>
+        </div>
+
+        <!-- Tab: Procedimentos -->
+        <div id="content-procedures" class="tab-content" style="display: none;">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3>Procedimentos Realizados</h3>
+                    <button onclick="openModal('procedure')" class="btn btn-success btn-sm">
+                        <i class="fas fa-plus"></i> Adicionar
+                    </button>
+                </div>
+                {{#if procedures.length}}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Procedimento</th>
+                            <th>Data</th>
+                            <th>Resultado</th>
+                            <th>Veterinário</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each procedures}}
+                        <tr>
+                            <td><strong>{{this.procedure_name}}</strong></td>
+                            <td>{{this.procedure_date}}</td>
+                            <td>{{this.result}}</td>
+                            <td>{{this.vet_name}}</td>
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+                {{else}}
+                <p class="empty">Nenhum procedimento registrado</p>
+                {{/if}}
+            </div>
+        </div>
+
+        <!-- Tab: Internações -->
+        <div id="content-hospitalizations" class="tab-content" style="display: none;">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3>Histórico de Internações</h3>
+                    <button onclick="openModal('hospitalization')" class="btn btn-success btn-sm">
+                        <i class="fas fa-plus"></i> Adicionar
+                    </button>
+                </div>
+                {{#if hospitalizations.length}}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data Entrada</th>
+                            <th>Motivo</th>
+                            <th>Diagnóstico</th>
+                            <th>Tratamento</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each hospitalizations}}
+                        <tr>
+                            <td>{{this.entry_date}}</td>
+                            <td>{{this.reason}}</td>
+                            <td>{{this.diagnosis}}</td>
+                            <td>{{this.treatment}}</td>
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+                {{else}}
+                <p class="empty">Nenhuma internação registrada</p>
+                {{/if}}
+            </div>
+        </div>
+
+        <!-- Seção Geral: Medicamentos -->
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3>Medicamentos Prescritos</h3>
+                <button onclick="openModal('medication')" class="btn btn-success btn-sm">
+                    <i class="fas fa-plus"></i> Adicionar
+                </button>
+            </div>
+            {{#if medications.length}}
+            <div style="display: grid; gap: 10px;">
+                {{#each medications}}
+                <div style="background: var(--bg); padding: 12px; border-radius: 8px; border: 1px solid var(--border);">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong>{{this.medication_name}}</strong><br>
+                            <small style="color: var(--muted);">Dosagem: {{this.dosage}} | Frequência: {{this.frequency}}</small><br>
+                            <small style="color: var(--muted);">De {{this.start_date}} até {{this.end_date}}</small>
+                        </div>
+                    </div>
+                </div>
+                {{/each}}
+            </div>
+            {{else}}
+            <p class="empty">Nenhum medicamento prescrito</p>
+            {{/if}}
+        </div>
+
+        <!-- Seção Geral: Documentos -->
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3>Documentos</h3>
+                <button onclick="openModal('document')" class="btn btn-success btn-sm">
+                    <i class="fas fa-plus"></i> Adicionar
+                </button>
+            </div>
+            {{#if documents.length}}
+            <div style="display: grid; gap: 10px;">
+                {{#each documents}}
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: var(--bg); border-radius: 8px; border: 1px solid var(--border);">
+                    <div>
+                        <i class="fas fa-file"></i> {{this.description}}<br>
+                        <small style="color: var(--muted);">Enviado em {{this.upload_date}}</small>
+                    </div>
+                    <a href="/animal/document/{{this.id}}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-download"></i> Download
+                    </a>
+                </div>
+                {{/each}}
+            </div>
+            {{else}}
+            <p class="empty">Nenhum documento</p>
+            {{/if}}
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Modais -->
+    <!-- Modal: Adicionar Saúde -->
+    <div id="modal-health" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Atualizar Saúde</h2>
+                <button class="close" onclick="closeModal('health')">&times;</button>
+            </div>
+            <form id="form-health" method="POST" action="/vet/animal/{{animal.id}}/health-record">
+                <div class="form-group">
+                    <label class="form-label">Peso (kg)</label>
+                    <input type="number" step="0.1" name="weight" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Condição Corporal</label>
+                    <select name="body_condition" class="form-control">
+                        <option value="">Selecione...</option>
+                        <option value="Muito magro">Muito magro</option>
+                        <option value="Magro">Magro</option>
+                        <option value="Ideal">Ideal</option>
+                        <option value="Acima do peso">Acima do peso</option>
+                        <option value="Obeso">Obeso</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Alergias</label>
+                    <input type="text" name="allergies" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Observações</label>
+                    <textarea name="observations" class="form-control" style="min-height: 100px;"></textarea>
+                </div>
+                <button type="submit" class="btn btn-success w-full">Salvar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Adicionar Vacinação -->
+    <div id="modal-vaccine" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Registrar Vacinação</h2>
+                <button class="close" onclick="closeModal('vaccine')">&times;</button>
+            </div>
+            <form id="form-vaccine" method="POST" action="/vet/animal/{{animal.id}}/vaccine">
+                <div class="form-group">
+                    <label class="form-label">Vacina *</label>
+                    <input type="text" name="vaccine_name" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Data Aplicação *</label>
+                    <input type="date" name="application_date" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Próxima Dose</label>
+                    <input type="date" name="next_dose_date" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Lote</label>
+                    <input type="text" name="batch" class="form-control">
+                </div>
+                <button type="submit" class="btn btn-success w-full">Salvar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Adicionar Procedimento -->
+    <div id="modal-procedure" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Registrar Procedimento</h2>
+                <button class="close" onclick="closeModal('procedure')">&times;</button>
+            </div>
+            <form id="form-procedure" method="POST" action="/vet/animal/{{animal.id}}/procedure">
+                <div class="form-group">
+                    <label class="form-label">Nome *</label>
+                    <input type="text" name="procedure_name" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Data *</label>
+                    <input type="date" name="procedure_date" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Descrição</label>
+                    <textarea name="description" class="form-control" style="min-height: 100px;"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Resultado</label>
+                    <input type="text" name="result" class="form-control">
+                </div>
+                <button type="submit" class="btn btn-success w-full">Salvar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Adicionar Medicamento -->
+    <div id="modal-medication" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Prescrever Medicamento</h2>
+                <button class="close" onclick="closeModal('medication')">&times;</button>
+            </div>
+            <form id="form-medication" method="POST" action="/vet/animal/{{animal.id}}/receita">
+                <div class="form-group">
+                    <label class="form-label">Medicamento *</label>
+                    <input type="text" name="medication_name" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Dosagem *</label>
+                    <input type="text" name="dosage" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Frequência *</label>
+                    <input type="text" name="frequency" class="form-control" required>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label class="form-label">Data Início *</label>
+                        <input type="date" name="start_date" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Data Fim</label>
+                        <input type="date" name="end_date" class="form-control">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Observações</label>
+                    <textarea name="notes" class="form-control" style="min-height: 80px;"></textarea>
+                </div>
+                <button type="submit" class="btn btn-success w-full">Salvar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Adicionar Internação -->
+    <div id="modal-hospitalization" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Registrar Internação</h2>
+                <button class="close" onclick="closeModal('hospitalization')">&times;</button>
+            </div>
+            <form id="form-hospitalization" method="POST" action="/vet/animal/{{animal.id}}/hospitalization">
+                <div class="form-group">
+                    <label class="form-label">Data Entrada *</label>
+                    <input type="date" name="entry_date" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Motivo *</label>
+                    <input type="text" name="reason" class="form-control" required>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label class="form-label">Diagnóstico</label>
+                        <textarea name="diagnosis" class="form-control" style="min-height: 80px;"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Tratamento</label>
+                        <textarea name="treatment" class="form-control" style="min-height: 80px;"></textarea>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-success w-full">Salvar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Adicionar Documento -->
+    <div id="modal-document" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Anexar Documento</h2>
+                <button class="close" onclick="closeModal('document')">&times;</button>
+            </div>
+            <form id="form-document" method="POST" action="/vet/animal/{{animal.id}}/document" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label class="form-label">Arquivo *</label>
+                    <input type="file" name="document" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Descrição</label>
+                    <input type="text" name="description" class="form-control" placeholder="Ex: Raio-X, Exame de Sangue...">
+                </div>
+                <button type="submit" class="btn btn-success w-full">Enviar</button>
+            </form>
+        </div>
+    </div>
+
     <script>
-        // Tab functionality
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.addEventListener('click', function() {
-                // Remove active class from all tabs and contents
-                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                
-                // Add active class to clicked tab
-                this.classList.add('active');
-                
-                // Show corresponding content
-                const tabId = this.getAttribute('data-tab');
-                document.getElementById(tabId).classList.add('active');
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('[id^="tab-"]').forEach(el => {
+                el.style.color = 'var(--muted)';
+                el.style.borderBottom = 'none';
             });
-        });
-        
-        // Update status classes
-        document.querySelectorAll('.status').forEach(status => {
-            const statusText = status.textContent.toLowerCase();
             
-            if (statusText.includes('controlad') || statusText.includes('concluíd') || statusText.includes('ok')) {
-                status.classList.remove('status-hospital');
-                status.classList.add('status-ok');
-            } else if (statusText.includes('emergênc') || statusText.includes('urgent') || statusText.includes('crític')) {
-                status.classList.remove('status-hospital');
-                status.classList.add('status-danger');
+            // Show selected tab
+            document.getElementById('content-' + tabName).style.display = 'block';
+            document.getElementById('tab-' + tabName).style.color = 'var(--primary)';
+            document.getElementById('tab-' + tabName).style.borderBottom = '2px solid var(--primary)';
+        }
+
+        function openModal(type) {
+            document.getElementById('modal-' + type).style.display = 'block';
+        }
+
+        function closeModal(type) {
+            document.getElementById('modal-' + type).style.display = 'none';
+        }
+
+        window.onclick = function(e) {
+            if (e.target.classList.contains('modal')) {
+                e.target.style.display = 'none';
             }
-        });
-        
-        // Button hover effects
-        document.querySelectorAll('.btn').forEach(btn => {
-            btn.addEventListener('mouseenter', function() {
-                this.style.transform = 'translateY(-2px)';
-            });
-            
-            btn.addEventListener('mouseleave', function() {
-                this.style.transform = '';
-            });
-        });
+        }
     </script>
+</body>
+</html>

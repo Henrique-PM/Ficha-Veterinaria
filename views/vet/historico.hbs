@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Histórico - {{animal.name}} | VetCare</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #121212;
+            --darker-bg: #0a0a0a;
+            --card-dark: #1e1e1e;
+            --text-dark: #e0e0e0;
+            --text-light: #b0b0b0;
+            --primary: #4e73df;
+            --primary-hover: #3a5bd9;
+            --success: #1cc88a;
+            --warning: #f6c23e;
+            --danger: #e74a3b;
+            --info: #36b9cc;
+            --border-dark: #333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-dark);
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background-color: var(--darker-bg);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: var(--text-dark);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .animal-info {
+            background-color: var(--card-dark);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .animal-photo {
+            width: 150px;
+            height: 150px;
+            border-radius: 12px;
+            object-fit: cover;
+            background-color: var(--darker-bg);
+        }
+
+        .animal-details h2 {
+            margin-bottom: 1rem;
+        }
+
+        .animal-details p {
+            color: var(--text-light);
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: var(--border-dark);
+        }
+
+        .timeline-item {
+            background-color: var(--card-dark);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -2.5rem;
+            top: 1.5rem;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            border: 3px solid var(--bg-dark);
+        }
+
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-dark);
+        }
+
+        .timeline-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .timeline-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .timeline-icon.health {
+            background-color: rgba(78, 115, 223, 0.2);
+            color: var(--primary);
+        }
+
+        .timeline-icon.vaccine {
+            background-color: rgba(28, 200, 138, 0.2);
+            color: var(--success);
+        }
+
+        .timeline-icon.hospital {
+            background-color: rgba(231, 74, 59, 0.2);
+            color: var(--danger);
+        }
+
+        .timeline-icon.procedure {
+            background-color: rgba(54, 185, 204, 0.2);
+            color: var(--info);
+        }
+
+        .timeline-date {
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+
+        .timeline-content p {
+            color: var(--text-light);
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-light);
+            background-color: var(--card-dark);
+            border-radius: 12px;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: var(--border-dark);
+            margin-bottom: 1rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin: 2rem 0 1rem 0;
+            color: var(--text-dark);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <h2><i class="fas fa-paw"></i> VetCare</h2>
+        </div>
+        <ul class="nav-links">
+            <li><a href="/vet/dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+            <li><a href="/auth/logout"><i class="fas fa-sign-out-alt"></i> Sair</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-history"></i> Histórico Completo</h1>
+            <a href="/vet/animal/{{animal.id}}" class="btn btn-primary">
+                <i class="fas fa-arrow-left"></i> Voltar para Ficha
+            </a>
+        </div>
+
+        <div class="animal-info">
+            {{#if animal.photo}}
+                <img src="/vet/animal/photo/{{animal.id}}" alt="{{animal.name}}" class="animal-photo">
+            {{else}}
+                <div class="animal-photo" style="display: flex; align-items: center; justify-content: center; font-size: 3rem; color: var(--text-light);">
+                    <i class="fas fa-paw"></i>
+                </div>
+            {{/if}}
+            <div class="animal-details">
+                <h2>{{animal.name}}</h2>
+                <p><strong>Espécie:</strong> {{animal.species}} | <strong>Raça:</strong> {{animal.breed}}</p>
+                <p><strong>Idade:</strong> {{animal.age}} anos | <strong>Sexo:</strong> {{animal.sex}}</p>
+                <p><strong>Status:</strong> {{animal.status}} | <strong>Chip:</strong> {{animal.chip_number}}</p>
+            </div>
+        </div>
+
+        <h2 class="section-title"><i class="fas fa-clock"></i> Linha do Tempo</h2>
+
+        <div class="timeline">
+            {{#if healthRecords.length}}
+                {{#each healthRecords}}
+                <div class="timeline-item">
+                    <div class="timeline-header">
+                        <div class="timeline-title">
+                            <div class="timeline-icon health">
+                                <i class="fas fa-notes-medical"></i>
+                            </div>
+                            <strong>Atualização de Ficha de Saúde</strong>
+                        </div>
+                        <span class="timeline-date">{{this.updated_at}}</span>
+                    </div>
+                    <div class="timeline-content">
+                        <p><strong>Peso:</strong> {{this.weight}} kg</p>
+                        <p><strong>Condição Corporal:</strong> {{this.body_condition}}</p>
+                        {{#if this.allergies}}<p><strong>Alergias:</strong> {{this.allergies}}</p>{{/if}}
+                        {{#if this.observations}}<p><strong>Observações:</strong> {{this.observations}}</p>{{/if}}
+                    </div>
+                </div>
+                {{/each}}
+            {{/if}}
+
+            {{#if vaccines.length}}
+                {{#each vaccines}}
+                <div class="timeline-item">
+                    <div class="timeline-header">
+                        <div class="timeline-title">
+                            <div class="timeline-icon vaccine">
+                                <i class="fas fa-syringe"></i>
+                            </div>
+                            <strong>Vacina: {{this.name}}</strong>
+                        </div>
+                        <span class="timeline-date">{{this.application_date}}</span>
+                    </div>
+                    <div class="timeline-content">
+                        {{#if this.next_dose}}<p><strong>Próxima Dose:</strong> {{this.next_dose}}</p>{{/if}}
+                        {{#if this.batch}}<p><strong>Lote:</strong> {{this.batch}}</p>{{/if}}
+                        {{#if this.observations}}<p><strong>Observações:</strong> {{this.observations}}</p>{{/if}}
+                    </div>
+                </div>
+                {{/each}}
+            {{/if}}
+
+            {{#if hospitalizations.length}}
+                {{#each hospitalizations}}
+                <div class="timeline-item">
+                    <div class="timeline-header">
+                        <div class="timeline-title">
+                            <div class="timeline-icon hospital">
+                                <i class="fas fa-hospital"></i>
+                            </div>
+                            <strong>Internação/Consulta</strong>
+                        </div>
+                        <span class="timeline-date">{{this.entry_date}}</span>
+                    </div>
+                    <div class="timeline-content">
+                        <p><strong>Motivo:</strong> {{this.reason}}</p>
+                        {{#if this.diagnosis}}<p><strong>Diagnóstico:</strong> {{this.diagnosis}}</p>{{/if}}
+                        {{#if this.treatment}}<p><strong>Tratamento:</strong> {{this.treatment}}</p>{{/if}}
+                        {{#if this.exit_date}}
+                            <p><strong>Alta:</strong> {{this.exit_date}}</p>
+                        {{else}}
+                            <p><strong>Status:</strong> Em atendimento</p>
+                        {{/if}}
+                        {{#if this.observations}}<p><strong>Observações:</strong> {{this.observations}}</p>{{/if}}
+                    </div>
+                </div>
+                {{/each}}
+            {{/if}}
+
+            {{#if procedures.length}}
+                {{#each procedures}}
+                <div class="timeline-item">
+                    <div class="timeline-header">
+                        <div class="timeline-title">
+                            <div class="timeline-icon procedure">
+                                <i class="fas fa-microscope"></i>
+                            </div>
+                            <strong>{{this.name}}</strong>
+                        </div>
+                        <span class="timeline-date">{{this.procedure_date}}</span>
+                    </div>
+                    <div class="timeline-content">
+                        {{#if this.description}}<p><strong>Descrição:</strong> {{this.description}}</p>{{/if}}
+                        {{#if this.observations}}<p><strong>Observações:</strong> {{this.observations}}</p>{{/if}}
+                    </div>
+                </div>
+                {{/each}}
+            {{/if}}
+        </div>
+
+        {{#unless healthRecords.length}}
+        {{#unless vaccines.length}}
+        {{#unless hospitalizations.length}}
+        {{#unless procedures.length}}
+        <div class="empty-state">
+            <i class="fas fa-history"></i>
+            <h3>Nenhum histórico registrado</h3>
+            <p>O histórico médico deste animal aparecerá aqui</p>
+        </div>
+        {{/unless}}
+        {{/unless}}
+        {{/unless}}
+        {{/unless}}
+    </div>
+</body>
+</html>

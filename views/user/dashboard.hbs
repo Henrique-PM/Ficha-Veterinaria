@@ -1,37 +1,49 @@
-<style>
-  .user-container{max-width:1200px;margin:20px auto;padding:0 16px;color:#e0e0e0}
-  .header{display:flex;justify-content:space-between;align-items:center;margin:16px 0}
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
-  .card{background:#1e1e1e;border:1px solid #333;border-radius:10px;overflow:hidden}
-  .photo{height:180px;background:#0a0a0a;background-size:cover;background-position:center}
-  .body{padding:12px}
-  .meta{display:flex;gap:8px;flex-wrap:wrap;color:#adb5bd;font-size:.85rem}
-  .badge{padding:2px 8px;border-radius:12px;background:#2c2c2c}
-  a.btn{display:inline-block;margin-top:10px;padding:8px 12px;border-radius:6px;background:#4e73df;color:#fff;text-decoration:none}
-</style>
-<div class="user-container">
-  <div class="header">
-    <h2>Animais Disponíveis</h2>
-    <a href="/auth/logout" class="btn">Sair</a>
-  </div>
-  <div class="grid">
-    {{#each animals}}
-      <div class="card">
-        <div class="photo" style="background-image:url('/animal/photo/{{this.id}}')"></div>
-        <div class="body">
-          <h4>{{this.name}}</h4>
-          <div class="meta">
-            <span class="badge">{{this.species}}</span>
-            <span class="badge">{{this.sex}}</span>
-            <span class="badge">{{this.age}} anos</span>
-            <span class="badge">{{this.status}}</span>
-          </div>
-          <a href="/user/animal/{{this.id}}" class="btn">Ver Ficha</a>
-        </div>
-      </div>
-    {{/each}}
-  </div>
-</div>
-                <p>{{em_tratamento}}</p>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animais - VetCare</title>
+    <link rel="stylesheet" href="/css/minimal.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="logo">🐾 VetCare</div>
+        <ul class="nav">
+            <li><a href="/user/dashboard" class="active"><i class="fas fa-paw"></i><span>Animais</span></a></li>
+            <li style="margin-top: auto;"><a href="/auth/logout"><i class="fas fa-sign-out-alt"></i><span>Sair</span></a></li>
+        </ul>
+    </nav>
 
+    <div class="main">
+        <div class="topbar">
+            <h1>Todos os Animais</h1>
+        </div>
+
+        {{#if animals.length}}
+        <div class="grid">
+            {{#each animals}}
+            <div class="animal-card">
+                <div class="animal-img" {{#if this.photo}}style="background-image: url('/animal/photo/{{this.id}}')"{{/if}}></div>
+                <div class="animal-info">
+                    <div class="animal-name">{{this.name}}</div>
+                    <div class="animal-tags">
+                        <span class="tag">{{this.species}}</span>
+                        <span class="tag">{{this.sex}}</span>
+                        <span class="tag">{{this.age}} anos</span>
+                    </div>
+                    <a href="/user/animal/{{this.id}}" class="btn btn-primary btn-sm w-full">Ver Detalhes</a>
+                </div>
             </div>
+            {{/each}}
+        </div>
+        {{else}}
+        <div class="card empty">
+            <div style="font-size: 3rem; margin-bottom: 10px;">📭</div>
+            <p>Nenhum animal disponível</p>
+        </div>
+        {{/if}}
+    </div>
+</body>
+</html>

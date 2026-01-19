@@ -11,6 +11,11 @@ const uploadDocument = multer({ storage });
 // Middleware: apenas veterinário
 router.use(ensureRole('veterinario'));
 
+// Diagnóstico rápido do mount
+router.get('/ping', (req, res) => {
+  res.send('vet ok');
+});
+
 // Dashboard do veterinário
 router.get('/dashboard', (req, res) => {
   const stats = {};
@@ -41,19 +46,6 @@ router.get('/dashboard', (req, res) => {
   });
 });
 
-
-router.get('/animal/photo/:id', (req, res) => {
-  const { id } = req.params;
-
-  db.get('SELECT photo FROM animals WHERE id = ?', [id], (err, row) => {
-    if (err || !row || !row.photo) {
-      return res.status(404).send('Imagem não encontrada');
-    }
-    res.setHeader('Content-Type', 'application/octet-stream');
-    res.send(row.photo);
-  });
-});
-
 router.get('/search', (req, res) => {
   const { name } = req.query;
 
@@ -74,8 +66,136 @@ router.get('/search', (req, res) => {
   });
 });
 
+// Listas filtradas de animais - ANTES de /animal/:id para evitar conflito
+router.get('/animais/tratamento', (req, res) => {
+  const q = `SELECT id, name, species, breed, age, sex, photo, status
+             FROM animals WHERE status IN ('hospital','clinica')
+             ORDER BY entry_date DESC`;
+  db.all(q, [], (err, animals) => {
+    if (err) return res.status(500).send('Erro ao carregar animais em tratamento');
+    res.render('layouts/pesquisa_animais', {
+      title: 'Animais em Tratamento',
+      animals: animals || [],
+      user: req.session.user
+    });
+  });
+});
 
-// Gerenciar animal
+router.get('/animais/adotados', (req, res) => {
+  const q = `SELECT id, name, species, breed, age, sex, photo, status
+             FROM animals WHERE status='adotado'
+             ORDER BY entry_date DESC`;
+  db.all(q, [], (err, animals) => {
+    if (err) return res.status(500).send('Erro ao carregar animais adotados');
+    res.render('layouts/pesquisa_animais', {
+      title: 'Animais Adotados',
+      animals: animals || [],
+      user: req.session.user
+    });
+  });
+});
+
+router.get('/animais/especie/:species', (req, res) => {
+  const { species } = req.params;
+  const q = `SELECT id, name, species, breed, age, sex, photo, status
+             FROM animals WHERE LOWER(species)=LOWER(?)
+             ORDER BY entry_date DESC`;
+  db.all(q, [species], (err, animals) => {
+    if (err) return res.status(500).send('Erro ao carregar animais por espécie');
+    res.render('layouts/pesquisa_animais', {
+      title: `Animais: ${species}`,
+      animals: animals || [],
+      user: req.session.user
+    });
+  });
+});
+
+// Rotas de atalho para seções da ficha
+router.get('/animal/:id/consulta', (req, res) => {
+  return res.redirect(`/vet/animal/${req.params.id}#ficha`);
+});
+
+router.get('/animal/:id/vacina', (req, res) => {
+  return res.redirect(`/vet/animal/${req.params.id}#vacina`);
+});
+
+router.get('/animal/:id/internacao', (req, res) => {
+  return res.redirect(`/vet/animal/${req.params.id}#internacao`);
+});
+
+router.get('/animal/:id/historico', (req, res) => {
+  const animalId = req.params.id;
+
+  db.get('SELECT * FROM animals WHERE id = ?', [animalId], (err, animal) => {
+    if (err || !animal) {
+      return res.status(404).send('Animal não encontrado');
+    }
+
+    const result = { user: req.session.user, animal };
+
+    db.all('SELECT * FROM health_records WHERE animal_id = ? ORDER BY updated_at DESC', [animalId], (err, healthRecords) => {
+      result.healthRecords = healthRecords || [];
+
+      db.all('SELECT * FROM vaccines WHERE animal_id = ? ORDER BY application_date DESC', [animalId], (err, vaccines) => {
+        result.vaccines = vaccines || [];
+
+        db.all('SELECT * FROM hospitalizations WHERE animal_id = ? ORDER BY entry_date DESC', [animalId], (err, hospitalizations) => {
+          result.hospitalizations = hospitalizations || [];
+
+          db.all('SELECT * FROM procedures WHERE animal_id = ? ORDER BY procedure_date DESC', [animalId], (err, procedures) => {
+            result.procedures = procedures || [];
+
+            res.render('vet/historico', result);
+          });
+        });
+      });
+    });
+  });
+});
+
+// Download de documento - rota específica antes de /animal/:id
+router.get('/animal/:animalId/document/:docId', (req, res) => {
+  const { animalId, docId } = req.params;
+  db.get('SELECT filename, mimetype, data FROM animal_documents WHERE id = ? AND animal_id = ?', [docId, animalId], (err, row) => {
+    if (err || !row) return res.status(404).send('Documento não encontrado');
+    res.setHeader('Content-Disposition', `attachment; filename="${row.filename}"`);
+    res.setHeader('Content-Type', row.mimetype);
+    return res.send(row.data);
+  });
+});
+
+// Foto do animal - rota específica antes de /animal/:id
+router.get('/animal/photo/:id', (req, res) => {
+  const { id } = req.params;
+
+  db.get('SELECT photo FROM animals WHERE id = ?', [id], (err, row) => {
+    if (err || !row || !row.photo) {
+      return res.status(404).send('Imagem não encontrada');
+    }
+    // Definir Content-Type padrão para imagens
+    res.setHeader('Content-Type', 'image/jpeg');
+    res.send(row.photo);
+  });
+});
+
+// Atualizar foto principal do animal
+router.post('/animal/:id/photo', uploadAnimalPhoto.single('photo'), (req, res) => {
+  const { id } = req.params;
+
+  if (!req.file || !req.file.buffer) {
+    return res.status(400).send('Arquivo de foto é obrigatório');
+  }
+
+  db.run('UPDATE animals SET photo = ? WHERE id = ?', [req.file.buffer, id], function (err) {
+    if (err) {
+      console.error('Erro ao atualizar foto:', err);
+      return res.status(500).send('Erro ao atualizar foto');
+    }
+    return res.redirect(`/vet/animal/${id}`);
+  });
+});
+
+// Gerenciar animal - rota genérica por último
 router.get('/animal/:id', (req, res) => {
   const animalId = req.params.id;
 
@@ -100,7 +220,21 @@ router.get('/animal/:id', (req, res) => {
 
             db.all('SELECT id, filename, description, upload_date FROM animal_documents WHERE animal_id = ? ORDER BY upload_date DESC', [animalId], (err, documents) => {
               result.documents = documents || [];
-              return res.render('vet/ficha2', result);
+              db.all('SELECT id, description, upload_date FROM animal_photos WHERE animal_id = ? ORDER BY upload_date DESC', [animalId], (pErr, photos) => {
+                result.photos = photos || [];
+                // Carregar medicamentos do animal (com nome)
+                const qMeds = `
+                  SELECT am.id, am.dosage, am.frequency, am.start_date, am.end_date, m.name AS medication_name
+                  FROM animal_medications am
+                  JOIN medications m ON am.medication_id = m.id
+                  WHERE am.animal_id = ?
+                  ORDER BY am.start_date DESC
+                `;
+                db.all(qMeds, [animalId], (mErr, medications) => {
+                  result.medications = medications || [];
+                  return res.render('vet/ficha', result);
+                });
+              });
             });
           });
         });
@@ -158,9 +292,9 @@ router.post('/animal/:id/hospitalization', (req, res) => {
   
   db.run(
     `INSERT INTO hospitalizations 
-     (animal_id, entry_date, reason, diagnosis, treatment, procedures, observations) 
-     VALUES (?, ?, ?, ?, ?, ?, ?)`,
-    [animalId, entry_date, reason, diagnosis, treatment, procedures, observations],
+     (animal_id, entry_date, reason, diagnosis, treatment, procedures, observations, responsible_vet) 
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    [animalId, entry_date, reason, diagnosis, treatment, procedures, observations, req.session.user.id],
     function(err) {
       if (err) {
         console.error(err);
@@ -193,6 +327,56 @@ router.post('/animal/:id/procedure', (req, res) => {
       return res.redirect(`/vet/animal/${animalId}`);
     }
   );
+});
+
+// Salvar receita/medicamento
+router.post('/animal/:id/receita', (req, res) => {
+  const animalId = req.params.id;
+  const { medication_name, dosage, frequency, start_date, end_date, notes } = req.body;
+
+  if (!medication_name || !dosage || !frequency || !start_date) {
+    return res.status(400).send('Campos obrigatórios ausentes');
+  }
+
+  // Encontrar ou criar o medicamento por nome
+  db.get('SELECT id FROM medications WHERE LOWER(name) = LOWER(?)', [medication_name], (findErr, med) => {
+    if (findErr) {
+      console.error('Erro ao buscar medicamento:', findErr);
+      return res.status(500).send('Erro ao salvar receita');
+    }
+
+    const insertAnimalMedication = (medicationId) => {
+      db.run(
+        `INSERT INTO animal_medications (animal_id, medication_id, dosage, frequency, start_date, end_date, prescribed_by, observations)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        [animalId, medicationId, dosage, frequency, start_date, end_date || null, req.session.user.id, notes || null],
+        function (err) {
+          if (err) {
+            console.error('Erro ao inserir receita:', err);
+            return res.status(500).send('Erro ao salvar receita');
+          }
+          return res.redirect(`/vet/consultas`);
+        }
+      );
+    };
+
+    if (med && med.id) {
+      insertAnimalMedication(med.id);
+    } else {
+      // Criar medicamento simples com nome
+      db.run(
+        `INSERT INTO medications (name) VALUES (?)`,
+        [medication_name],
+        function (createErr) {
+          if (createErr) {
+            console.error('Erro ao criar medicamento:', createErr);
+            return res.status(500).send('Erro ao salvar receita');
+          }
+          insertAnimalMedication(this.lastID);
+        }
+      );
+    }
+  });
 });
 
 // Upload de documento
@@ -246,14 +430,18 @@ router.post('/cadastrar-animal', uploadAnimalPhoto.single('photo'), (req, res) =
   const veterinarian_id = req.session.user.id;
 
   const photoBuffer = req.file ? req.file.buffer : null;
+  const chipValue = chip_number && chip_number.trim() !== '' ? chip_number.trim() : null; // null evita conflito de UNIQUE com string vazia
   
   db.run(
     `INSERT INTO animals (name, species, breed, age, sex, photo, chip_number, status, characteristics, description, created_by)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [name, species, breed, age, sex, photoBuffer, chip_number, status, characteristics, description, veterinarian_id],
+    [name, species, breed, age, sex, photoBuffer, chipValue, status, characteristics, description, veterinarian_id],
     function(err) {
       if (err) {
         console.error(err);
+        if (err.code === 'SQLITE_CONSTRAINT') {
+          return res.status(400).render('vet/cadastra_animal', { user: req.session.user, error: 'Chip já cadastrado. Use outro número ou deixe em branco.' });
+        }
         return res.status(500).render('vet/cadastra_animal', { user: req.session.user, error: 'Erro ao cadastrar animal' });
       }
 
@@ -284,5 +472,229 @@ router.get('/biblioteca', (req, res) => {
   });
 });
 
+// Página de consultas/internações
+router.get('/consultas', (req, res) => {
+  const query = `
+    SELECT h.*, a.name as animal_name, a.species, u.name as vet_name
+    FROM hospitalizations h
+    JOIN animals a ON h.animal_id = a.id
+    LEFT JOIN users u ON h.responsible_vet = u.id
+    ORDER BY h.entry_date DESC
+  `;
+
+  db.all(query, [], (err, hospitalizations) => {
+    if (err) {
+      console.error('Erro ao buscar consultas:', err);
+      return res.status(500).send('Erro ao carregar consultas');
+    }
+
+    res.render('vet/consultas', {
+      user: req.session.user,
+      hospitalizations
+    });
+  });
+});
+
+// Consultas de hoje
+router.get('/consultas/hoje', (req, res) => {
+  const query = `
+    SELECT h.*, a.name as animal_name, a.species, u.name as vet_name
+    FROM hospitalizations h
+    JOIN animals a ON h.animal_id = a.id
+    LEFT JOIN users u ON h.responsible_vet = u.id
+    WHERE date(h.entry_date) = date('now')
+    ORDER BY h.entry_date DESC
+  `;
+  db.all(query, [], (err, hospitalizations) => {
+    if (err) {
+      console.error('Erro ao buscar consultas de hoje:', err);
+      return res.status(500).send('Erro ao carregar consultas de hoje');
+    }
+    res.render('vet/consultas', {
+      user: req.session.user,
+      hospitalizations,
+      todayOnly: true
+    });
+  });
+});
+
+// Página de medicamentos
+router.get('/medicamentos', (req, res) => {
+  db.all('SELECT * FROM medications ORDER BY name', [], (err, medications) => {
+    if (err) {
+      console.error('Erro ao buscar medicamentos:', err);
+      return res.status(500).send('Erro ao carregar medicamentos');
+    }
+
+    res.render('vet/medicamentos', {
+      user: req.session.user,
+      medications
+    });
+  });
+});
+
+// Medicamentos com estoque baixo
+router.get('/medicamentos/baixa', (req, res) => {
+  db.all('SELECT * FROM medications WHERE stock_quantity <= min_stock_level ORDER BY name', [], (err, medications) => {
+    if (err) {
+      console.error('Erro ao buscar medicamentos baixos:', err);
+      return res.status(500).send('Erro ao carregar medicamentos');
+    }
+    res.render('vet/medicamentos', { user: req.session.user, medications, lowOnly: true });
+  });
+});
+
+// Adicionar medicamento
+router.post('/medicamentos', (req, res) => {
+  const { name, description, stock_quantity, unit, min_stock_level } = req.body;
+  
+  db.run(
+    'INSERT INTO medications (name, description, stock_quantity, unit, min_stock_level) VALUES (?, ?, ?, ?, ?)',
+    [name, description, stock_quantity, unit, min_stock_level],
+    function(err) {
+      if (err) {
+        console.error(err);
+        return res.status(500).send('Erro ao adicionar medicamento');
+      }
+      res.redirect('/vet/medicamentos');
+    }
+  );
+});
+
+// Atualizar estoque de medicamento
+router.post('/medicamentos/:id/atualizar-estoque', (req, res) => {
+  const { id } = req.params;
+  const { stock_quantity } = req.body;
+  
+  db.run('UPDATE medications SET stock_quantity = ? WHERE id = ?', [stock_quantity, id], (err) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send('Erro ao atualizar estoque');
+    }
+    res.redirect('/vet/medicamentos');
+  });
+});
+
+// Fichas atualizadas hoje
+router.get('/fichas/hoje', (req, res) => {
+  const q = `
+    SELECT hr.*, a.name AS animal_name, a.species
+    FROM health_records hr
+    JOIN animals a ON hr.animal_id = a.id
+    WHERE date(hr.updated_at) = date('now')
+    ORDER BY hr.updated_at DESC
+  `;
+  db.all(q, [], (err, fichas) => {
+    if (err) return res.status(500).send('Erro ao carregar fichas de hoje');
+    res.render('vet/fichas', { user: req.session.user, fichas });
+  });
+});
+
+// Página de relatórios
+router.get('/relatorios', (req, res) => {
+  const stats = {};
+  
+  const queries = {
+    total_animais: 'SELECT COUNT(*) as count FROM animals',
+    por_especie: 'SELECT species, COUNT(*) as count FROM animals GROUP BY species',
+    por_status: 'SELECT status, COUNT(*) as count FROM animals GROUP BY status',
+    vacinas_mes: "SELECT COUNT(*) as count FROM vaccines WHERE strftime('%Y-%m', application_date) = strftime('%Y-%m', 'now')",
+    consultas_mes: "SELECT COUNT(*) as count FROM hospitalizations WHERE strftime('%Y-%m', entry_date) = strftime('%Y-%m', 'now')",
+    animais_adotados: "SELECT COUNT(*) as count FROM animals WHERE status = 'adotado'",
+    medicamentos_baixos: 'SELECT * FROM medications WHERE stock_quantity <= min_stock_level'
+  };
+
+  let completed = 0;
+  const total = Object.keys(queries).length;
+
+  Object.keys(queries).forEach(key => {
+    if (key === 'por_especie' || key === 'por_status' || key === 'medicamentos_baixos') {
+      db.all(queries[key], [], (err, rows) => {
+        stats[key] = rows || [];
+        if (++completed === total) {
+          res.render('vet/relatorios', { user: req.session.user, ...stats });
+        }
+      });
+    } else {
+      db.get(queries[key], [], (err, row) => {
+        stats[key] = row ? row.count : 0;
+        if (++completed === total) {
+          res.render('vet/relatorios', { user: req.session.user, ...stats });
+        }
+      });
+    }
+  });
+});
+
+// Meus registros do veterinário
+router.get('/meus-registros', (req, res) => {
+  const vetId = req.session.user.id;
+  const result = { user: req.session.user };
+
+  const qVacinas = `
+    SELECT v.*, a.name AS animal_name, a.species
+    FROM vaccines v
+    JOIN animals a ON v.animal_id = a.id
+    WHERE v.veterinarian_id = ?
+    ORDER BY v.application_date DESC
+  `;
+  const qProcedures = `
+    SELECT p.*, a.name AS animal_name, a.species
+    FROM procedures p
+    JOIN animals a ON p.animal_id = a.id
+    WHERE p.veterinarian_id = ?
+    ORDER BY p.procedure_date DESC
+  `;
+  const qReceitas = `
+    SELECT am.*, a.name AS animal_name, a.species, m.name AS medication_name
+    FROM animal_medications am
+    JOIN animals a ON am.animal_id = a.id
+    JOIN medications m ON am.medication_id = m.id
+    WHERE am.prescribed_by = ?
+    ORDER BY am.start_date DESC
+  `;
+
+  db.all(qVacinas, [vetId], (e1, vacinas) => {
+    result.vacinas = vacinas || [];
+    db.all(qProcedures, [vetId], (e2, procedimentos) => {
+      result.procedimentos = procedimentos || [];
+      db.all(qReceitas, [vetId], (e3, receitas) => {
+        result.receitas = receitas || [];
+        return res.render('vet/meus_registros', result);
+      });
+    });
+  });
+});
+
+// Histórico completo do animal
+router.get('/animal/:id/historico', (req, res) => {
+  const animalId = req.params.id;
+
+  db.get('SELECT * FROM animals WHERE id = ?', [animalId], (err, animal) => {
+    if (err || !animal) {
+      return res.status(404).send('Animal não encontrado');
+    }
+
+    const result = { user: req.session.user, animal };
+
+    db.all('SELECT * FROM health_records WHERE animal_id = ? ORDER BY updated_at DESC', [animalId], (err, healthRecords) => {
+      result.healthRecords = healthRecords || [];
+
+      db.all('SELECT * FROM vaccines WHERE animal_id = ? ORDER BY application_date DESC', [animalId], (err, vaccines) => {
+        result.vaccines = vaccines || [];
+
+        db.all('SELECT * FROM hospitalizations WHERE animal_id = ? ORDER BY entry_date DESC', [animalId], (err, hospitalizations) => {
+          result.hospitalizations = hospitalizations || [];
+
+          db.all('SELECT * FROM procedures WHERE animal_id = ? ORDER BY procedure_date DESC', [animalId], (err, procedures) => {
+            result.procedures = procedures || [];
+
+            res.render('vet/historico', result);
+          });
+        });
+      });
+    });
+  });
+});
 
 module.exports = router;

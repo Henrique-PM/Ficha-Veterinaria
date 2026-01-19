@@ -1,0 +1,87 @@
+<style>
+  :root { --dark-bg:#121212; --dark-card:#1e1e1e; --text:#f8f9fa; --muted:#adb5bd; --primary:#4e73df; --accent:#36b9cc; }
+  body { background:var(--dark-bg); color:var(--text); font-family:Segoe UI,Tahoma,Geneva,Verdana,sans-serif; }
+  .container { max-width:1200px; margin:30px auto; padding:0 20px; }
+  .grid { display:grid; grid-template-columns:1fr; gap:20px; }
+  @media(min-width:992px){ .grid{ grid-template-columns:1fr 1fr; } }
+  .card { background:var(--dark-card); border-radius:10px; padding:20px; box-shadow:0 0 10px rgba(0,0,0,.3); }
+  .header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+  .pill { background:#222; border:1px solid #333; padding:6px 12px; border-radius:20px; font-size:.85rem; color:var(--muted); }
+  table { width:100%; border-collapse:collapse; }
+  th, td { padding:10px; border-bottom:1px solid #2b2b2b; font-size:.95rem; }
+  th { text-align:left; color:var(--muted); font-weight:600; }
+  tbody tr:hover { background:#191919; }
+  .section-title { display:flex; align-items:center; gap:10px; }
+  .section-title i { color:var(--accent); }
+</style>
+<div class="container">
+  <h2 style="margin-bottom:20px">Meus Registros</h2>
+  <div class="grid">
+    <div class="card">
+      <div class="header">
+        <div class="section-title"><i class="fas fa-syringe"></i><h3>Vacinas</h3></div>
+        <span class="pill">{{vacinas.length}} itens</span>
+      </div>
+      {{#if vacinas.length}}
+      <table>
+        <thead><tr><th>Animal</th><th>Vacina</th><th>Aplicação</th><th>Próxima Dose</th></tr></thead>
+        <tbody>
+          {{#each vacinas}}
+            <tr>
+              <td><a href="/vet/animal/{{this.animal_id}}">{{this.animal_name}}</a></td>
+              <td>{{this.name}}</td>
+              <td>{{this.application_date}}</td>
+              <td>{{this.next_dose}}</td>
+            </tr>
+          {{/each}}
+        </tbody>
+      </table>
+      {{else}}<p style="color:var(--muted)">Nenhuma vacina registrada por você.</p>{{/if}}
+    </div>
+
+    <div class="card">
+      <div class="header">
+        <div class="section-title"><i class="fas fa-flask"></i><h3>Procedimentos/Exames</h3></div>
+        <span class="pill">{{procedimentos.length}} itens</span>
+      </div>
+      {{#if procedimentos.length}}
+      <table>
+        <thead><tr><th>Animal</th><th>Procedimento</th><th>Data</th></tr></thead>
+        <tbody>
+          {{#each procedimentos}}
+            <tr>
+              <td><a href="/vet/animal/{{this.animal_id}}">{{this.animal_name}}</a></td>
+              <td>{{this.name}}</td>
+              <td>{{this.procedure_date}}</td>
+            </tr>
+          {{/each}}
+        </tbody>
+      </table>
+      {{else}}<p style="color:var(--muted)">Nenhum procedimento registrado por você.</p>{{/if}}
+    </div>
+
+    <div class="card" style="grid-column:1/-1">
+      <div class="header">
+        <div class="section-title"><i class="fas fa-prescription-bottle-alt"></i><h3>Receitas/Medicações</h3></div>
+        <span class="pill">{{receitas.length}} itens</span>
+      </div>
+      {{#if receitas.length}}
+      <table>
+        <thead><tr><th>Animal</th><th>Medicamento</th><th>Dosagem</th><th>Início</th><th>Término</th></tr></thead>
+        <tbody>
+          {{#each receitas}}
+            <tr>
+              <td><a href="/vet/animal/{{this.animal_id}}">{{this.animal_name}}</a></td>
+              <td>{{this.medication_name}}</td>
+              <td>{{this.dosage}}</td>
+              <td>{{this.start_date}}</td>
+              <td>{{this.end_date}}</td>
+            </tr>
+          {{/each}}
+        </tbody>
+      </table>
+      {{else}}<p style="color:var(--muted)">Nenhuma receita registrada por você.</p>{{/if}}
+    </div>
+  </div>
+</div>
+<script src="https://kit.fontawesome.com/a2d04b7f0b.js" crossorigin="anonymous"></script>

@@ -1,544 +1,97 @@
-    <style>
-        :root {
-            --dark-bg: #121212;
-            --darker-bg: #0a0a0a;
-            --dark-card: #1e1e1e;
-            --dark-border: #333;
-            --primary-color: #4e73df;
-            --primary-hover: #3a5bd9;
-            --text-light: #f8f9fa;
-            --text-muted: #adb5bd;
-            --success-color: #1cc88a;
-            --warning-color: #f6c23e;
-            --danger-color: #e74a3b;
-            --info-color: #36b9cc;
-        }
-
-        body {
-            background-color: var(--dark-bg);
-            color: var(--text-light);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        /* Navbar */
-        .sidebar {
-            background-color: var(--darker-bg);
-            min-height: 100vh;
-            width: 250px;
-            position: fixed;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-        }
-
-        .sidebar-brand {
-            height: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: rgba(0, 0, 0, 0.2);
-            margin-bottom: 1rem;
-        }
-
-        .sidebar-brand-text {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: var(--text-light);
-        }
-
-        .nav-item {
-            margin: 0.5rem 1rem;
-            border-radius: 5px;
-            overflow: hidden;
-        }
-
-        .nav-link {
-            color: var(--text-muted);
-            padding: 0.75rem 1rem;
-            transition: all 0.3s;
-        }
-
-        .nav-link:hover {
-            color: var(--text-light);
-            background-color: rgba(255, 255, 255, 0.05);
-        }
-
-        .nav-link.active {
-            color: var(--text-light);
-            background-color: var(--primary-color);
-        }
-
-        .nav-link i {
-            margin-right: 0.5rem;
-            width: 20px;
-            text-align: center;
-        }
-
-        /* Main Content */
-        .main-content {
-            margin-left: 250px;
-            padding: 20px;
-            min-height: 100vh;
-        }
-
-        /* Header */
-        .topbar {
-            background-color: var(--dark-card);
-            height: 80px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 20px;
-        }
-
-        .page-title h1 {
-            font-size: 1.8rem;
-            margin: 0;
-            font-weight: 600;
-            color: var(--text-light);
-        }
-
-        .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid var(--primary-color);
-        }
-
-        .user-name {
-            font-weight: 500;
-        }
-
-        .btn-add-animal {
-            background-color: var(--primary-color);
-            border: none;
-            padding: 0.5rem 1.5rem;
-            border-radius: 50px;
-            font-weight: 500;
-            transition: all 0.3s;
-        }
-
-        .btn-add-animal:hover {
-            background-color: var(--primary-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(78, 115, 223, 0.3);
-        }
-
-        /* Search Bar */
-        .search-container {
-            background-color: var(--dark-card);
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-        }
-
-        .search-bar {
-            display: flex;
-            gap: 10px;
-        }
-
-        .search-input {
-            flex: 1;
-            background-color: var(--dark-bg);
-            border: 1px solid var(--dark-border);
-            color: var(--text-light);
-            padding: 0.75rem 1rem;
-            border-radius: 50px;
-            transition: all 0.3s;
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
-        }
-
-        .search-btn {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 0 1.5rem;
-            border-radius: 50px;
-            font-weight: 500;
-            transition: all 0.3s;
-        }
-
-        .search-btn:hover {
-            background-color: var(--primary-hover);
-        }
-
-        /* Stats Cards */
-        .stats-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .stat-card {
-            background-color: var(--dark-card);
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-            transition: all 0.3s;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
-        }
-
-        .stat-icon {
-            font-size: 2rem;
-            margin-bottom: 15px;
-        }
-
-        .stat-title {
-            font-size: 1rem;
-            color: var(--text-muted);
-            margin-bottom: 5px;
-        }
-
-        .stat-value {
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin: 0;
-        }
-
-        /* Animal Cards */
-        .animals-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-        }
-
-        .animal-card {
-            background-color: var(--dark-card);
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-            transition: all 0.3s;
-        }
-
-        .animal-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
-        }
-
-        .animal-image {
-            height: 200px;
-            background-size: cover;
-            background-position: center;
-            position: relative;
-        }
-
-        .animal-status {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            padding: 0.25rem 0.75rem;
-            border-radius: 50px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .status-treatment {
-            background-color: var(--warning-color);
-            color: #000;
-        }
-
-        .status-adopted {
-            background-color: var(--success-color);
-            color: #fff;
-        }
-
-        .status-shelter {
-            background-color: var(--info-color);
-            color: #fff;
-        }
-
-        .animal-info {
-            padding: 20px;
-        }
-
-        .animal-name {
-            font-size: 1.3rem;
-            margin-bottom: 15px;
-            color: var(--text-light);
-        }
-
-        .animal-details {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .animal-detail {
-            background-color: rgba(255, 255, 255, 0.1);
-            padding: 0.25rem 0.75rem;
-            border-radius: 50px;
-            font-size: 0.8rem;
-        }
-
-        .animal-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .btn-primary {
-            background-color: var(--primary-color);
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
-            font-weight: 500;
-            transition: all 0.3s;
-        }
-
-        .btn-primary:hover {
-            background-color: var(--primary-hover);
-        }
-
-        .btn-outline {
-            background-color: transparent;
-            border: 1px solid var(--primary-color);
-            color: var(--primary-color);
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
-            font-weight: 500;
-            transition: all 0.3s;
-        }
-
-        .btn-outline:hover {
-            background-color: rgba(78, 115, 223, 0.1);
-        }
-
-        /* Responsive */
-        @media (max-width: 992px) {
-            .sidebar {
-                width: 80px;
-            }
-            .sidebar-brand-text, .nav-link span {
-                display: none;
-            }
-            .nav-link {
-                text-align: center;
-                padding: 1rem 0;
-            }
-            .nav-link i {
-                margin-right: 0;
-                font-size: 1.2rem;
-            }
-            .main-content {
-                margin-left: 80px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .stats-container {
-                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            }
-            .animals-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
-
-    <!-- Sidebar -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - VetCare</title>
+    <link rel="stylesheet" href="/css/minimal.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
     <nav class="sidebar">
-        <div class="sidebar-brand">
-            <span class="sidebar-brand-text">VetCare System</span>
-        </div>
-        <ul class="nav flex-column">
-            <li class="nav-item">
-                <a class="nav-link active" href="/vet/dashboard">
-                    <i class="fas fa-tachometer-alt"></i>
-                    <span>Dashboard</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/vet/biblioteca">
-                    <i class="fas fa-paw"></i>
-                    <span>Animais</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/vet/consultas">
-                    <i class="fas fa-calendar-check"></i>
-                    <span>Consultas</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/vet/medicamentos">
-                    <i class="fas fa-pills"></i>
-                    <span>Medicamentos</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/vet/relatorios">
-                    <i class="fas fa-chart-bar"></i>
-                    <span>Relatórios</span>
-                </a>
-            </li>
-            <li class="nav-item mt-auto">
-                <a class="nav-link" href="/auth/logout">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Sair</span>
-                </a>
-            </li>
+        <div class="logo">🐾 VetCare</div>
+        <ul class="nav">
+            <li><a href="/vet/dashboard" class="active"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+            <li><a href="/vet/biblioteca"><i class="fas fa-paw"></i><span>Animais</span></a></li>
+            <li><a href="/vet/consultas"><i class="fas fa-stethoscope"></i><span>Consultas</span></a></li>
+            <li><a href="/vet/medicamentos"><i class="fas fa-pills"></i><span>Medicamentos</span></a></li>
+            <li><a href="/vet/relatorios"><i class="fas fa-chart-line"></i><span>Relatórios</span></a></li>
+            <li style="margin-top: auto;"><a href="/auth/logout"><i class="fas fa-sign-out-alt"></i><span>Sair</span></a></li>
         </ul>
     </nav>
 
-    <!-- Main Content -->
-    <div class="main-content">
-        <!-- Topbar -->
+    <div class="main">
         <div class="topbar">
-            <div class="page-title">
-                <h1>Painel Veterinário</h1>
-            </div>
-            <div class="user-profile">
-                <a href="/vet/cadastrar-animal" class="btn btn-add-animal">
-                    <i class="fas fa-plus me-2"></i>Cadastrar Animal
-                </a>
-                <img src="https://via.placeholder.com/40" alt="Usuário" class="user-avatar">
-                <span class="user-name">Dr. Veterinário</span>
-            </div>
+            <h1>Dashboard Veterinário</h1>
+            <a href="/vet/cadastrar-animal" class="btn btn-primary">+ Cadastrar Animal</a>
         </div>
 
-        <!-- Search Bar -->
-        <div class="search-container">
-            <form action="/vet/search" method="GET" class="search-bar">
-                <input type="text" name="name" placeholder="Buscar por animal..." class="search-input">
-                <button type="submit" class="search-btn">
-                    <i class="fas fa-search me-2"></i>Pesquisar
-                </button>
+        <div class="search">
+            <form action="/vet/search" method="GET" style="display: flex; gap: 10px; width: 100%;">
+                <input type="text" name="name" placeholder="Buscar animal..." required>
+                <button type="submit" class="btn btn-primary">Buscar</button>
             </form>
         </div>
 
-        <!-- Stats Cards -->
-        <div class="stats-container">
-            <div class="stat-card">
+        <div class="stats">
+            <a href="/vet/biblioteca" class="stat">
                 <div class="stat-icon">🐕</div>
-                <h4 class="stat-title">Total de Animais</h4>
-                <p class="stat-value">{{total_animais}}</p>
-            </div>
-            
-            <div class="stat-card">
+                <div class="stat-label">Total de Animais</div>
+                <div class="stat-value">{{total_animais}}</div>
+            </a>
+            <a href="/vet/animais/tratamento" class="stat">
                 <div class="stat-icon">🏥</div>
-                <h4 class="stat-title">Em Tratamento</h4>
-                <p class="stat-value">{{em_tratamento}}</p>
-            </div>
-            
-            <div class="stat-card">
-                <div class="stat-icon">💉</div>
-                <h4 class="stat-title">Vacinas Pendentes</h4>
-                <p class="stat-value">{{vacinas_pendentes}}</p>
-            </div>
-            
-            <div class="stat-card">
-                <div class="stat-icon">❤️</div>
-                <h4 class="stat-title">Adotados</h4>
-                <p class="stat-value">{{animais_adotados}}</p>
-            </div>
-            
-            <div class="stat-card">
-                <div class="stat-icon">🐴</div>
-                <h4 class="stat-title">Cavalos Atendidos</h4>
-                <p class="stat-value">{{total_cavalos}}</p>
-            </div>
-            
-            <div class="stat-card">
-                <div class="stat-icon">🐱</div>
-                <h4 class="stat-title">Gatos Atendidos</h4>
-                <p class="stat-value">{{total_gatos}}</p>
-            </div>
-
-            <div class="stat-card">
+                <div class="stat-label">Em Tratamento</div>
+                <div class="stat-value">{{em_tratamento}}</div>
+            </a>
+            <a href="/vet/consultas/hoje" class="stat">
                 <div class="stat-icon">📅</div>
-                <h4 class="stat-title">Consultas Hoje</h4>
-                <p class="stat-value">{{consultas_hoje}}</p>
-            </div>
-
-            <div class="stat-card">
-                <div class="stat-icon">📂</div>
-                <h4 class="stat-title">Fichas Atualizadas</h4>
-                <p class="stat-value">{{fichas_atualizadas_hoje}}</p>
-            </div>
-
-            <div class="stat-card">
+                <div class="stat-label">Consultas Hoje</div>
+                <div class="stat-value">{{consultas_hoje}}</div>
+            </a>
+            <a href="/vet/animais/adotados" class="stat">
+                <div class="stat-icon">❤️</div>
+                <div class="stat-label">Adotados</div>
+                <div class="stat-value">{{animais_adotados}}</div>
+            </a>
+            <a href="/vet/relatorios" class="stat">
+                <div class="stat-icon">💉</div>
+                <div class="stat-label">Vacinas Pendentes</div>
+                <div class="stat-value">{{vacinas_pendentes}}</div>
+            </a>
+            <a href="/vet/medicamentos/baixa" class="stat">
                 <div class="stat-icon">🧪</div>
-                <h4 class="stat-title">Medicamentos Baixos</h4>
-                <p class="stat-value">{{medicamentos_baixos}}</p>
-            </div>
+                <div class="stat-label">Estoque Baixo</div>
+                <div class="stat-value">{{medicamentos_baixos}}</div>
+            </a>
         </div>
 
-        <!-- Animals Grid -->
-        <h2 class="mb-4">Animais Recentes</h2>
-        <div class="animals-grid">
-            {{#each animals}}
+        <div class="card">
+            <h2>Animais Recentes</h2>
+            {{#if animals.length}}
+            <div class="grid">
+                {{#each animals}}
                 <div class="animal-card">
-                    <div class="animal-image" style="background-image: url('/animal/photo/{{this.id}}');">
-                        <span class="animal-status status-{{this.status}}">{{this.status}}</span>
-                    </div>
+                    <div class="animal-img" {{#if this.photo}}style="background-image: url('/vet/animal/photo/{{this.id}}')"{{/if}}></div>
                     <div class="animal-info">
-                        <h3 class="animal-name">{{this.name}}</h3>
-                        <div class="animal-details">
-                            <span class="animal-detail">🐕 {{this.species}}</span>
-                            <span class="animal-detail">♂ {{this.sex}}</span>
-                            <span class="animal-detail">{{this.age}} anos</span>
-                            <span class="animal-detail">#{{this.chip_number}}</span>
+                        <div class="animal-name">{{this.name}}</div>
+                        <div class="animal-tags">
+                            <span class="tag">{{this.species}}</span>
+                            <span class="tag">{{this.sex}}</span>
+                            <span class="tag">{{this.age}} anos</span>
                         </div>
-                        <div class="animal-actions">
-                            <a href="/vet/animal/{{this.id}}" class="btn btn-primary">
-                                <i class="fas fa-file-alt me-1"></i>Ficha
-                            </a>
-                            <a href="/vet/animal/{{this.id}}/historico" class="btn btn-outline">
-                                <i class="fas fa-history me-1"></i>Histórico
-                            </a>
-                        </div>
+                        <a href="/vet/animal/{{this.id}}" class="btn btn-primary btn-sm w-full">Ver Ficha</a>
                     </div>
                 </div>
-            {{/each}}
+                {{/each}}
+            </div>
+            {{else}}
+            <div class="empty">
+                <div style="font-size: 3rem; margin-bottom: 10px;">📭</div>
+                <p>Nenhum animal cadastrado</p>
+            </div>
+            {{/if}}
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Adiciona efeito de hover nos cards
-        document.querySelectorAll('.animal-card').forEach(card => {
-            card.addEventListener('mouseenter', function() {
-                this.style.transform = 'translateY(-5px)';
-                this.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.4)';
-            });
-            
-            card.addEventListener('mouseleave', function() {
-                this.style.transform = '';
-                this.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.3)';
-            });
-        });
-
-        // Atualiza dinamicamente o status das classes
-        document.querySelectorAll('.animal-status').forEach(status => {
-            const statusText = status.textContent.toLowerCase();
-            status.classList.remove('status-treatment');
-            
-            if (statusText.includes('adotado')) {
-                status.classList.add('status-adopted');
-            } else if (statusText.includes('abrigo')) {
-                status.classList.add('status-shelter');
-            } else {
-                status.classList.add('status-treatment');
-            }
-        });
-    </script>
+</body>
+</html>
