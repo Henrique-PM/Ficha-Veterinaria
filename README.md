@@ -1,6 +1,69 @@
 # 🐾 Ficha Veterinária
 
-Sistema de gestão de fichas veterinárias para abrigos, gatis e canis.
+Prontuário veterinário e controle de alojamento para abrigos, gatis e canis.
+
+---
+
+## 📖 Sobre o projeto
+
+### O problema
+
+Abrigo de animais costuma controlar tudo em caderno, grupo de WhatsApp e planilha
+solta. O resultado é sempre o mesmo: ninguém sabe de cabeça **qual gato já foi
+castrado**, **quem está com a vacina vencida**, **qual filhote ainda não foi testado
+para FIV/FeLV** ou **em qual gatil está o animal** que o veterinário precisa ver
+agora. Quando o voluntário troca ou o veterinário é outro, o histórico se perde.
+
+E tem um problema de privacidade que quase ninguém trata: a planilha que circula
+entre voluntários costuma ser a mesma que tem diagnóstico, medicação e resultado de
+exame. Informação clínica acaba na mão de quem só queria ajudar a divulgar o animal
+para adoção.
+
+### O que este sistema faz
+
+É uma aplicação web onde cada animal tem uma **ficha única e permanente**, e cada
+pessoa vê exatamente o que o papel dela permite.
+
+**Prontuário completo.** Peso e condição corporal ao longo do tempo, alergias,
+vacinas com controle de próxima dose, vermifugação e antipulgas, exames e
+procedimentos, internações com entrada e alta, prescrições e documentos anexados
+(laudo, raio-X, exame de sangue). Tudo com data e autor.
+
+**Ambientes.** Gatis, canis, baias e quarentena são cadastrados como caixas com
+capacidade definida, e cada animal é alocado a um deles. A tela mostra a ocupação de
+cada ambiente e avisa quando passa da capacidade — útil, por exemplo, para manter um
+gatil separado só para gatos FIV+.
+
+**Alertas.** O sistema avisa sozinho o que está vencendo: vacina atrasada,
+vermifugação a renovar, internação que ficou sem alta, medicamento com estoque
+abaixo do mínimo e animal ainda sem ambiente definido.
+
+**Controle sanitário próprio de coletivo.** Castração, status de FIV e FeLV com data
+do teste — os dados que definem se um animal pode ou não dividir espaço com outro.
+
+**Separação de acesso.** Quem se cadastra no site entra como **visualizador** e vê
+só a apresentação dos animais: nome, foto, raça, idade, temperamento. Prontuário,
+exames, medicação, chip e dados de tutor existem apenas para a **equipe
+veterinária** — e essa separação é feita na consulta ao banco, não só na tela, então
+os dados clínicos nem chegam a ser carregados na área pública. Quem concede o acesso
+de veterinário é o **administrador (root)**.
+
+### Para quem é
+
+| Perfil | Usa para |
+|---|---|
+| **Veterinário** | Preencher e consultar prontuário, dar alta, prescrever, controlar estoque e alojamento |
+| **Voluntário / adotante** | Conhecer os animais disponíveis e contribuir com fotos |
+| **Administrador (root)** | Definir quem é veterinário e gerenciar as contas |
+
+### Como foi construído
+
+Node.js e Express com Handlebars renderizando no servidor — sem framework de
+front-end, sem CDN externo, sem etapa de build. O banco é SQLite: um arquivo local
+em desenvolvimento e [Turso](https://turso.tech) em produção, com o mesmo dialeto
+SQL nos dois. Roda como função serverless na Vercel, o que exigiu guardar sessão no
+banco em vez de memória. `npm run check` sobe a aplicação de verdade e roda 69
+verificações de rota, permissão e vazamento de dado clínico.
 
 ---
 
