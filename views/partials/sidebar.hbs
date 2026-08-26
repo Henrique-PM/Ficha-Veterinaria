@@ -1,0 +1,62 @@
+<nav class="sidebar" aria-label="Menu principal">
+    <a class="brand" href="/">
+        <span>🐾</span>
+        <span>Ficha Veterinária</span>
+    </a>
+
+    {{#if isVet}}
+        <a class="nav-link {{navActive currentPath '/vet/dashboard'}}" href="/vet/dashboard">
+            <span class="ico" aria-hidden="true">📊</span> Dashboard
+        </a>
+        <a class="nav-link {{navActive currentPath '/vet/animais'}}" href="/vet/animais">
+            <span class="ico" aria-hidden="true">🐾</span> Animais
+        </a>
+        <a class="nav-link {{navActive currentPath '/vet/ambientes'}}" href="/vet/ambientes">
+            <span class="ico" aria-hidden="true">🏠</span> Ambientes
+        </a>
+        <a class="nav-link {{navActive currentPath '/vet/alertas'}}" href="/vet/alertas">
+            <span class="ico" aria-hidden="true">🔔</span> Alertas
+        </a>
+
+        <div class="nav-group-label">Clínica</div>
+        <a class="nav-link {{navActive currentPath '/vet/consultas'}}" href="/vet/consultas">
+            <span class="ico" aria-hidden="true">🏥</span> Internações
+        </a>
+        <a class="nav-link {{navActive currentPath '/vet/medicamentos'}}" href="/vet/medicamentos">
+            <span class="ico" aria-hidden="true">💊</span> Medicamentos
+        </a>
+        <a class="nav-link {{navActive currentPath '/vet/relatorios'}}" href="/vet/relatorios">
+            <span class="ico" aria-hidden="true">📈</span> Relatórios
+        </a>
+        <a class="nav-link {{navActive currentPath '/vet/meus-registros'}}" href="/vet/meus-registros">
+            <span class="ico" aria-hidden="true">📋</span> Meus registros
+        </a>
+
+        <div class="nav-group-label">Administração</div>
+        <a class="nav-link {{navActive currentPath '/vet/equipe'}}" href="/vet/equipe">
+            <span class="ico" aria-hidden="true">👥</span> Equipe
+            {{#if isRoot}}<span class="count" style="background:var(--primary)">root</span>{{/if}}
+        </a>
+    {{else}}
+        <a class="nav-link {{navActive currentPath '/user/dashboard'}}" href="/user/dashboard">
+            <span class="ico" aria-hidden="true">🐾</span> Animais
+        </a>
+    {{/if}}
+
+    <div class="sidebar-foot">
+        <div class="user-chip">
+            <div class="avatar" aria-hidden="true">{{initials currentUser.name}}</div>
+            <div class="who">
+                <strong>{{currentUser.name}}</strong>
+                <small>{{#if isRoot}}Administrador{{else}}{{#if isVet}}Veterinário{{else}}Visualizador{{/if}}{{/if}}</small>
+            </div>
+        </div>
+        <div class="row-tight">
+            <a href="/auth/senha" class="btn btn-ghost btn-sm" style="flex:1">Senha</a>
+            <form method="POST" action="/auth/logout" style="flex:1">
+                <input type="hidden" name="_csrf" value="{{csrfToken}}">
+                <button type="submit" class="btn btn-ghost btn-sm btn-block">Sair</button>
+            </form>
+        </div>
+    </div>
+</nav>

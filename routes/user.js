@@ -1,92 +1,150 @@
 const express = require('express');
-const router = express.Router();
-const db = require('../database');
-const multer = require('multer');
-const { ensureRole } = require('../middleware/auth');
-const storage = multer.memoryStorage();
-const uploadPhoto = multer({ storage });
 
-// Middleware: apenas visualizador
+const db = require('../database');
+const { ensureRole } = require('../middleware/auth');
+const { uploadPhoto } = require('../middleware/uploads');
+const { verifyCsrf } = require('../middleware/csrf');
+
+const router = express.Router();
+
+/*
+ * Área do visualizador (voluntário / adotante).
+ *
+ * REGRA DESTA ROTA: nada de prontuário aqui.
+ *
+ * A versão anterior renderizava health_records na ficha do visualizador —
+ * condição corporal, alergias e as observações clínicas do veterinário ficavam
+ * visíveis para qualquer conta comum. Peso, vacinas, internações, exames,
+ * medicamentos, documentos, número do chip e dados do tutor agora existem
+ * somente em /vet.
+ *
+ * A proteção é feita na consulta, não no template: a lista de colunas abaixo é
+ * a única coisa que sai do banco por aqui, então nenhum erro de view consegue
+ * expor um campo clínico que nunca foi carregado.
+ */
+const PUBLIC_COLUMNS = `
+  a.id, a.name, a.species, a.breed, a.age, a.birth_date, a.sex, a.size,
+  a.status, a.entry_date, a.description, a.characteristics, a.neutered,
+  a.photo IS NOT NULL AS has_photo,
+  e.name AS environment_name, e.kind AS environment_kind
+`;
+
 router.use(ensureRole('visualizador'));
 
-// Dashboard do usuário
-router.get('/dashboard', (req, res) => {
-  db.all('SELECT * FROM animals WHERE status != "falecido"', [], (err, animals) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).send('Erro ao buscar animais');
+// Catálogo de animais
+router.get('/dashboard', async (req, res, next) => {
+  try {
+    const search = String(req.query.q || '').trim();
+    const species = String(req.query.especie || '').trim();
+
+    const where = ["a.status != 'falecido'"];
+    const params = [];
+
+    if (search) {
+      where.push('(a.name LIKE ? OR a.breed LIKE ?)');
+      params.push(`%${search}%`, `%${search}%`);
     }
-    
-    res.render('user/dashboard', { 
-      user: req.session.user,
-      animals 
-    });
-  });
-});
-
-// Visualizar animal específico
-router.get('/animal/:id', (req, res) => {
-  const animalId = req.params.id;
-  
-  db.get('SELECT * FROM animals WHERE id = ?', [animalId], (err, animal) => {
-    if (err || !animal) {
-      return res.status(404).send('Animal não encontrado');
+    if (species) {
+      where.push('LOWER(a.species) = LOWER(?)');
+      params.push(species);
     }
-    
-    db.get('SELECT * FROM health_records WHERE animal_id = ? ORDER BY updated_at DESC LIMIT 1', [animalId], (err, healthRecord) => {
-      db.all('SELECT id, description, upload_date FROM animal_photos WHERE animal_id = ? ORDER BY upload_date DESC', [animalId], (pErr, photos) => {
-        if (pErr) {
-          console.error('Erro ao carregar fotos adicionais:', pErr);
-        }
-        res.render('user/ficha', {
-          user: req.session.user,
-          animal,
-          healthRecord,
-          photos: photos || []
-        });
-      });
+
+    const animals = await db.all(
+      `SELECT ${PUBLIC_COLUMNS}
+       FROM animals a
+       LEFT JOIN environments e ON a.environment_id = e.id
+       WHERE ${where.join(' AND ')}
+       ORDER BY a.entry_date DESC`,
+      params
+    );
+
+    const especies = await db.all(
+      "SELECT DISTINCT species FROM animals WHERE status != 'falecido' ORDER BY species"
+    );
+
+    res.render('user/dashboard', {
+      title: 'Animais',
+      animals,
+      especies,
+      search,
+      species,
+      total: animals.length
     });
-  });
-});
-
-// Upload de foto (usuário visualizador pode enviar foto para o animal)
-router.post('/animal/:id/photo', uploadPhoto.single('photo'), (req, res) => {
-  const animalId = req.params.id;
-  if (!req.session || !req.session.user) return res.redirect('/auth/login');
-  const uploadedBy = req.session.user.id;
-
-  if (!req.file || !req.file.buffer) {
-    return res.status(400).send('Arquivo de foto obrigatório');
+  } catch (err) {
+    next(err);
   }
+});
 
-  const description = req.body.description || null;
-  const photoBuffer = req.file.buffer;
+// Ficha reduzida — apresentação do animal, sem nada clínico
+router.get('/animal/:id', async (req, res, next) => {
+  try {
+    const animal = await db.get(
+      `SELECT ${PUBLIC_COLUMNS}
+       FROM animals a
+       LEFT JOIN environments e ON a.environment_id = e.id
+       WHERE a.id = ?`,
+      [req.params.id]
+    );
 
-  db.run(
-    `INSERT INTO animal_photos (animal_id, photo, description, uploaded_by) VALUES (?, ?, ?, ?)`,
-    [animalId, photoBuffer, description, uploadedBy],
-    function (err) {
-      if (err) {
-        console.error('Erro ao salvar foto:', err);
-        return res.status(500).send('Erro ao salvar foto');
+    if (!animal) {
+      return res.status(404).render('error', {
+        title: 'Animal não encontrado',
+        code: 404,
+        message: 'Este animal não existe ou foi removido.',
+        backUrl: '/user/dashboard'
+      });
+    }
+
+    const photos = await db.all(
+      'SELECT id, description, upload_date FROM animal_photos WHERE animal_id = ? ORDER BY upload_date DESC',
+      [req.params.id]
+    );
+
+    res.render('user/ficha', { title: animal.name, animal, photos });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Voluntário pode contribuir com fotos do animal
+router.post(
+  '/animal/:id/photo',
+  uploadPhoto.single('photo'),
+  verifyCsrf, // depois do multer: é ele quem preenche req.body em multipart
+  async (req, res, next) => {
+    try {
+      const animalId = req.params.id;
+
+      if (!req.file || !req.file.buffer) {
+        return res.status(400).render('error', {
+          title: 'Foto obrigatória',
+          code: 400,
+          message: 'Selecione uma imagem para enviar.',
+          backUrl: `/user/animal/${animalId}`
+        });
       }
-      return res.redirect(`/user/animal/${animalId}`);
-    }
-  );
-});
 
-router.get('/biblioteca-fotos', (req, res) => {
-  const query = `SELECT id, name, species, breed, age, sex, photo, status FROM animals ORDER BY entry_date DESC`;
-  db.all(query, [], (err, animals) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).render('error', { error: 'Erro ao carregar fotos' });
+      // Confere que o animal existe antes de gravar; sem isto era possível
+      // inserir fotos apontando para ids inexistentes.
+      const animal = await db.get('SELECT id FROM animals WHERE id = ?', [animalId]);
+      if (!animal) return res.status(404).send('Animal não encontrado');
+
+      await db.run(
+        'INSERT INTO animal_photos (animal_id, photo, mimetype, description, uploaded_by) VALUES (?, ?, ?, ?, ?)',
+        [
+          animalId,
+          req.file.buffer,
+          req.file.mimetype,
+          String(req.body.description || '').slice(0, 200) || null,
+          req.session.user.id
+        ]
+      );
+
+      return res.redirect(`/user/animal/${animalId}`);
+    } catch (err) {
+      next(err);
     }
-    res.render('layouts/pesquisa_animais', {
-      title: 'Biblioteca de Fotos',
-      animals
-    });
-  });
-});
+  }
+);
 
 module.exports = router;

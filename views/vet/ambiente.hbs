@@ -1,0 +1,105 @@
+<div class="topbar">
+    <div class="row">
+        <button type="button" class="btn btn-ghost btn-icon menu-toggle" data-menu-toggle
+                aria-expanded="false" aria-label="Abrir menu">☰</button>
+        <a href="/vet/ambientes" class="btn btn-ghost btn-sm">← Ambientes</a>
+        <div class="titles">
+            <h1>{{kindIcon environment.kind}} {{environment.name}}</h1>
+            <div class="subtitle">
+                {{kindLabel environment.kind}} ·
+                {{animals.length}} {{#if (eq animals.length 1)}}animal{{else}}animais{{/if}}
+                {{#if environment.capacity}} de {{environment.capacity}} vagas{{/if}}
+            </div>
+        </div>
+    </div>
+    <div class="actions">
+        <button type="button" class="btn btn-primary" data-modal-open="mover">+ Alocar animal aqui</button>
+    </div>
+</div>
+
+{{#if environment.notes}}
+<div class="alert alert-info">{{environment.notes}}</div>
+{{/if}}
+
+{{#if environment.capacity}}
+    {{#if (gt animals.length environment.capacity)}}
+    <div class="alert alert-danger">
+        ⚠️ Este ambiente está acima da capacidade: {{animals.length}} animais para {{environment.capacity}} vagas.
+    </div>
+    {{/if}}
+{{/if}}
+
+{{#if animals.length}}
+<div class="grid">
+    {{#each animals}}
+    <article class="animal-card">
+        <div class="animal-photo"
+             {{#if this.has_photo}}style="background-image:url('/media/animal/{{this.id}}/photo')"{{/if}}>
+            {{#unless this.has_photo}}<span aria-hidden="true">{{speciesIcon this.species}}</span>{{/unless}}
+            <span class="corner badge badge-{{statusVariant this.status}}">{{statusLabel this.status}}</span>
+        </div>
+        <div class="animal-body">
+            <div>
+                <div class="animal-name">{{this.name}}</div>
+                <div class="animal-meta">{{speciesIcon this.species}} {{this.species}} · {{displayAge this}}</div>
+            </div>
+            <div class="tags">
+                {{#if this.neutered}}<span class="tag badge-success">Castrado</span>{{/if}}
+                {{#if (eq this.fiv_status 'positivo')}}<span class="tag badge-danger">FIV+</span>{{/if}}
+                {{#if (eq this.felv_status 'positivo')}}<span class="tag badge-danger">FeLV+</span>{{/if}}
+            </div>
+            <div class="row-tight" style="margin-top:auto">
+                <a href="/vet/animal/{{this.id}}" class="btn btn-ghost btn-sm" style="flex:1">Ficha</a>
+                <form method="POST" action="/vet/ambientes/{{../environment.id}}/animais/{{this.id}}/remover"
+                      class="inline-form" data-confirm="Tirar {{this.name}} deste ambiente?">
+                    <input type="hidden" name="_csrf" value="{{../csrfToken}}">
+                    <button type="submit" class="btn btn-ghost btn-sm" title="Remover deste ambiente">✕</button>
+                </form>
+            </div>
+        </div>
+    </article>
+    {{/each}}
+</div>
+{{else}}
+<div class="card">
+    <div class="empty">
+        <span class="emoji" aria-hidden="true">{{kindIcon environment.kind}}</span>
+        <p>Nenhum animal alojado aqui ainda.</p>
+        <p class="mt">
+            <button type="button" class="btn btn-primary" data-modal-open="mover">Alocar o primeiro</button>
+        </p>
+    </div>
+</div>
+{{/if}}
+
+<dialog id="modal-mover">
+    <form method="POST" action="/vet/ambientes/{{environment.id}}/animais">
+        <input type="hidden" name="_csrf" value="{{csrfToken}}">
+        <div class="modal-head">
+            <h2>Alocar animal em {{environment.name}}</h2>
+            <button type="button" class="modal-close" data-modal-close aria-label="Fechar">&times;</button>
+        </div>
+        <div class="modal-body">
+            {{#if disponiveis.length}}
+            <div class="field">
+                <label for="animal_id">Animal</label>
+                <select id="animal_id" name="animal_id" required>
+                    <option value="">Selecione…</option>
+                    {{#each disponiveis}}
+                    <option value="{{this.id}}">{{this.name}} — {{this.species}}</option>
+                    {{/each}}
+                </select>
+                <span class="hint">
+                    Se o animal já estiver em outro ambiente, ele será movido para cá.
+                </span>
+            </div>
+            {{else}}
+            <p class="muted">Não há animais disponíveis para alocar.</p>
+            {{/if}}
+        </div>
+        <div class="modal-foot">
+            <button type="button" class="btn btn-ghost" data-modal-close>Cancelar</button>
+            <button type="submit" class="btn btn-primary" {{#unless disponiveis.length}}disabled{{/unless}}>Alocar</button>
+        </div>
+    </form>
+</dialog>

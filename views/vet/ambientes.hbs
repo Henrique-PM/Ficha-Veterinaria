@@ -1,0 +1,190 @@
+<div class="topbar">
+    <div class="row">
+        <button type="button" class="btn btn-ghost btn-icon menu-toggle" data-menu-toggle
+                aria-expanded="false" aria-label="Abrir menu">☰</button>
+        <div class="titles">
+            <h1>Ambientes</h1>
+            <div class="subtitle">Gatis, canis e baias — onde cada animal está alojado</div>
+        </div>
+    </div>
+    <div class="actions">
+        <button type="button" class="btn btn-primary" data-modal-open="novo-ambiente">+ Novo ambiente</button>
+    </div>
+</div>
+
+{{#if semAmbiente}}
+<div class="alert alert-warning">
+    ⚠️ {{semAmbiente}} {{#if (eq semAmbiente 1)}}animal está{{else}}animais estão{{/if}}
+    sem ambiente definido. <a href="/vet/animais?ambiente=">Ver na lista de animais</a>
+</div>
+{{/if}}
+
+<div class="env-grid">
+    {{#each environments}}
+    <a class="env-card" href="/vet/ambientes/{{this.id}}"
+       {{#if this.color}}style="border-left-color:{{this.color}}"{{/if}}>
+        <div class="env-top">
+            <span class="env-icon" aria-hidden="true">{{kindIcon this.kind}}</span>
+            <span>
+                <span class="env-name">{{this.name}}</span><br>
+                <span class="env-sub">{{kindLabel this.kind}}</span>
+            </span>
+        </div>
+
+        <div>
+            <span class="env-count">{{this.ocupacao}}</span>
+            <span class="env-sub">
+                {{#if this.capacity}}/ {{this.capacity}} vagas{{else}}
+                {{#if (eq this.ocupacao 1)}}animal{{else}}animais{{/if}}{{/if}}
+            </span>
+        </div>
+
+        {{#if this.capacity}}
+        <div class="meter {{#if (gt this.ocupacao this.capacity)}}is-full{{/if}}">
+            <span style="width:{{percent this.ocupacao this.capacity}}%"></span>
+        </div>
+        {{#if (gt this.ocupacao this.capacity)}}
+        <small class="badge badge-danger">Acima da capacidade</small>
+        {{/if}}
+        {{/if}}
+
+        {{#if this.notes}}<small class="env-sub">{{truncate this.notes 60}}</small>{{/if}}
+    </a>
+    {{/each}}
+
+    <button type="button" class="env-card env-add" data-modal-open="novo-ambiente">
+        <span class="plus" aria-hidden="true">+</span>
+        <span>Criar ambiente</span>
+        <small class="env-sub">Gatil, canil, baia ou quarentena</small>
+    </button>
+</div>
+
+{{#if environments.length}}
+<div class="card mt">
+    <div class="card-head">
+        <h2>⚙️ Editar ambientes</h2>
+        <span class="section-note">Alterar nome, tipo e capacidade</span>
+    </div>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr><th>Ambiente</th><th>Tipo</th><th>Ocupação</th><th class="actions-cell">Ações</th></tr>
+            </thead>
+            <tbody>
+                {{#each environments}}
+                <tr>
+                    <td><strong>{{this.name}}</strong></td>
+                    <td>{{kindIcon this.kind}} {{kindLabel this.kind}}</td>
+                    <td>{{this.ocupacao}}{{#if this.capacity}} / {{this.capacity}}{{/if}}</td>
+                    <td class="actions-cell">
+                        <div class="row-tight" style="justify-content:flex-end">
+                            <button type="button" class="btn btn-ghost btn-sm"
+                                    data-modal-open="editar-{{this.id}}">Editar</button>
+                            <form method="POST" action="/vet/ambientes/{{this.id}}/excluir" class="inline-form"
+                                  data-confirm="Excluir o ambiente &quot;{{this.name}}&quot;? Os {{this.ocupacao}} animais dele ficarão sem ambiente (nenhum animal é apagado).">
+                                <input type="hidden" name="_csrf" value="{{../csrfToken}}">
+                                <button type="submit" class="btn btn-danger btn-sm">Excluir</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+</div>
+{{/if}}
+
+<dialog id="modal-novo-ambiente">
+    <form method="POST" action="/vet/ambientes">
+        <input type="hidden" name="_csrf" value="{{csrfToken}}">
+        <div class="modal-head">
+            <h2>Novo ambiente</h2>
+            <button type="button" class="modal-close" data-modal-close aria-label="Fechar">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="field">
+                <label for="nome-ambiente">Nome</label>
+                <input type="text" id="nome-ambiente" name="name" required maxlength="80"
+                       placeholder="Ex.: Gatil 1, Canil dos filhotes, Quarentena">
+            </div>
+            <div class="form-row">
+                <div class="field">
+                    <label for="tipo-ambiente">Tipo</label>
+                    <select id="tipo-ambiente" name="kind">
+                        <option value="gatil">🐈 Gatil</option>
+                        <option value="canil">🐕 Canil</option>
+                        <option value="baia">🐴 Baia</option>
+                        <option value="quarentena">⚠️ Quarentena</option>
+                        <option value="outro">🏠 Outro</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label for="cap-ambiente">Capacidade</label>
+                    <input type="number" id="cap-ambiente" name="capacity" min="0" max="999"
+                           placeholder="Opcional">
+                    <span class="hint">Quantos animais cabem.</span>
+                </div>
+            </div>
+            <div class="field">
+                <label for="cor-ambiente">Cor de identificação</label>
+                <input type="text" id="cor-ambiente" name="color" maxlength="20" placeholder="#2f7a63">
+            </div>
+            <div class="field">
+                <label for="notas-ambiente">Observações</label>
+                <textarea id="notas-ambiente" name="notes" maxlength="300"
+                          placeholder="Ex.: só gatos FIV+, área externa coberta"></textarea>
+            </div>
+        </div>
+        <div class="modal-foot">
+            <button type="button" class="btn btn-ghost" data-modal-close>Cancelar</button>
+            <button type="submit" class="btn btn-primary">Criar ambiente</button>
+        </div>
+    </form>
+</dialog>
+
+{{#each environments}}
+<dialog id="modal-editar-{{this.id}}">
+    <form method="POST" action="/vet/ambientes/{{this.id}}">
+        <input type="hidden" name="_csrf" value="{{../csrfToken}}">
+        <div class="modal-head">
+            <h2>Editar {{this.name}}</h2>
+            <button type="button" class="modal-close" data-modal-close aria-label="Fechar">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="field">
+                <label for="nome-{{this.id}}">Nome</label>
+                <input type="text" id="nome-{{this.id}}" name="name" value="{{this.name}}" required maxlength="80">
+            </div>
+            <div class="form-row">
+                <div class="field">
+                    <label for="tipo-{{this.id}}">Tipo</label>
+                    <select id="tipo-{{this.id}}" name="kind">
+                        <option value="gatil" {{selected this.kind 'gatil'}}>🐈 Gatil</option>
+                        <option value="canil" {{selected this.kind 'canil'}}>🐕 Canil</option>
+                        <option value="baia" {{selected this.kind 'baia'}}>🐴 Baia</option>
+                        <option value="quarentena" {{selected this.kind 'quarentena'}}>⚠️ Quarentena</option>
+                        <option value="outro" {{selected this.kind 'outro'}}>🏠 Outro</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label for="cap-{{this.id}}">Capacidade</label>
+                    <input type="number" id="cap-{{this.id}}" name="capacity" value="{{this.capacity}}" min="0" max="999">
+                </div>
+            </div>
+            <div class="field">
+                <label for="cor-{{this.id}}">Cor</label>
+                <input type="text" id="cor-{{this.id}}" name="color" value="{{this.color}}" maxlength="20">
+            </div>
+            <div class="field">
+                <label for="notas-{{this.id}}">Observações</label>
+                <textarea id="notas-{{this.id}}" name="notes" maxlength="300">{{this.notes}}</textarea>
+            </div>
+        </div>
+        <div class="modal-foot">
+            <button type="button" class="btn btn-ghost" data-modal-close>Cancelar</button>
+            <button type="submit" class="btn btn-primary">Salvar</button>
+        </div>
+    </form>
+</dialog>
+{{/each}}

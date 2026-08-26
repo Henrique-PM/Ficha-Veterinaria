@@ -1,0 +1,145 @@
+<div class="topbar">
+    <div class="row">
+        <button type="button" class="btn btn-ghost btn-icon menu-toggle" data-menu-toggle
+                aria-expanded="false" aria-label="Abrir menu">☰</button>
+        <div class="titles">
+            <h1>Olá, {{currentUser.name}}</h1>
+            <div class="subtitle">Visão geral do abrigo</div>
+        </div>
+    </div>
+    <div class="actions">
+        <form method="GET" action="/vet/animais" class="row-tight">
+            <input type="search" name="q" placeholder="Buscar animal, raça ou chip" style="min-width:210px">
+            <button type="submit" class="btn btn-ghost">Buscar</button>
+        </form>
+        <a href="/vet/cadastrar-animal" class="btn btn-primary">+ Cadastrar animal</a>
+    </div>
+</div>
+
+<div class="stats">
+    <a class="stat" href="/vet/animais">
+        <div class="ico" aria-hidden="true">🐾</div>
+        <div class="label">Total de animais</div>
+        <div class="value">{{total_animais}}</div>
+    </a>
+    <a class="stat" href="/vet/animais?status=abrigo">
+        <div class="ico" aria-hidden="true">🏠</div>
+        <div class="label">No abrigo</div>
+        <div class="value">{{no_abrigo}}</div>
+    </a>
+    <a class="stat {{#if internados}}is-warn{{/if}}" href="/vet/consultas?filtro=abertas">
+        <div class="ico" aria-hidden="true">🏥</div>
+        <div class="label">Internados agora</div>
+        <div class="value">{{internados}}</div>
+    </a>
+    <a class="stat" href="/vet/animais?status=adotado">
+        <div class="ico" aria-hidden="true">❤️</div>
+        <div class="label">Adotados</div>
+        <div class="value">{{adotados}}</div>
+    </a>
+    <a class="stat {{#if vacinas_vencidas}}is-alert{{/if}}" href="/vet/alertas">
+        <div class="ico" aria-hidden="true">💉</div>
+        <div class="label">Vacinas vencidas</div>
+        <div class="value">{{vacinas_vencidas}}</div>
+    </a>
+    <a class="stat {{#if vermifugos_vencidos}}is-alert{{/if}}" href="/vet/alertas">
+        <div class="ico" aria-hidden="true">🪱</div>
+        <div class="label">Vermífugos vencidos</div>
+        <div class="value">{{vermifugos_vencidos}}</div>
+    </a>
+    <a class="stat {{#if estoque_baixo}}is-warn{{/if}}" href="/vet/medicamentos?filtro=baixo">
+        <div class="ico" aria-hidden="true">💊</div>
+        <div class="label">Estoque baixo</div>
+        <div class="value">{{estoque_baixo}}</div>
+    </a>
+    <a class="stat" href="/vet/ambientes">
+        <div class="ico" aria-hidden="true">🏘️</div>
+        <div class="label">Ambientes</div>
+        <div class="value">{{total_ambientes}}</div>
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-head">
+        <h2>🏘️ Ambientes</h2>
+        <a href="/vet/ambientes" class="btn btn-ghost btn-sm">Gerenciar</a>
+    </div>
+
+    {{#if environments.length}}
+    <div class="env-grid">
+        {{#each environments}}
+        <a class="env-card" href="/vet/ambientes/{{this.id}}"
+           {{#if this.color}}style="border-left-color:{{this.color}}"{{/if}}>
+            <div class="env-top">
+                <span class="env-icon" aria-hidden="true">{{kindIcon this.kind}}</span>
+                <span class="env-name">{{this.name}}</span>
+            </div>
+            <div>
+                <span class="env-count">{{this.ocupacao}}</span>
+                <span class="env-sub">{{#if this.capacity}}/ {{this.capacity}}{{/if}}</span>
+            </div>
+            {{#if this.capacity}}
+            <div class="meter {{#if (gt this.ocupacao this.capacity)}}is-full{{/if}}">
+                <span style="width:{{percent this.ocupacao this.capacity}}%"></span>
+            </div>
+            {{/if}}
+        </a>
+        {{/each}}
+        <a class="env-card env-add" href="/vet/ambientes">
+            <span class="plus" aria-hidden="true">+</span>
+            <span>Novo ambiente</span>
+        </a>
+    </div>
+    {{else}}
+    <div class="empty">
+        <span class="emoji" aria-hidden="true">🏘️</span>
+        <p>Nenhum ambiente criado ainda.</p>
+        <p class="mt"><a href="/vet/ambientes" class="btn btn-primary">Criar o primeiro gatil</a></p>
+    </div>
+    {{/if}}
+</div>
+
+{{#if alerts.length}}
+<div class="card">
+    <div class="card-head">
+        <h2>🔔 Vacinas a vencer</h2>
+        <a href="/vet/alertas" class="btn btn-ghost btn-sm">Ver todos os alertas</a>
+    </div>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Animal</th><th>Vacina</th><th>Vencimento</th><th>Situação</th></tr></thead>
+            <tbody>
+                {{#each alerts}}
+                <tr>
+                    <td><a href="/vet/animal/{{this.animal_id}}">{{this.animal_name}}</a></td>
+                    <td>{{this.item}}</td>
+                    <td class="nowrap">{{formatDate this.due}}</td>
+                    <td><span class="badge badge-{{dueVariant this.due}}">{{dueLabel this.due}}</span></td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+</div>
+{{/if}}
+
+<div class="card">
+    <div class="card-head">
+        <h2>🐾 Cadastrados recentemente</h2>
+        <a href="/vet/animais" class="btn btn-ghost btn-sm">Ver todos</a>
+    </div>
+
+    {{#if animals.length}}
+    <div class="grid">
+        {{#each animals}}
+            {{> animal-card animal=this href=(concat "/vet/animal/" this.id)}}
+        {{/each}}
+    </div>
+    {{else}}
+    <div class="empty">
+        <span class="emoji" aria-hidden="true">🐾</span>
+        <p>Nenhum animal cadastrado ainda.</p>
+        <p class="mt"><a href="/vet/cadastrar-animal" class="btn btn-primary">Cadastrar o primeiro</a></p>
+    </div>
+    {{/if}}
+</div>

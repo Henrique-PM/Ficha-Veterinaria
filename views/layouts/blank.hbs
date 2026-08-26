@@ -10,16 +10,7 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐾</text></svg>">
 </head>
 <body>
-    <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
-
-    <div class="layout">
-        {{#if currentUser}}{{> sidebar}}{{/if}}
-
-        <main class="content" id="conteudo">
-            {{{body}}}
-        </main>
-    </div>
-
+    {{{body}}}
     <script src="/js/app.js"></script>
 </body>
 </html>

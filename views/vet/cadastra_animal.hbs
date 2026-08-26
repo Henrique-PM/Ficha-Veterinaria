@@ -1,108 +1,172 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastrar Animal - VetCare</title>
-    <link rel="stylesheet" href="/css/minimal.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<body>
-    <nav class="sidebar">
-        <div class="logo">🐾 VetCare</div>
-        <ul class="nav">
-            <li><a href="/vet/dashboard"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
-            <li><a href="/vet/biblioteca"><i class="fas fa-image"></i><span>Biblioteca</span></a></li>
-            <li><a href="/vet/consultas"><i class="fas fa-stethoscope"></i><span>Consultas</span></a></li>
-            <li><a href="/vet/medicamentos"><i class="fas fa-pills"></i><span>Medicamentos</span></a></li>
-            <li><a href="/vet/relatorios"><i class="fas fa-chart-line"></i><span>Relatórios</span></a></li>
-            <li style="margin-top: auto;"><a href="/auth/logout"><i class="fas fa-sign-out-alt"></i><span>Sair</span></a></li>
-        </ul>
-    </nav>
+<div class="topbar">
+    <div class="row">
+        <button type="button" class="btn btn-ghost btn-icon menu-toggle" data-menu-toggle
+                aria-expanded="false" aria-label="Abrir menu">☰</button>
+        <a href="/vet/animais" class="btn btn-ghost btn-sm">← Voltar</a>
+        <div class="titles"><h1>Cadastrar animal</h1></div>
+    </div>
+</div>
 
-    <div class="main">
-        <div class="topbar">
-            <div style="display:flex; gap:10px; align-items:center;">
-                <a href="/vet/dashboard" class="btn btn-primary btn-sm">← Voltar</a>
-                <h1 style="margin:0;">Cadastrar Animal</h1>
+{{#if error}}<div class="alert alert-danger" role="alert">{{error}}</div>{{/if}}
+
+<form action="/vet/cadastrar-animal" method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+
+    <div class="card">
+        <div class="card-head"><h2>🐾 Identificação</h2></div>
+
+        <div class="form-row">
+            <div class="field">
+                <label for="name">Nome *</label>
+                <input type="text" id="name" name="name" value="{{form.name}}" required maxlength="80" autofocus>
+            </div>
+            <div class="field">
+                <label for="species">Espécie *</label>
+                <select id="species" name="species" required>
+                    <option value="">Selecione…</option>
+                    <option value="gato" {{selected form.species 'gato'}}>🐈 Gato</option>
+                    <option value="cachorro" {{selected form.species 'cachorro'}}>🐕 Cachorro</option>
+                    <option value="cavalo" {{selected form.species 'cavalo'}}>🐴 Cavalo</option>
+                    <option value="ave" {{selected form.species 'ave'}}>🦜 Ave</option>
+                    <option value="outro" {{selected form.species 'outro'}}>🐾 Outro</option>
+                </select>
+            </div>
+            <div class="field">
+                <label for="breed">Raça</label>
+                <input type="text" id="breed" name="breed" value="{{form.breed}}" maxlength="60" placeholder="SRD">
             </div>
         </div>
 
-        <div class="card">
-            {{#if error}}
-            <div class="alert alert-danger">{{error}}</div>
-            {{/if}}
+        <div class="form-row">
+            <div class="field">
+                <label for="birth_date">Data de nascimento</label>
+                <input type="date" id="birth_date" name="birth_date" value="{{form.birth_date}}">
+                <span class="hint">Preferível à idade: atualiza sozinha com o tempo.</span>
+            </div>
+            <div class="field">
+                <label for="age">Idade aproximada (anos)</label>
+                <input type="number" id="age" name="age" value="{{form.age}}" min="0" max="60">
+                <span class="hint">Use só se não souber a data de nascimento.</span>
+            </div>
+            <div class="field">
+                <label for="sex">Sexo</label>
+                <select id="sex" name="sex">
+                    <option value="">Selecione…</option>
+                    <option value="macho" {{selected form.sex 'macho'}}>Macho</option>
+                    <option value="fêmea" {{selected form.sex 'fêmea'}}>Fêmea</option>
+                    <option value="indeterminado" {{selected form.sex 'indeterminado'}}>Indeterminado</option>
+                </select>
+            </div>
+            <div class="field">
+                <label for="size">Porte</label>
+                <select id="size" name="size">
+                    <option value="">Selecione…</option>
+                    <option value="pequeno" {{selected form.size 'pequeno'}}>Pequeno</option>
+                    <option value="medio" {{selected form.size 'medio'}}>Médio</option>
+                    <option value="grande" {{selected form.size 'grande'}}>Grande</option>
+                </select>
+            </div>
+        </div>
 
-            <form action="/vet/cadastrar-animal" method="POST" enctype="multipart/form-data" style="display:grid; gap: 15px;">
-                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px;">
-                    <div class="form-group">
-                        <label class="form-label">Nome</label>
-                        <input type="text" name="name" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Espécie</label>
-                        <select name="species" class="form-control" required>
-                            <option value="">Selecione...</option>
-                            <option value="cachorro">Cachorro</option>
-                            <option value="gato">Gato</option>
-                            <option value="cavalo">Cavalo</option>
-                            <option value="ave">Ave</option>
-                            <option value="outro">Outro</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Raça</label>
-                        <input type="text" name="breed" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Idade (anos)</label>
-                        <input type="number" name="age" min="0" max="50" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Sexo</label>
-                        <select name="sex" class="form-control" required>
-                            <option value="">Selecione...</option>
-                            <option value="macho">Macho</option>
-                            <option value="fêmea">Fêmea</option>
-                            <option value="indeterminado">Indeterminado</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Chip (opcional)</label>
-                        <input type="text" name="chip_number" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Status</label>
-                        <select name="status" class="form-control" required>
-                            <option value="abrigo">Abrigo</option>
-                            <option value="hospital">Hospital</option>
-                            <option value="clinica">Clínica</option>
-                            <option value="adotado">Adotado</option>
-                            <option value="falecido">Falecido</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Foto do Animal (opcional)</label>
-                    <input type="file" name="photo" accept="image/*" class="form-control">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Características</label>
-                    <textarea name="characteristics" class="form-control" placeholder="Cor, marcações, porte..."></textarea>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Descrição/Observações</label>
-                    <textarea name="description" class="form-control" placeholder="Histórico, comportamento, notas gerais..."></textarea>
-                </div>
-
-                <div style="display:flex; gap:10px; justify-content:flex-end;">
-                    <button type="reset" class="btn btn-secondary">Limpar</button>
-                    <button type="submit" class="btn btn-success">Cadastrar</button>
-                </div>
-            </form>
+        <div class="form-row">
+            <div class="field">
+                <label for="chip_number">Número do chip</label>
+                <input type="text" id="chip_number" name="chip_number" value="{{form.chip_number}}" maxlength="60">
+                <span class="hint">Deixe vazio se não houver.</span>
+            </div>
+            <div class="field">
+                <label for="status">Status</label>
+                <select id="status" name="status">
+                    <option value="abrigo" {{selected form.status 'abrigo'}}>Abrigo</option>
+                    <option value="hospital" {{selected form.status 'hospital'}}>Hospital</option>
+                    <option value="clinica" {{selected form.status 'clinica'}}>Clínica</option>
+                    <option value="adotado" {{selected form.status 'adotado'}}>Adotado</option>
+                </select>
+            </div>
+            <div class="field">
+                <label for="environment_id">Ambiente</label>
+                <select id="environment_id" name="environment_id">
+                    <option value="">Sem ambiente</option>
+                    {{#each environments}}
+                    <option value="{{this.id}}" {{selected this.id ../form.environment_id}}>
+                        {{kindIcon this.kind}} {{this.name}}
+                    </option>
+                    {{/each}}
+                </select>
+                {{#unless environments.length}}
+                <span class="hint">Nenhum ambiente criado. <a href="/vet/ambientes">Criar um gatil</a>.</span>
+                {{/unless}}
+            </div>
         </div>
     </div>
-</body>
-</html>
+
+    <div class="card">
+        <div class="card-head">
+            <h2>🩺 Situação sanitária</h2>
+            <span class="section-note">Controle essencial em alojamento coletivo</span>
+        </div>
+
+        <div class="form-row">
+            <div class="field">
+                <label class="check">
+                    <input type="checkbox" name="neutered" value="1" {{checked form.neutered}}>
+                    Castrado
+                </label>
+                <label for="neutered_date">Data da castração</label>
+                <input type="date" id="neutered_date" name="neutered_date" value="{{form.neutered_date}}">
+            </div>
+            <div class="field">
+                <label for="fiv_status">FIV</label>
+                <select id="fiv_status" name="fiv_status">
+                    <option value="nao_testado" {{selected form.fiv_status 'nao_testado'}}>Não testado</option>
+                    <option value="negativo" {{selected form.fiv_status 'negativo'}}>Negativo</option>
+                    <option value="positivo" {{selected form.fiv_status 'positivo'}}>Positivo</option>
+                    <option value="indeterminado" {{selected form.fiv_status 'indeterminado'}}>Indeterminado</option>
+                </select>
+            </div>
+            <div class="field">
+                <label for="felv_status">FeLV</label>
+                <select id="felv_status" name="felv_status">
+                    <option value="nao_testado" {{selected form.felv_status 'nao_testado'}}>Não testado</option>
+                    <option value="negativo" {{selected form.felv_status 'negativo'}}>Negativo</option>
+                    <option value="positivo" {{selected form.felv_status 'positivo'}}>Positivo</option>
+                    <option value="indeterminado" {{selected form.felv_status 'indeterminado'}}>Indeterminado</option>
+                </select>
+            </div>
+            <div class="field">
+                <label for="retro_test_date">Data do teste</label>
+                <input type="date" id="retro_test_date" name="retro_test_date" value="{{form.retro_test_date}}">
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-head"><h2>📷 Foto e descrição</h2></div>
+
+        <div class="field">
+            <label for="photo">Foto principal</label>
+            <input type="file" id="photo" name="photo" accept="image/*" data-preview="preview-foto">
+            <span class="hint">JPG, PNG, WEBP ou GIF. Até 5 MB.</span>
+        </div>
+        <div class="profile-photo" id="preview-foto" style="max-width:180px;margin-bottom:14px">
+            <span aria-hidden="true">📷</span>
+        </div>
+
+        <div class="field">
+            <label for="characteristics">Características</label>
+            <textarea id="characteristics" name="characteristics" maxlength="1000"
+                      placeholder="Cor, marcações, sinais particulares…">{{form.characteristics}}</textarea>
+        </div>
+
+        <div class="field">
+            <label for="description">Histórico e comportamento</label>
+            <textarea id="description" name="description" maxlength="2000"
+                      placeholder="Como chegou, temperamento, convivência com outros animais…">{{form.description}}</textarea>
+        </div>
+
+        <div class="form-actions">
+            <a href="/vet/animais" class="btn btn-ghost">Cancelar</a>
+            <button type="submit" class="btn btn-primary">Cadastrar animal</button>
+        </div>
+    </div>
+</form>

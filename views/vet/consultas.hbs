@@ -1,123 +1,113 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Consultas - VetCare</title>
-    <link rel="stylesheet" href="/css/minimal.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<body>
-    <nav class="sidebar">
-        <div class="logo">🐾 VetCare</div>
-        <ul class="nav">
-            <li><a href="/vet/dashboard"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
-            <li><a href="/vet/biblioteca"><i class="fas fa-paw"></i><span>Animais</span></a></li>
-            <li><a href="/vet/consultas" class="active"><i class="fas fa-stethoscope"></i><span>Consultas</span></a></li>
-            <li><a href="/vet/medicamentos"><i class="fas fa-pills"></i><span>Medicamentos</span></a></li>
-            <li><a href="/vet/relatorios"><i class="fas fa-chart-line"></i><span>Relatórios</span></a></li>
-            <li style="margin-top: auto;"><a href="/auth/logout"><i class="fas fa-sign-out-alt"></i><span>Sair</span></a></li>
-        </ul>
-    </nav>
-
-    <div class="main">
-        <div class="topbar">
-            <h1>Consultas e Internações</h1>
-        </div>
-
-        <div class="card">
-            <h2>Internações Ativas</h2>
-            {{#if hospitalizations.length}}
-            <table>
-                <thead>
-                    <tr>
-                        <th>Animal</th>
-                        <th>Espécie</th>
-                        <th>Data</th>
-                        <th>Motivo</th>
-                        <th>Veterinário</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {{#each hospitalizations}}
-                    <tr>
-                        <td><strong>{{this.animal_name}}</strong></td>
-                        <td><span class="badge badge-primary">{{this.species}}</span></td>
-                        <td>{{this.entry_date}}</td>
-                        <td>{{this.reason}}</td>
-                        <td>{{this.vet_name}}</td>
-                        <td>
-                            <a href="/vet/animal/{{this.animal_id}}" class="btn btn-primary btn-sm">Ficha</a>
-                            <button onclick="openModal({{this.animal_id}}, '{{this.animal_name}}')" class="btn btn-success btn-sm">Receita</button>
-                        </td>
-                    </tr>
-                    {{/each}}
-                </tbody>
-            </table>
-            {{else}}
-            <div class="empty">
-                <div style="font-size: 3rem; margin-bottom: 10px;">📭</div>
-                <p>Nenhuma internação ativa</p>
+<div class="topbar">
+    <div class="row">
+        <button type="button" class="btn btn-ghost btn-icon menu-toggle" data-menu-toggle
+                aria-expanded="false" aria-label="Abrir menu">☰</button>
+        <div class="titles">
+            <h1>Internações</h1>
+            <div class="subtitle">
+                {{hospitalizations.length}} {{#if (eq hospitalizations.length 1)}}registro{{else}}registros{{/if}}
             </div>
-            {{/if}}
         </div>
     </div>
-
-    <div id="modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Prescrever Medicamento</h2>
-                <button class="close" onclick="closeModal()">&times;</button>
-            </div>
-            <form id="form" method="POST">
-                <input type="hidden" id="animalId">
-                <div class="form-group">
-                    <label class="form-label">Animal</label>
-                    <input type="text" id="animalName" class="form-control" readonly>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Medicamento *</label>
-                    <input type="text" name="medication_name" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Dosagem *</label>
-                    <input type="text" name="dosage" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Frequência *</label>
-                    <input type="text" name="frequency" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Data Início *</label>
-                    <input type="date" name="start_date" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Data Fim</label>
-                    <input type="date" name="end_date" class="form-control">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Observações</label>
-                    <textarea name="notes" class="form-control"></textarea>
-                </div>
-                <button type="submit" class="btn btn-success w-full">Salvar Receita</button>
-            </form>
-        </div>
+    <div class="actions">
+        <a href="/vet/consultas" class="btn {{#if (eq filtro 'todas')}}btn-primary{{else}}btn-ghost{{/if}}">Todas</a>
+        <a href="/vet/consultas?filtro=abertas" class="btn {{#if (eq filtro 'abertas')}}btn-primary{{else}}btn-ghost{{/if}}">Em aberto</a>
+        <a href="/vet/consultas?filtro=hoje" class="btn {{#if (eq filtro 'hoje')}}btn-primary{{else}}btn-ghost{{/if}}">Hoje</a>
     </div>
+</div>
 
-    <script>
-        function openModal(id, name) {
-            document.getElementById('animalId').value = id;
-            document.getElementById('animalName').value = name;
-            document.getElementById('form').action = '/vet/animal/' + id + '/receita';
-            document.getElementById('modal').style.display = 'block';
-        }
-        function closeModal() {
-            document.getElementById('modal').style.display = 'none';
-        }
-        window.onclick = function(e) {
-            if (e.target.id === 'modal') closeModal();
-        }
-    </script>
-</body>
-</html>
+<div class="card">
+    {{#if hospitalizations.length}}
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Animal</th><th>Entrada</th><th>Saída</th><th>Motivo</th>
+                    <th>Diagnóstico</th><th>Responsável</th><th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each hospitalizations}}
+                <tr>
+                    <td>
+                        <a href="/vet/animal/{{this.animal_id}}"><strong>{{this.animal_name}}</strong></a>
+                        <br><small class="muted">{{speciesIcon this.species}} {{this.species}}</small>
+                    </td>
+                    <td class="nowrap">{{formatDate this.entry_date}}</td>
+                    <td class="nowrap">
+                        {{#if this.exit_date}}
+                            {{formatDate this.exit_date}}
+                            {{#if this.exit_status}}<br><small class="muted">{{this.exit_status}}</small>{{/if}}
+                        {{else}}
+                            <span class="badge badge-warning">Em aberto</span>
+                        {{/if}}
+                    </td>
+                    <td>{{this.reason}}</td>
+                    <td>{{#if this.diagnosis}}{{truncate this.diagnosis 80}}{{else}}—{{/if}}</td>
+                    <td><small>{{#if this.vet_name}}{{this.vet_name}}{{else}}—{{/if}}</small></td>
+                    <td class="actions-cell">
+                        {{#unless this.exit_date}}
+                        <button type="button" class="btn btn-primary btn-sm" data-modal-open="alta-{{this.id}}">
+                            Dar alta
+                        </button>
+                        {{/unless}}
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+    {{else}}
+    <div class="empty">
+        <span class="emoji" aria-hidden="true">🏥</span>
+        <p>Nenhuma internação{{#unless (eq filtro 'todas')}} com esse filtro{{/unless}}.</p>
+    </div>
+    {{/if}}
+</div>
+
+{{#each hospitalizations}}
+    {{#unless this.exit_date}}
+    <dialog id="modal-alta-{{this.id}}">
+        <form method="POST" action="/vet/internacao/{{this.id}}/alta">
+            <input type="hidden" name="_csrf" value="{{../csrfToken}}">
+            <div class="modal-head">
+                <h2>Dar alta — {{this.animal_name}}</h2>
+                <button type="button" class="modal-close" data-modal-close aria-label="Fechar">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="muted" style="margin-bottom:14px">
+                    Internado em {{formatDate this.entry_date}} — {{this.reason}}
+                </p>
+                <div class="form-row">
+                    <div class="field">
+                        <label for="saida-{{this.id}}">Data da alta</label>
+                        <input type="date" id="saida-{{this.id}}" name="exit_date" data-default-today>
+                    </div>
+                    <div class="field">
+                        <label for="st-{{this.id}}">Status após a alta</label>
+                        <select id="st-{{this.id}}" name="animal_status">
+                            <option value="abrigo">Abrigo</option>
+                            <option value="clinica">Clínica</option>
+                            <option value="adotado">Adotado</option>
+                            <option value="falecido">Falecido</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="field">
+                    <label for="cond-{{this.id}}">Condição na alta</label>
+                    <input type="text" id="cond-{{this.id}}" name="exit_status" maxlength="200"
+                           placeholder="Ex.: recuperado, estável">
+                </div>
+                <div class="field">
+                    <label for="obs-{{this.id}}">Observações finais</label>
+                    <textarea id="obs-{{this.id}}" name="observations" maxlength="1000"></textarea>
+                </div>
+            </div>
+            <div class="modal-foot">
+                <button type="button" class="btn btn-ghost" data-modal-close>Cancelar</button>
+                <button type="submit" class="btn btn-primary">Confirmar alta</button>
+            </div>
+        </form>
+    </dialog>
+    {{/unless}}
+{{/each}}

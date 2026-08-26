@@ -1,203 +1,157 @@
-# Ficha Veterinária - Sistema de Gestão de Animais
+# 🐾 Ficha Veterinária
 
-Sistema web completo para gerenciar fichas veterinárias de animais em abrigos, clínicas e hospitais veterinários.
-
-## 🎯 Funcionalidades
-
-### Autenticação e Autorização (RBAC)
-- ✅ Login seguro com bcrypt
-- ✅ Dois papéis: **veterinário** (acesso completo) e **visualizador** (leitura)
-- ✅ Sessões seguras com cookies HttpOnly, SameSite e proteção CSRF
-- ✅ Rate limiting global (100 req/15min)
-
-### Gestão de Animais
-- ✅ Cadastro completo: espécie, raça, idade, sexo, chip, foto
-- ✅ Dashboard com métricas: total de animais, em tratamento, adotados, etc.
-- ✅ Busca por nome
-- ✅ Biblioteca de fotos com filtros
-- ✅ Status: abrigo, hospital, clínica, adotado, falecido
-
-### Ficha Veterinária Completa
-- ✅ **Saúde**: peso, condição corporal, alergias, observações
-- ✅ **Vacinas**: nome, data aplicação, próxima dose, lote
-- ✅ **Internações**: data entrada/saída, motivo, diagnóstico, tratamento
-- ✅ **Exames/Procedimentos**: raio-X, ultrassom, etc. com descrição
-- ✅ **Documentos**: upload/download de arquivos (PDF, imagem, etc.)
-
-### Segurança
-- ✅ Helmet (headers de segurança HTTP)
-- ✅ CSRF protection com tokens
-- ✅ Validação e sanitização com express-validator
-- ✅ SQL prepared statements (proteção contra SQL injection)
-- ✅ Autenticação por papel em rotas
-
-## 📋 Requisitos
-
-- Node.js 14+
-- npm 6+
-- SQLite3
-
-## 🚀 Instalação
-
-```bash
-# Clonar repositório
-git clone https://github.com/seu-usuario/Ficha-Veterinaria.git
-cd Ficha-Veterinaria
-
-# Instalar dependências
-npm install
-
-# Rodar em desenvolvimento
-npm run dev
-
-# Rodar em produção
-npm start
-```
-
-Servidor rodará em `http://localhost:5001`
-
-## 🔐 Variáveis de Ambiente
-
-Criar arquivo `.env` na raiz:
-
-```bash
-PORT=5001
-SESSION_SECRET=seu_segredo_forte_aqui
-COOKIE_SECURE=0  # Defina como 1 para HTTPS em produção
-NODE_ENV=development
-```
-
-## 👥 Papéis e Acesso
-
-### Veterinário
-- Acesso completo ao sistema
-- Criar/editar/visualizar animais
-- Registrar saúde, vacinas, procedimentos, internações
-- Upload de documentos
-- Dashboard com métricas
-
-### Visualizador
-- Apenas leitura
-- Ver animais e fichas (sem editar)
-- Acessar biblioteca de fotos
-
-## 📚 Estrutura do Banco de Dados
-
-### Tabelas principais
-- `users` - usuários do sistema
-- `animals` - dados básicos dos animais
-- `health_records` - ficha de saúde (peso, condição, alergias)
-- `vaccines` - vacinação
-- `procedures` - exames e procedimentos
-- `hospitalizations` - internações
-- `animal_documents` - documentos anexados
-- `medications` - medicamentos em stock
-- `animal_medications` - tratamentos
-
-## 🔌 Endpoints da API
-
-### Autenticação
-- `POST /auth/login` - Login
-- `POST /auth/register` - Cadastro
-- `GET /auth/logout` - Logout
-
-### Veterinário
-- `GET /vet/dashboard` - Dashboard com métricas
-- `GET /vet/animal/:id` - Ver ficha completa
-- `POST /vet/cadastrar-animal` - Cadastrar animal
-- `POST /vet/animal/:id/health-record` - Atualizar saúde
-- `POST /vet/animal/:id/vaccine` - Registrar vacina
-- `POST /vet/animal/:id/procedure` - Registrar exame/procedimento
-- `POST /vet/animal/:id/hospitalization` - Registrar internação
-- `POST /vet/animal/:id/document` - Upload documento
-- `GET /vet/animal/:animalId/document/:docId` - Download documento
-- `GET /vet/biblioteca` - Biblioteca de fotos com paginação
-- `GET /vet/search?name=...` - Buscar animal
-
-### Usuário (Visualizador)
-- `GET /user/dashboard` - Animais disponíveis
-- `GET /user/animal/:id` - Ver ficha (leitura)
-- `GET /user/biblioteca-fotos` - Biblioteca de fotos
-
-## 🎨 Design
-
-- Interface moderna **dark theme** (tema escuro)
-- Responsivo (mobile, tablet, desktop)
-- CSS utilities inline (sem dependências adicionais)
-- Formulários com validação client-side e server-side
-- Tabelas dinâmicas renderizadas do banco
-
-## 🔧 Desenvolvimento
-
-### Stack
-- **Backend**: Express.js 5
-- **Frontend**: Handlebars templates
-- **Banco**: SQLite3
-- **Auth**: bcrypt, express-session
-- **Segurança**: helmet, csurf, express-rate-limit, express-validator
-
-### Estrutura de arquivos
-```
-├── app.js                 # App principal
-├── database.js            # Inicialização SQLite
-├── middleware/
-│   └── auth.js           # Middlewares RBAC
-├── routes/
-│   ├── auth.js           # Login/registro/logout
-│   ├── user.js           # Rotas para visualizadores
-│   └── veterinario.js    # Rotas para veterinários
-├── views/
-│   ├── layouts/
-│   │   ├── main.hbs
-│   │   └── pesquisa_animais.hbs
-│   ├── auth/
-│   │   ├── login.hbs
-│   │   └── register.hbs
-│   ├── user/
-│   │   ├── dashboard.hbs
-│   │   └── ficha.hbs
-│   └── vet/
-│       ├── animais.hbs
-│       ├── cadastra_animal.hbs
-│       ├── cadastra_consulta.hbs
-│       └── ficha2.hbs    # Nova ficha completa
-├── public/
-│   ├── css/
-│   │   └── style.css
-│   └── js/
-│       └── script.js
-└── package.json
-```
-
-## ⚠️ Importante
-
-1. **Primeiro acesso**: Execute `npm install` para criar `node_modules` e inicializar o banco de dados.
-2. **Senha padrão** (criar na mão para primeiro usuário ou via formulário de registro).
-3. **Documentos**: Suporta qualquer tipo de arquivo; recomenda-se validação de tamanho/tipo em produção.
-4. **Dados de teste**: A ficha.hbs antiga continha dados mockados; a nova (ficha2.hbs) renderiza dados reais do BD.
-
-## 🐛 Troubleshooting
-
-**Erro "Conectado ao banco SQLite"**: Base de dados inicia vazia, crie usuários via formulário.
-
-**Upload de documento falha**: Verifique tamanho do arquivo e permissões de escrita em database.sqlite.
-
-**CSRF token inválido**: Certifique-se que a sessão do usuário está ativa e os formulários têm `name="_csrf"`.
-
-## 📝 Licença
-
-ISC - Veja LICENSE
-
-## 👨‍💻 Autor
-
-Henrique-PM
+Sistema de gestão de fichas veterinárias para abrigos, gatis e canis.
 
 ---
 
-**Melhorias Recentes:**
-- ✨ Redesign da ficha veterinária com layout moderno
-- ✨ Implementação completa de exames/procedimentos
-- ✨ Sistema de upload/download de documentos
-- ✨ Dashboard com métricas em tempo real
-- ✨ Validação e sanitização com express-validator
-- 🔒 Proteção CSRF, Helmet, rate limiting
+## 🚀 Subir na Vercel — passo a passo
+
+### 1. Criar o banco no Turso
+
+O SQLite em arquivo **não funciona na Vercel**: serverless tem disco somente-leitura
+e efêmero. O Turso é SQLite gerenciado, com o mesmo dialeto SQL.
+
+```bash
+# instalar a CLI
+curl -sSfL https://get.tur.so/install.sh | bash
+
+turso auth signup          # cria conta (grátis)
+turso db create fichavet   # cria o banco
+
+turso db show fichavet --url          # → TURSO_DATABASE_URL
+turso db tokens create fichavet       # → TURSO_AUTH_TOKEN
+```
+
+> Dá para fazer tudo pelo site [turso.tech](https://turso.tech) sem CLI.
+
+### 2. Gerar o segredo da sessão
+
+```bash
+node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
+```
+
+### 3. Configurar as variáveis na Vercel
+
+**Settings → Environment Variables** (marque *Production*, *Preview* e *Development*):
+
+| Variável | Valor | Obrigatória |
+|---|---|---|
+| `SESSION_SECRET` | o hex gerado no passo 2 | **sim** |
+| `TURSO_DATABASE_URL` | `libsql://fichavet-....turso.io` | **sim** |
+| `TURSO_AUTH_TOKEN` | o token do passo 1 | **sim** |
+| `ROOT_EMAIL` | e-mail do administrador | **sim** |
+| `ROOT_PASSWORD` | senha forte do administrador | **sim** |
+| `ROOT_NAME` | nome exibido do admin | não |
+| `NODE_ENV` | `production` | **sim** |
+
+> ⚠️ Sem `SESSION_SECRET` o app **se recusa a subir** em produção — de propósito.
+> Um segredo fixo no código permitiria forjar cookie de sessão e entrar como veterinário.
+
+### 4. Deploy
+
+```bash
+git add -A
+git commit -m "v2: RBAC, ambientes, segurança e Turso"
+git push
+```
+
+Importe o repositório na Vercel. O `vercel.json` já está configurado — não mexa nas
+configurações de build.
+
+### 5. Primeiro acesso
+
+Entre com `ROOT_EMAIL` / `ROOT_PASSWORD`, vá em **Equipe** e promova os veterinários.
+Depois **troque a senha do root** em *Senha*, na barra lateral.
+
+---
+
+## 💻 Rodar localmente
+
+```bash
+npm install
+cp .env.example .env     # preencha SESSION_SECRET, ROOT_EMAIL, ROOT_PASSWORD
+npm run dev              # http://localhost:5001
+```
+
+Sem `TURSO_DATABASE_URL`, o banco vira um arquivo em `./data/local.db`.
+
+```bash
+npm run seed    # dados de exemplo (gatis, animais, vacinas)
+npm run check   # teste de fumaça: 54 verificações de rota, papel e vazamento
+```
+
+---
+
+## 🔐 Papéis de acesso
+
+| | Visualizador | Veterinário | Administrador (root) |
+|---|:---:|:---:|:---:|
+| Ver apresentação dos animais | ✅ | ✅ | ✅ |
+| Enviar fotos para a galeria | ✅ | ✅ | ✅ |
+| **Prontuário, vacinas, exames, internações** | ❌ | ✅ | ✅ |
+| **Peso, alergias, observações clínicas** | ❌ | ✅ | ✅ |
+| **FIV/FeLV, chip, dados do tutor** | ❌ | ✅ | ✅ |
+| **Documentos e laudos** | ❌ | ✅ | ✅ |
+| Gerenciar ambientes e medicamentos | ❌ | ✅ | ✅ |
+| Promover / rebaixar veterinário | ❌ | ✅ | ✅ |
+| Conceder papel de administrador | ❌ | ❌ | ✅ |
+| Ativar/desativar conta, redefinir senha | ❌ | ❌ | ✅ |
+
+**Todo cadastro público nasce como visualizador.** O papel nunca vem do formulário:
+virar veterinário só acontece por promoção em `/vet/equipe`. Ao rebaixar alguém,
+as sessões dessa pessoa são encerradas na hora.
+
+---
+
+## 🏠 Ambientes (gatis / canis)
+
+Cada animal pode ser alocado a um ambiente — *Gatil 1*, *Canil A*, *Quarentena*…
+com tipo, capacidade, cor e observações. A tela mostra ocupação por ambiente e
+avisa quando passa da capacidade. Excluir um ambiente **não apaga animal nenhum**:
+eles apenas ficam sem alocação.
+
+---
+
+## 📋 O que a ficha registra
+
+**Identificação** — nome, espécie, raça, nascimento (a idade se atualiza sozinha),
+sexo, porte, chip, foto, ambiente, status.
+
+**Sanitário** — castração com data, FIV, FeLV, data do teste retroviral.
+
+**Clínico** — histórico de peso e condição corporal, alergias, observações,
+vacinas com controle de próxima dose, vermifugação e antiparasitários,
+exames e procedimentos, internações **com alta**, prescrições, documentos.
+
+**Desfecho** — adoção com adotante e data, óbito com data e causa.
+
+---
+
+## 🗂️ Estrutura
+
+```
+app.js              app Express (exporta, não escuta)
+server.js           execução local
+api/index.js        entrada da Vercel
+database.js         cliente libSQL (Turso remoto ou arquivo local)
+db/schema.js        migrations idempotentes, rodam a cada boot
+lib/                helpers do Handlebars, store de sessão, bootstrap do root
+middleware/         auth, CSRF, uploads
+routes/             auth, user, veterinario, equipe, media
+views/              layouts, partials e telas
+scripts/            check (testes), seed (dados de exemplo)
+```
+
+---
+
+## 🛡️ Segurança
+
+- Sessões no banco (funcionam em serverless), cookie `HttpOnly` + `SameSite` + `Secure`
+- CSRF em todo POST, com token por sessão e comparação em tempo constante
+- CSP sem `script-src: unsafe-inline` — nenhum JS inline nos templates
+- Rate limit global e específico nas rotas de credencial
+- Papel definido no servidor; sessões encerradas ao mudar
+- Uploads com limite de tamanho e whitelist de tipo; download sempre como `attachment`
+- Fotos e documentos exigem login; documento exige papel de veterinário
+- Consultas parametrizadas em toda parte; a área do visualizador só carrega colunas públicas
+- `0 vulnerabilidades` no `npm audit`

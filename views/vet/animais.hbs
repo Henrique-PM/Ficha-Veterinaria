@@ -1,97 +1,76 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - VetCare</title>
-    <link rel="stylesheet" href="/css/minimal.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<body>
-    <nav class="sidebar">
-        <div class="logo">🐾 VetCare</div>
-        <ul class="nav">
-            <li><a href="/vet/dashboard" class="active"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
-            <li><a href="/vet/biblioteca"><i class="fas fa-paw"></i><span>Animais</span></a></li>
-            <li><a href="/vet/consultas"><i class="fas fa-stethoscope"></i><span>Consultas</span></a></li>
-            <li><a href="/vet/medicamentos"><i class="fas fa-pills"></i><span>Medicamentos</span></a></li>
-            <li><a href="/vet/relatorios"><i class="fas fa-chart-line"></i><span>Relatórios</span></a></li>
-            <li style="margin-top: auto;"><a href="/auth/logout"><i class="fas fa-sign-out-alt"></i><span>Sair</span></a></li>
-        </ul>
-    </nav>
-
-    <div class="main">
-        <div class="topbar">
-            <h1>Dashboard Veterinário</h1>
-            <a href="/vet/cadastrar-animal" class="btn btn-primary">+ Cadastrar Animal</a>
-        </div>
-
-        <div class="search">
-            <form action="/vet/search" method="GET" style="display: flex; gap: 10px; width: 100%;">
-                <input type="text" name="name" placeholder="Buscar animal..." required>
-                <button type="submit" class="btn btn-primary">Buscar</button>
-            </form>
-        </div>
-
-        <div class="stats">
-            <a href="/vet/biblioteca" class="stat">
-                <div class="stat-icon">🐕</div>
-                <div class="stat-label">Total de Animais</div>
-                <div class="stat-value">{{total_animais}}</div>
-            </a>
-            <a href="/vet/animais/tratamento" class="stat">
-                <div class="stat-icon">🏥</div>
-                <div class="stat-label">Em Tratamento</div>
-                <div class="stat-value">{{em_tratamento}}</div>
-            </a>
-            <a href="/vet/consultas/hoje" class="stat">
-                <div class="stat-icon">📅</div>
-                <div class="stat-label">Consultas Hoje</div>
-                <div class="stat-value">{{consultas_hoje}}</div>
-            </a>
-            <a href="/vet/animais/adotados" class="stat">
-                <div class="stat-icon">❤️</div>
-                <div class="stat-label">Adotados</div>
-                <div class="stat-value">{{animais_adotados}}</div>
-            </a>
-            <a href="/vet/relatorios" class="stat">
-                <div class="stat-icon">💉</div>
-                <div class="stat-label">Vacinas Pendentes</div>
-                <div class="stat-value">{{vacinas_pendentes}}</div>
-            </a>
-            <a href="/vet/medicamentos/baixa" class="stat">
-                <div class="stat-icon">🧪</div>
-                <div class="stat-label">Estoque Baixo</div>
-                <div class="stat-value">{{medicamentos_baixos}}</div>
-            </a>
-        </div>
-
-        <div class="card">
-            <h2>Animais Recentes</h2>
-            {{#if animals.length}}
-            <div class="grid">
-                {{#each animals}}
-                <div class="animal-card">
-                    <div class="animal-img" {{#if this.photo}}style="background-image: url('/vet/animal/photo/{{this.id}}')"{{/if}}></div>
-                    <div class="animal-info">
-                        <div class="animal-name">{{this.name}}</div>
-                        <div class="animal-tags">
-                            <span class="tag">{{this.species}}</span>
-                            <span class="tag">{{this.sex}}</span>
-                            <span class="tag">{{this.age}} anos</span>
-                        </div>
-                        <a href="/vet/animal/{{this.id}}" class="btn btn-primary btn-sm w-full">Ver Ficha</a>
-                    </div>
-                </div>
-                {{/each}}
+<div class="topbar">
+    <div class="row">
+        <button type="button" class="btn btn-ghost btn-icon menu-toggle" data-menu-toggle
+                aria-expanded="false" aria-label="Abrir menu">☰</button>
+        <div class="titles">
+            <h1>Animais</h1>
+            <div class="subtitle">
+                {{animals.length}} {{#if (eq animals.length 1)}}resultado{{else}}resultados{{/if}}
             </div>
-            {{else}}
-            <div class="empty">
-                <div style="font-size: 3rem; margin-bottom: 10px;">📭</div>
-                <p>Nenhum animal cadastrado</p>
-            </div>
-            {{/if}}
         </div>
     </div>
-</body>
-</html>
+    <div class="actions">
+        <a href="/vet/cadastrar-animal" class="btn btn-primary">+ Cadastrar animal</a>
+    </div>
+</div>
+
+<div class="card">
+    <form method="GET" action="/vet/animais" class="filters">
+        <div class="field">
+            <label for="q">Buscar</label>
+            <input type="search" id="q" name="q" value="{{filtros.search}}" placeholder="Nome, raça ou chip">
+        </div>
+        <div class="field">
+            <label for="status">Status</label>
+            <select id="status" name="status" data-autosubmit>
+                <option value="">Todos</option>
+                {{#each statuses}}
+                <option value="{{this}}" {{selected this ../filtros.status}}>{{statusLabel this}}</option>
+                {{/each}}
+            </select>
+        </div>
+        <div class="field">
+            <label for="especie">Espécie</label>
+            <select id="especie" name="especie" data-autosubmit>
+                <option value="">Todas</option>
+                {{#each especies}}
+                <option value="{{this.species}}" {{selected this.species ../filtros.species}}>{{this.species}}</option>
+                {{/each}}
+            </select>
+        </div>
+        <div class="field">
+            <label for="ambiente">Ambiente</label>
+            <select id="ambiente" name="ambiente" data-autosubmit>
+                <option value="">Todos</option>
+                {{#each environments}}
+                <option value="{{this.id}}" {{selected this.id ../filtros.ambiente}}>
+                    {{kindIcon this.kind}} {{this.name}}
+                </option>
+                {{/each}}
+            </select>
+        </div>
+        <div class="field">
+            <label>&nbsp;</label>
+            <div class="row-tight">
+                <button type="submit" class="btn btn-primary">Filtrar</button>
+                <a href="/vet/animais" class="btn btn-ghost">Limpar</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+{{#if animals.length}}
+<div class="grid">
+    {{#each animals}}
+        {{> animal-card animal=this href=(concat "/vet/animal/" this.id)}}
+    {{/each}}
+</div>
+{{else}}
+<div class="card">
+    <div class="empty">
+        <span class="emoji" aria-hidden="true">🔍</span>
+        <p>Nenhum animal encontrado com esses filtros.</p>
+        <p class="mt"><a href="/vet/animais" class="btn btn-ghost">Limpar filtros</a></p>
+    </div>
+</div>
+{{/if}}

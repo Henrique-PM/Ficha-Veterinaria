@@ -1,0 +1,32 @@
+# Dependências
+node_modules/
+
+# Segredos — NUNCA commitar
+.env
+.env.local
+.env.*.local
+
+# Banco local
+data/
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Build / deploy
+.vercel/
+dist/
+build/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+*.log
+
+# SO / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

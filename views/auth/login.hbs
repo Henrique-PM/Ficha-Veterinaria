@@ -1,40 +1,31 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - VetCare</title>
-    <link rel="stylesheet" href="/css/minimal.css">
-</head>
-<body>
-    <div class="auth-container">
-        <div class="auth-card">
-            <div class="auth-header">
-                <div class="auth-logo">🐾</div>
-                <h1 class="auth-title">VetCare</h1>
-                <p class="auth-subtitle">Sistema Veterinário</p>
+<div class="auth-wrap">
+    <div class="auth-card">
+        <div class="auth-head">
+            <div class="logo" aria-hidden="true">🐾</div>
+            <h1>Ficha Veterinária</h1>
+            <p>Entre para acessar o sistema</p>
+        </div>
+
+        {{#if error}}<div class="alert alert-danger" role="alert">{{error}}</div>{{/if}}
+
+        <form action="/auth/login" method="POST">
+            <input type="hidden" name="_csrf" value="{{csrfToken}}">
+
+            <div class="field">
+                <label for="email">E-mail</label>
+                <input type="email" id="email" name="email" required autofocus autocomplete="username">
             </div>
 
-            {{#if error}}
-            <div class="alert alert-danger">{{error}}</div>
-            {{/if}}
-
-            <form action="/auth/login" method="POST">
-                <div class="form-group">
-                    <label class="form-label">Email</label>
-                    <input type="email" name="email" class="form-control" required autofocus>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Senha</label>
-                    <input type="password" name="password" class="form-control" required>
-                </div>
-                <button type="submit" class="btn btn-primary w-full">Entrar</button>
-            </form>
-
-            <div class="auth-footer">
-                <a href="/auth/register">Criar conta →</a>
+            <div class="field">
+                <label for="password">Senha</label>
+                <input type="password" id="password" name="password" required autocomplete="current-password">
             </div>
+
+            <button type="submit" class="btn btn-primary btn-block">Entrar</button>
+        </form>
+
+        <div class="auth-foot">
+            Ainda não tem conta? <a href="/auth/register">Criar conta</a>
         </div>
     </div>
-</body>
-</html>
+</div>

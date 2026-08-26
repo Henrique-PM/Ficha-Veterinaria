@@ -1,0 +1,136 @@
+<div class="topbar">
+    <div class="row">
+        <button type="button" class="btn btn-ghost btn-icon menu-toggle" data-menu-toggle
+                aria-expanded="false" aria-label="Abrir menu">☰</button>
+        <div class="titles">
+            <h1>Alertas</h1>
+            <div class="subtitle">O que precisa de atenção agora</div>
+        </div>
+    </div>
+</div>
+
+{{#unless totalAlertas}}
+<div class="card">
+    <div class="empty">
+        <span class="emoji" aria-hidden="true">✅</span>
+        <h2>Tudo em dia</h2>
+        <p class="mt">Nenhuma vacina vencida, vermifugação atrasada, internação em aberto ou estoque baixo.</p>
+    </div>
+</div>
+{{/unless}}
+
+{{#if internados.length}}
+<div class="card">
+    <div class="card-head">
+        <h2>🏥 Internações em aberto <span class="badge badge-warning">{{internados.length}}</span></h2>
+        <span class="section-note">Animais que entraram e ainda não receberam alta</span>
+    </div>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Animal</th><th>Motivo</th><th>Entrada</th><th></th></tr></thead>
+            <tbody>
+                {{#each internados}}
+                <tr>
+                    <td><strong>{{this.animal_name}}</strong></td>
+                    <td>{{this.reason}}</td>
+                    <td class="nowrap">{{formatDate this.entry_date}}</td>
+                    <td class="actions-cell">
+                        <a href="/vet/animal/{{this.animal_id}}#internacoes" class="btn btn-ghost btn-sm">Dar alta</a>
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+</div>
+{{/if}}
+
+{{#if vacinas.length}}
+<div class="card">
+    <div class="card-head">
+        <h2>💉 Vacinas vencidas ou a vencer <span class="badge badge-danger">{{vacinas.length}}</span></h2>
+        <span class="section-note">Próximos 30 dias e atrasadas</span>
+    </div>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Animal</th><th>Vacina</th><th>Vencimento</th><th>Situação</th><th></th></tr></thead>
+            <tbody>
+                {{#each vacinas}}
+                <tr>
+                    <td><strong>{{this.animal_name}}</strong> <small class="muted">{{speciesIcon this.species}}</small></td>
+                    <td>{{this.name}}</td>
+                    <td class="nowrap">{{formatDate this.next_dose}}</td>
+                    <td><span class="badge badge-{{dueVariant this.next_dose}}">{{dueLabel this.next_dose}}</span></td>
+                    <td class="actions-cell">
+                        <a href="/vet/animal/{{this.animal_id}}#vacinas" class="btn btn-ghost btn-sm">Abrir</a>
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+</div>
+{{/if}}
+
+{{#if vermifugos.length}}
+<div class="card">
+    <div class="card-head">
+        <h2>🪱 Vermifugação a renovar <span class="badge badge-warning">{{vermifugos.length}}</span></h2>
+    </div>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Animal</th><th>Produto</th><th>Próxima</th><th>Situação</th><th></th></tr></thead>
+            <tbody>
+                {{#each vermifugos}}
+                <tr>
+                    <td><strong>{{this.animal_name}}</strong></td>
+                    <td>{{this.product}}</td>
+                    <td class="nowrap">{{formatDate this.next_application}}</td>
+                    <td><span class="badge badge-{{dueVariant this.next_application}}">{{dueLabel this.next_application}}</span></td>
+                    <td class="actions-cell">
+                        <a href="/vet/animal/{{this.animal_id}}#vermifugacao" class="btn btn-ghost btn-sm">Abrir</a>
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+</div>
+{{/if}}
+
+{{#if estoque.length}}
+<div class="card">
+    <div class="card-head">
+        <h2>💊 Estoque baixo <span class="badge badge-warning">{{estoque.length}}</span></h2>
+        <a href="/vet/medicamentos" class="btn btn-ghost btn-sm">Gerenciar estoque</a>
+    </div>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Medicamento</th><th>Em estoque</th><th>Mínimo</th></tr></thead>
+            <tbody>
+                {{#each estoque}}
+                <tr>
+                    <td><strong>{{this.name}}</strong></td>
+                    <td><span class="badge badge-danger">{{this.stock_quantity}} {{this.unit}}</span></td>
+                    <td>{{this.min_stock_level}}</td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+</div>
+{{/if}}
+
+{{#if semAmbiente.length}}
+<div class="card">
+    <div class="card-head">
+        <h2>🏠 Sem ambiente definido <span class="badge badge-muted">{{semAmbiente.length}}</span></h2>
+        <span class="section-note">Animais no abrigo que ainda não foram alocados a um gatil/canil</span>
+    </div>
+    <div class="tags">
+        {{#each semAmbiente}}
+        <a href="/vet/animal/{{this.id}}" class="tag">{{speciesIcon this.species}} {{this.name}}</a>
+        {{/each}}
+    </div>
+</div>
+{{/if}}

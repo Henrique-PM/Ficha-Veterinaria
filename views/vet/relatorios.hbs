@@ -1,212 +1,151 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Relatórios - VetCare</title>
-    <link rel="stylesheet" href="/css/minimal.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
-    <nav class="sidebar">
-        <div class="logo">🐾 VetCare</div>
-        <ul class="nav">
-            <li><a href="/vet/dashboard"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
-            <li><a href="/vet/biblioteca"><i class="fas fa-image"></i><span>Biblioteca</span></a></li>
-            <li><a href="/vet/consultas"><i class="fas fa-stethoscope"></i><span>Consultas</span></a></li>
-            <li><a href="/vet/medicamentos"><i class="fas fa-pills"></i><span>Medicamentos</span></a></li>
-            <li><a href="/vet/relatorios" class="active"><i class="fas fa-chart-line"></i><span>Relatórios</span></a></li>
-            <li style="margin-top: auto;"><a href="/auth/logout"><i class="fas fa-sign-out-alt"></i><span>Sair</span></a></li>
-        </ul>
-    </nav>
-
-    <div class="main">
-        <div class="topbar">
-            <h1>📊 Relatórios e Estatísticas</h1>
-        </div>
-
-        <!-- KPIs Principais -->
-        <div class="stats">
-            <div class="stat">
-                <div class="stat-icon">🐕</div>
-                <div class="stat-label">Total de Animais</div>
-                <div class="stat-value">{{stats.total_animais}}</div>
-            </div>
-            <div class="stat">
-                <div class="stat-icon">💉</div>
-                <div class="stat-label">Vacinas (Mês)</div>
-                <div class="stat-value">{{stats.vacinas_mes}}</div>
-            </div>
-            <div class="stat">
-                <div class="stat-icon">🩺</div>
-                <div class="stat-label">Consultas (Mês)</div>
-                <div class="stat-value">{{stats.consultas_mes}}</div>
-            </div>
-            <div class="stat">
-                <div class="stat-icon">❤️</div>
-                <div class="stat-label">Adotados</div>
-                <div class="stat-value">{{stats.animais_adotados}}</div>
-            </div>
-        </div>
-
-        <!-- Gráficos e Tabelas -->
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
-            <!-- Distribuição por Espécie -->
-            <div class="card">
-                <h3><i class="fas fa-chart-pie"></i> Distribuição por Espécie</h3>
-                {{#if por_especie.length}}
-                <div style="position: relative; height: 250px; margin-bottom: 20px;">
-                    <canvas id="chart-especie"></canvas>
-                </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Espécie</th>
-                            <th>Quantidade</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {{#each por_especie}}
-                        <tr>
-                            <td><i class="fas fa-paw"></i> {{this.species}}</td>
-                            <td><span class="badge badge-primary">{{this.count}}</span></td>
-                        </tr>
-                        {{/each}}
-                    </tbody>
-                </table>
-                {{else}}
-                <div class="empty">Sem dados disponíveis</div>
-                {{/if}}
-            </div>
-
-            <!-- Distribuição por Status -->
-            <div class="card">
-                <h3><i class="fas fa-chart-bar"></i> Distribuição por Status</h3>
-                {{#if por_status.length}}
-                <div style="position: relative; height: 250px; margin-bottom: 20px;">
-                    <canvas id="chart-status"></canvas>
-                </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Status</th>
-                            <th>Quantidade</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {{#each por_status}}
-                        <tr>
-                            <td><span class="badge badge-success">{{this.status}}</span></td>
-                            <td><strong>{{this.count}}</strong></td>
-                        </tr>
-                        {{/each}}
-                    </tbody>
-                </table>
-                {{else}}
-                <div class="empty">Sem dados disponíveis</div>
-                {{/if}}
-            </div>
-        </div>
-
-        <!-- Resumo Geral -->
-        <div class="card">
-            <h3><i class="fas fa-info-circle"></i> Resumo Geral</h3>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
-                <div style="padding: 15px; background: rgba(91, 90, 255, 0.1); border-radius: 8px; border-left: 4px solid var(--primary);">
-                    <div style="font-size: 0.9rem; color: var(--muted); margin-bottom: 5px;">Total de Registros</div>
-                    <div style="font-size: 1.8rem; font-weight: 700; color: var(--primary);">{{stats.total_animais}}</div>
-                </div>
-                <div style="padding: 15px; background: rgba(16, 185, 129, 0.1); border-radius: 8px; border-left: 4px solid var(--success);">
-                    <div style="font-size: 0.9rem; color: var(--muted); margin-bottom: 5px;">Adotados Este Mês</div>
-                    <div style="font-size: 1.8rem; font-weight: 700; color: var(--success);">{{stats.animais_adotados}}</div>
-                </div>
-                <div style="padding: 15px; background: rgba(245, 158, 11, 0.1); border-radius: 8px; border-left: 4px solid var(--warning);">
-                    <div style="font-size: 0.9rem; color: var(--muted); margin-bottom: 5px;">Consultas Este Mês</div>
-                    <div style="font-size: 1.8rem; font-weight: 700; color: var(--warning);">{{stats.consultas_mes}}</div>
-                </div>
-                <div style="padding: 15px; background: rgba(239, 68, 68, 0.1); border-radius: 8px; border-left: 4px solid var(--danger);">
-                    <div style="font-size: 0.9rem; color: var(--muted); margin-bottom: 5px;">Vacinações Este Mês</div>
-                    <div style="font-size: 1.8rem; font-weight: 700; color: var(--danger);">{{stats.vacinas_mes}}</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Última Atualização -->
-        <div style="text-align: center; color: var(--muted); font-size: 0.9rem; margin-top: 20px; padding: 20px; background: var(--bg); border-radius: 8px;">
-            📅 Dados atualizados em tempo real • Última sincronização: {{today}}
+<div class="topbar">
+    <div class="row">
+        <button type="button" class="btn btn-ghost btn-icon menu-toggle" data-menu-toggle
+                aria-expanded="false" aria-label="Abrir menu">☰</button>
+        <div class="titles">
+            <h1>Relatórios</h1>
+            <div class="subtitle">Panorama do abrigo</div>
         </div>
     </div>
+</div>
 
-    <script>
-        // Dados para os gráficos
-        const especieData = {
-            labels: [{{#each por_especie}}'{{this.species}}'{{#unless @last}},{{/unless}}{{/each}}],
-            datasets: [{
-                label: 'Animais por Espécie',
-                data: [{{#each por_especie}}{{this.count}}{{#unless @last}},{{/unless}}{{/each}}],
-                backgroundColor: ['#5b5aff', '#10b981', '#f59e0b', '#ef4444', '#ec4899'],
-                borderColor: 'var(--border)',
-                borderWidth: 2
-            }]
-        };
+<div class="stats">
+    <div class="stat">
+        <div class="ico" aria-hidden="true">🐾</div>
+        <div class="label">Total de animais</div>
+        <div class="value">{{total_animais}}</div>
+    </div>
+    <div class="stat">
+        <div class="ico" aria-hidden="true">❤️</div>
+        <div class="label">Adotados</div>
+        <div class="value">{{adotados}}</div>
+    </div>
+    <div class="stat">
+        <div class="ico" aria-hidden="true">✂️</div>
+        <div class="label">Castrados</div>
+        <div class="value">{{castrados}}</div>
+    </div>
+    <div class="stat">
+        <div class="ico" aria-hidden="true">💉</div>
+        <div class="label">Vacinas no mês</div>
+        <div class="value">{{vacinas_mes}}</div>
+    </div>
+    <div class="stat">
+        <div class="ico" aria-hidden="true">🏥</div>
+        <div class="label">Internações no mês</div>
+        <div class="value">{{internacoes_mes}}</div>
+    </div>
+    <div class="stat">
+        <div class="ico" aria-hidden="true">🔬</div>
+        <div class="label">Procedimentos no mês</div>
+        <div class="value">{{procedimentos_mes}}</div>
+    </div>
+    <div class="stat {{#if fiv_positivos}}is-warn{{/if}}">
+        <div class="ico" aria-hidden="true">🧬</div>
+        <div class="label">Gatos FIV+</div>
+        <div class="value">{{fiv_positivos}}</div>
+    </div>
+    <div class="stat {{#if felv_positivos}}is-warn{{/if}}">
+        <div class="ico" aria-hidden="true">🧬</div>
+        <div class="label">Gatos FeLV+</div>
+        <div class="value">{{felv_positivos}}</div>
+    </div>
+</div>
 
-        const statusData = {
-            labels: [{{#each por_status}}'{{this.status}}'{{#unless @last}},{{/unless}}{{/each}}],
-            datasets: [{
-                label: 'Animais por Status',
-                data: [{{#each por_status}}{{this.count}}{{#unless @last}},{{/unless}}{{/each}}],
-                backgroundColor: ['#3b82f6', '#10b981', '#f59e0b'],
-                borderColor: 'var(--border)',
-                borderWidth: 2
-            }]
-        };
+<div class="card">
+    <div class="card-head">
+        <h2>🐾 Animais por espécie</h2>
+    </div>
+    {{#if porEspecie.length}}
+    <div class="bars">
+        {{#each porEspecie}}
+        <div class="bar-row">
+            <span>{{speciesIcon this.species}} {{this.species}}</span>
+            <span class="bar-track"><span class="bar-fill" style="width:{{percent this.count ../maxEspecie}}%"></span></span>
+            <span class="bar-value">{{this.count}}</span>
+        </div>
+        {{/each}}
+    </div>
+    {{else}}
+    <p class="empty">Sem dados.</p>
+    {{/if}}
+</div>
 
-        // Configuração dos gráficos
-        const chartConfig = {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        stepSize: 1
-                    }
-                }
-            }
-        };
+<div class="card">
+    <div class="card-head"><h2>📍 Animais por status</h2></div>
+    {{#if porStatus.length}}
+    <div class="bars">
+        {{#each porStatus}}
+        <div class="bar-row">
+            <span><span class="badge badge-{{statusVariant this.status}}">{{statusLabel this.status}}</span></span>
+            <span class="bar-track"><span class="bar-fill" style="width:{{percent this.count ../maxStatus}}%"></span></span>
+            <span class="bar-value">{{this.count}}</span>
+        </div>
+        {{/each}}
+    </div>
+    {{else}}
+    <p class="empty">Sem dados.</p>
+    {{/if}}
+</div>
 
-        // Renderizar gráficos
-        if (document.getElementById('chart-especie')) {
-            new Chart(document.getElementById('chart-especie'), {
-                type: 'doughnut',
-                data: especieData,
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
-                        }
-                    }
-                }
-            });
-        }
+<div class="card">
+    <div class="card-head">
+        <h2>🏘️ Ocupação por ambiente</h2>
+        <a href="/vet/ambientes" class="btn btn-ghost btn-sm">Gerenciar</a>
+    </div>
+    {{#if porAmbiente.length}}
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Ambiente</th><th>Tipo</th><th>Animais</th><th>Capacidade</th><th>Ocupação</th></tr></thead>
+            <tbody>
+                {{#each porAmbiente}}
+                <tr>
+                    <td><strong>{{this.name}}</strong></td>
+                    <td>{{kindIcon this.kind}} {{kindLabel this.kind}}</td>
+                    <td>{{this.count}}</td>
+                    <td>{{#if this.capacity}}{{this.capacity}}{{else}}—{{/if}}</td>
+                    <td style="min-width:140px">
+                        {{#if this.capacity}}
+                        <div class="meter {{#if (gt this.count this.capacity)}}is-full{{/if}}">
+                            <span style="width:{{percent this.count this.capacity}}%"></span>
+                        </div>
+                        <small class="muted">{{percent this.count this.capacity}}%</small>
+                        {{else}}
+                        <span class="muted">—</span>
+                        {{/if}}
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+    {{else}}
+    <div class="empty">
+        <span class="emoji" aria-hidden="true">🏘️</span>
+        <p>Nenhum ambiente cadastrado.</p>
+    </div>
+    {{/if}}
+</div>
 
-        if (document.getElementById('chart-status')) {
-            new Chart(document.getElementById('chart-status'), {
-                type: 'bar',
-                data: statusData,
-                options: chartConfig
-            });
-        }
-    </script>
-</body>
-</html>
-</body>
-</html>
+{{#if estoqueBaixo.length}}
+<div class="card">
+    <div class="card-head">
+        <h2>💊 Medicamentos com estoque baixo</h2>
+        <a href="/vet/medicamentos?filtro=baixo" class="btn btn-ghost btn-sm">Repor</a>
+    </div>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Medicamento</th><th>Estoque</th><th>Mínimo</th></tr></thead>
+            <tbody>
+                {{#each estoqueBaixo}}
+                <tr>
+                    <td><strong>{{this.name}}</strong></td>
+                    <td><span class="badge badge-danger">{{this.stock_quantity}} {{this.unit}}</span></td>
+                    <td>{{this.min_stock_level}}</td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+</div>
+{{/if}}

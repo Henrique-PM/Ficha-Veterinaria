@@ -4,14 +4,22 @@ function ensureAuthenticated(req, res, next) {
 }
 
 function ensureRole(role) {
+  const allowed = Array.isArray(role) ? role : [role];
   return (req, res, next) => {
     if (!req.session || !req.session.user) return res.redirect('/auth/login');
-    const userRole = req.session.user.type;
-    if (Array.isArray(role) ? role.includes(userRole) : userRole === role) {
-      return next();
-    }
-    return res.status(403).send('Acesso negado');
+    if (allowed.includes(req.session.user.type)) return next();
+
+    // Sem permissão: manda para a área do próprio papel em vez de dar 403 seco,
+    // que é o que acontecia quando um visualizador tocava numa URL /vet.
+    return res.status(403).render('error', {
+      title: 'Acesso negado',
+      code: 403,
+      message: 'Esta área é exclusiva da equipe veterinária.',
+      backUrl: req.session.user.type === 'veterinario' ? '/vet/dashboard' : '/user/dashboard'
+    });
   };
 }
 
-module.exports = { ensureAuthenticated, ensureRole };
+const ensureVet = ensureRole(['veterinario', 'admin']);
+
+module.exports = { ensureAuthenticated, ensureRole, ensureVet };

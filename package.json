@@ -1,40 +1,31 @@
 {
-  "name": "ficha-veterin-ria",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "ficha-veterinaria",
+  "version": "2.0.0",
+  "description": "Sistema de gestão de fichas veterinárias para abrigos, gatis e canis",
+  "main": "app.js",
   "scripts": {
-    "start": "node app.js",
-    "dev": "NODE_ENV=development node app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",
+    "dev": "NODE_ENV=development node server.js",
+    "migrate": "node scripts/migrate.js",
+    "seed": "node scripts/seed.js",
+    "check": "node scripts/check.js"
+  },
+  "engines": {
+    "node": ">=20"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Henrique-PM/Ficha-Veterin-ria.git"
   },
-  "keywords": [],
-  "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/Henrique-PM/Ficha-Veterin-ria/issues"
-  },
-  "homepage": "https://github.com/Henrique-PM/Ficha-Veterin-ria#readme",
-  "overrides": {
-    "cookie": "^0.7.2",
-    "tar": "^7.5.3"
-  },
   "dependencies": {
-    "bcrypt": "^6.0.0",
-    "body-parser": "^2.2.0",
-    "csurf": "^1.2.2",
+    "@libsql/client": "^0.15.15",
+    "bcryptjs": "^3.0.2",
     "express": "^5.1.0",
     "express-handlebars": "^8.0.3",
-    "express-rate-limit": "^7.3.1",
+    "express-rate-limit": "^7.5.1",
     "express-session": "^1.18.1",
-    "express-validator": "^7.0.1",
-    "hbs": "^4.2.0",
-    "helmet": "^7.0.0",
-    "multer": "^2.0.1",
-    "sqlite3": "^5.0.2"
+    "helmet": "^8.1.0",
+    "multer": "^2.0.1"
   }
 }

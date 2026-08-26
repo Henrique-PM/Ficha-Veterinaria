@@ -1,103 +1,125 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Medicamentos - VetCare</title>
-    <link rel="stylesheet" href="/css/minimal.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<body>
-    <nav class="sidebar">
-        <div class="logo">🐾 VetCare</div>
-        <ul class="nav">
-            <li><a href="/vet/dashboard"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
-            <li><a href="/vet/biblioteca"><i class="fas fa-paw"></i><span>Animais</span></a></li>
-            <li><a href="/vet/consultas"><i class="fas fa-stethoscope"></i><span>Consultas</span></a></li>
-            <li><a href="/vet/medicamentos" class="active"><i class="fas fa-pills"></i><span>Medicamentos</span></a></li>
-            <li><a href="/vet/relatorios"><i class="fas fa-chart-line"></i><span>Relatórios</span></a></li>
-            <li style="margin-top: auto;"><a href="/auth/logout"><i class="fas fa-sign-out-alt"></i><span>Sair</span></a></li>
-        </ul>
-    </nav>
-
-    <div class="main">
-        <div class="topbar">
-            <h1>Estoque de Medicamentos</h1>
-            <button onclick="openModal()" class="btn btn-primary">+ Adicionar</button>
+<div class="topbar">
+    <div class="row">
+        <button type="button" class="btn btn-ghost btn-icon menu-toggle" data-menu-toggle
+                aria-expanded="false" aria-label="Abrir menu">☰</button>
+        <div class="titles">
+            <h1>Medicamentos</h1>
+            <div class="subtitle">
+                {{#if lowOnly}}Somente estoque baixo{{else}}Estoque da farmácia{{/if}}
+            </div>
         </div>
+    </div>
+    <div class="actions">
+        <a href="/vet/medicamentos" class="btn {{#unless lowOnly}}btn-primary{{else}}btn-ghost{{/unless}}">Todos</a>
+        <a href="/vet/medicamentos?filtro=baixo" class="btn {{#if lowOnly}}btn-primary{{else}}btn-ghost{{/if}}">Estoque baixo</a>
+        <button type="button" class="btn btn-primary" data-modal-open="novo-medicamento">+ Adicionar</button>
+    </div>
+</div>
 
-        {{#if medications.length}}
-        <div class="grid">
-            {{#each medications}}
-            <div class="card">
-                <h2>{{this.name}}</h2>
-                <p class="text-muted mb-20">{{this.description}}</p>
-                <div class="d-flex" style="justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <span class="badge badge-primary">{{this.unit}}</span>
-                    <span style="font-size: 1.5rem; font-weight: 700;">{{this.stock_quantity}}</span>
-                </div>
-                <p class="text-muted" style="font-size: 0.9rem;">Mínimo: {{this.min_stock_level}}</p>
-                <form action="/vet/medicamentos/{{this.id}}/atualizar-estoque" method="POST" class="mt-20">
-                    <div class="form-group">
-                        <label class="form-label">Atualizar Estoque</label>
-                        <div class="d-flex gap-10">
-                            <input type="number" name="stock_quantity" class="form-control" required>
-                            <button type="submit" class="btn btn-success">OK</button>
+<div class="card">
+    {{#if medications.length}}
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Medicamento</th><th>Estoque</th><th>Mínimo</th>
+                    <th>Prescrições ativas</th><th class="actions-cell">Ajustar estoque</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each medications}}
+                <tr>
+                    <td>
+                        <strong>{{this.name}}</strong>
+                        {{#if this.description}}<br><small class="muted">{{truncate this.description 70}}</small>{{/if}}
+                    </td>
+                    <td>
+                        {{#if (gt this.stock_quantity this.min_stock_level)}}
+                            <span class="badge badge-success">{{this.stock_quantity}} {{this.unit}}</span>
+                        {{else}}
+                            <span class="badge badge-danger">{{this.stock_quantity}} {{this.unit}}</span>
+                        {{/if}}
+                    </td>
+                    <td>{{this.min_stock_level}}</td>
+                    <td>
+                        {{#if this.prescricoes_ativas}}
+                            <span class="badge badge-info">{{this.prescricoes_ativas}}</span>
+                        {{else}}
+                            <span class="muted">—</span>
+                        {{/if}}
+                    </td>
+                    <td class="actions-cell">
+                        <div class="row-tight" style="justify-content:flex-end">
+                            <form method="POST" action="/vet/medicamentos/{{this.id}}/estoque" class="inline-form">
+                                <input type="hidden" name="_csrf" value="{{../csrfToken}}">
+                                <input type="hidden" name="delta" value="-1">
+                                <input type="hidden" name="filtro" value="{{#if ../lowOnly}}baixo{{/if}}">
+                                <button type="submit" class="btn btn-ghost btn-sm" aria-label="Diminuir uma unidade">−</button>
+                            </form>
+                            <form method="POST" action="/vet/medicamentos/{{this.id}}/estoque" class="inline-form">
+                                <input type="hidden" name="_csrf" value="{{../csrfToken}}">
+                                <input type="hidden" name="delta" value="1">
+                                <input type="hidden" name="filtro" value="{{#if ../lowOnly}}baixo{{/if}}">
+                                <button type="submit" class="btn btn-ghost btn-sm" aria-label="Aumentar uma unidade">+</button>
+                            </form>
+                            <form method="POST" action="/vet/medicamentos/{{this.id}}/estoque" class="row-tight">
+                                <input type="hidden" name="_csrf" value="{{../csrfToken}}">
+                                <input type="hidden" name="filtro" value="{{#if ../lowOnly}}baixo{{/if}}">
+                                <input type="number" name="stock_quantity" min="0" max="99999"
+                                       placeholder="{{this.stock_quantity}}" style="width:86px"
+                                       aria-label="Definir quantidade exata">
+                                <button type="submit" class="btn btn-ghost btn-sm">Definir</button>
+                            </form>
                         </div>
-                    </div>
-                </form>
-            </div>
-            {{/each}}
-        </div>
-        {{else}}
-        <div class="card empty">
-            <div style="font-size: 3rem; margin-bottom: 10px;">📭</div>
-            <p>Nenhum medicamento cadastrado</p>
-        </div>
-        {{/if}}
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
     </div>
-
-    <div id="modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Novo Medicamento</h2>
-                <button class="close" onclick="closeModal()">&times;</button>
-            </div>
-            <form action="/vet/medicamentos" method="POST">
-                <div class="form-group">
-                    <label class="form-label">Nome *</label>
-                    <input type="text" name="name" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Descrição</label>
-                    <textarea name="description" class="form-control"></textarea>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Unidade *</label>
-                    <select name="unit" class="form-control" required>
-                        <option value="ml">ml</option>
-                        <option value="mg">mg</option>
-                        <option value="comprimido">Comprimido</option>
-                        <option value="ampola">Ampola</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Quantidade Inicial *</label>
-                    <input type="number" name="stock_quantity" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Estoque Mínimo *</label>
-                    <input type="number" name="min_stock_level" class="form-control" required>
-                </div>
-                <button type="submit" class="btn btn-success w-full">Salvar</button>
-            </form>
-        </div>
+    {{else}}
+    <div class="empty">
+        <span class="emoji" aria-hidden="true">💊</span>
+        <p>{{#if lowOnly}}Nenhum medicamento com estoque baixo.{{else}}Nenhum medicamento cadastrado.{{/if}}</p>
     </div>
+    {{/if}}
+</div>
 
-    <script>
-        function openModal() { document.getElementById('modal').style.display = 'block'; }
-        function closeModal() { document.getElementById('modal').style.display = 'none'; }
-        window.onclick = function(e) { if (e.target.id === 'modal') closeModal(); }
-    </script>
-</body>
-</html>
+<dialog id="modal-novo-medicamento">
+    <form method="POST" action="/vet/medicamentos">
+        <input type="hidden" name="_csrf" value="{{csrfToken}}">
+        <div class="modal-head">
+            <h2>Novo medicamento</h2>
+            <button type="button" class="modal-close" data-modal-close aria-label="Fechar">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="field">
+                <label for="med-nome">Nome *</label>
+                <input type="text" id="med-nome" name="name" required maxlength="100">
+            </div>
+            <div class="field">
+                <label for="med-desc">Descrição</label>
+                <textarea id="med-desc" name="description" maxlength="500"></textarea>
+            </div>
+            <div class="form-row">
+                <div class="field">
+                    <label for="med-qtd">Quantidade inicial</label>
+                    <input type="number" id="med-qtd" name="stock_quantity" min="0" max="99999" value="0">
+                </div>
+                <div class="field">
+                    <label for="med-unid">Unidade</label>
+                    <input type="text" id="med-unid" name="unit" maxlength="20" placeholder="comprimidos, ml, frascos">
+                </div>
+                <div class="field">
+                    <label for="med-min">Estoque mínimo</label>
+                    <input type="number" id="med-min" name="min_stock_level" min="0" max="9999" value="5">
+                    <span class="hint">Abaixo disso vira alerta.</span>
+                </div>
+            </div>
+        </div>
+        <div class="modal-foot">
+            <button type="button" class="btn btn-ghost" data-modal-close>Cancelar</button>
+            <button type="submit" class="btn btn-primary">Adicionar</button>
+        </div>
+    </form>
+</dialog>

@@ -1,0 +1,42 @@
+<div class="topbar">
+    <div class="row">
+        <button type="button" class="btn btn-ghost btn-icon menu-toggle" data-menu-toggle
+                aria-expanded="false" aria-label="Abrir menu">☰</button>
+        <div class="titles">
+            <h1>Alterar senha</h1>
+            <div class="subtitle">{{currentUser.email}}</div>
+        </div>
+    </div>
+</div>
+
+<div class="card" style="max-width:480px">
+    {{#if error}}<div class="alert alert-danger" role="alert">{{error}}</div>{{/if}}
+    {{#if sucesso}}<div class="alert alert-success" role="status">{{sucesso}}</div>{{/if}}
+
+    <form method="POST" action="/auth/senha">
+        <input type="hidden" name="_csrf" value="{{csrfToken}}">
+
+        <div class="field">
+            <label for="current_password">Senha atual</label>
+            <input type="password" id="current_password" name="current_password" required
+                   autocomplete="current-password">
+        </div>
+
+        <div class="field">
+            <label for="new_password">Nova senha</label>
+            <input type="password" id="new_password" name="new_password" required minlength="8"
+                   autocomplete="new-password">
+            <span class="hint">Mínimo de 8 caracteres.</span>
+        </div>
+
+        <div class="field">
+            <label for="confirm_password">Confirmar nova senha</label>
+            <input type="password" id="confirm_password" name="confirm_password" required minlength="8"
+                   autocomplete="new-password">
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Alterar senha</button>
+        </div>
+    </form>
+</div>
