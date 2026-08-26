@@ -77,7 +77,7 @@ Sem `TURSO_DATABASE_URL`, o banco vira um arquivo em `./data/local.db`.
 
 ```bash
 npm run seed    # dados de exemplo (gatis, animais, vacinas)
-npm run check   # teste de fumaça: 54 verificações de rota, papel e vazamento
+npm run check   # teste de fumaça: 69 verificações de rota, papel e vazamento
 ```
 
 ---
@@ -93,13 +93,15 @@ npm run check   # teste de fumaça: 54 verificações de rota, papel e vazamento
 | **FIV/FeLV, chip, dados do tutor** | ❌ | ✅ | ✅ |
 | **Documentos e laudos** | ❌ | ✅ | ✅ |
 | Gerenciar ambientes e medicamentos | ❌ | ✅ | ✅ |
-| Promover / rebaixar veterinário | ❌ | ✅ | ✅ |
+| Ver a aba **Administração / Equipe** | ❌ | ❌ | ✅ |
+| Promover / rebaixar veterinário | ❌ | ❌ | ✅ |
 | Conceder papel de administrador | ❌ | ❌ | ✅ |
 | Ativar/desativar conta, redefinir senha | ❌ | ❌ | ✅ |
 
 **Todo cadastro público nasce como visualizador.** O papel nunca vem do formulário:
-virar veterinário só acontece por promoção em `/vet/equipe`. Ao rebaixar alguém,
-as sessões dessa pessoa são encerradas na hora.
+virar veterinário só acontece por promoção em `/vet/equipe`, e essa tela é
+**exclusiva do administrador (root)** — o veterinário não vê o menu nem passa pela
+rota. Ao rebaixar ou desativar alguém, as sessões dessa pessoa são encerradas na hora.
 
 ---
 
@@ -146,6 +148,7 @@ scripts/            check (testes), seed (dados de exemplo)
 
 ## 🛡️ Segurança
 
+- Tema claro fixo, contraste de texto acima de 4.5:1
 - Sessões no banco (funcionam em serverless), cookie `HttpOnly` + `SameSite` + `Secure`
 - CSRF em todo POST, com token por sessão e comparação em tempo constante
 - CSP sem `script-src: unsafe-inline` — nenhum JS inline nos templates

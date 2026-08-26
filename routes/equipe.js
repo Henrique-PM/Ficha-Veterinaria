@@ -2,20 +2,19 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 
 const db = require('../database');
-const { ensureVet } = require('../middleware/auth');
+const { ensureAdmin } = require('../middleware/auth');
 const { killSessionsForUser } = require('../lib/session-store');
 
 const router = express.Router();
 
 /*
- * Gestão de acesso.
+ * Gestão de acesso — exclusiva do root.
  *
  * Regras:
  *  - todo cadastro nasce visualizador (ver routes/auth.js);
- *  - veterinário promove visualizador → veterinário, e rebaixa veterinário;
- *  - admin (root) faz tudo, inclusive criar outro admin, desativar contas e
- *    redefinir senha;
- *  - ninguém mexe no próprio papel, e admin só é tocado por admin.
+ *  - só o admin (root) promove, rebaixa, desativa conta e redefine senha;
+ *  - veterinário NÃO acessa esta área: nem vê o menu, nem passa pela rota;
+ *  - o root não mexe no próprio papel e não fica sem sucessor.
  */
 
 const ROLES = ['visualizador', 'veterinario', 'admin'];
@@ -38,7 +37,9 @@ async function logChange(targetId, actorId, from, to, action) {
   );
 }
 
-router.use(ensureVet);
+// Trava no servidor. Esconder o item de menu não protege nada: sem isto,
+// bastaria digitar /vet/equipe na barra de endereço.
+router.use(ensureAdmin);
 
 // ── Listagem ─────────────────────────────────────────────────────────────────
 router.get('/', async (req, res, next) => {

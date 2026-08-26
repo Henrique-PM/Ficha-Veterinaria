@@ -555,6 +555,29 @@
     </div>
 </section>
 
+<div class="card danger-zone">
+    <div class="card-head">
+        <h2>⚠️ Excluir animal</h2>
+    </div>
+    <div class="row between">
+        <p class="muted" style="max-width:60ch">
+            Remove <strong>{{animal.name}}</strong> e todo o histórico clínico dele
+            {{#if totalRegistros}}
+                — {{totalRegistros}} {{#if (eq totalRegistros 1)}}registro{{else}}registros{{/if}}
+                entre vacinas, exames, internações, medicamentos, fotos e documentos.
+            {{else}}
+                (não há nenhum registro clínico associado).
+            {{/if}}
+            Esta ação não pode ser desfeita.
+        </p>
+        <form method="POST" action="/vet/animal/{{animal.id}}/excluir"
+              data-confirm="Excluir {{animal.name}} definitivamente? {{#if totalRegistros}}Os {{totalRegistros}} registros clínicos dele serão apagados junto. {{/if}}Esta ação não pode ser desfeita.">
+            <input type="hidden" name="_csrf" value="{{csrfToken}}">
+            <button type="submit" class="btn btn-danger">🗑 Excluir animal</button>
+        </form>
+    </div>
+</div>
+
 <!-- ════════════════════ Modais ════════════════════ -->
 
 <dialog id="modal-status">

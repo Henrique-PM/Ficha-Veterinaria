@@ -32,11 +32,13 @@
             <span class="ico" aria-hidden="true">📋</span> Meus registros
         </a>
 
+        {{#if isRoot}}
         <div class="nav-group-label">Administração</div>
         <a class="nav-link {{navActive currentPath '/vet/equipe'}}" href="/vet/equipe">
             <span class="ico" aria-hidden="true">👥</span> Equipe
-            {{#if isRoot}}<span class="count" style="background:var(--primary)">root</span>{{/if}}
+            <span class="count" style="background:var(--primary)">root</span>
         </a>
+        {{/if}}
     {{else}}
         <a class="nav-link {{navActive currentPath '/user/dashboard'}}" href="/user/dashboard">
             <span class="ico" aria-hidden="true">🐾</span> Animais

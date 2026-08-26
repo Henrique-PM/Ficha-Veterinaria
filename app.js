@@ -137,6 +137,7 @@ app.use((req, res, next) => {
   // Mensagens simples via querystring (?erro=chip). Evita precisar de uma
   // dependência de flash messages só para isto.
   res.locals.erro = typeof req.query.erro === 'string' ? req.query.erro.slice(0, 40) : null;
+  res.locals.ok = typeof req.query.ok === 'string' ? req.query.ok.slice(0, 120) : null;
   next();
 });
 app.use(checkCsrf);

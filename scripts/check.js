@@ -67,6 +67,7 @@ const tokenFrom = (html) => {
   const anon = makeClient(base);
   const vet = makeClient(base);
   const viewer = makeClient(base);
+  let email = null; // e-mail do voluntário criado no teste 3, usado no teste 7
 
   try {
     // ── 1. Acesso anônimo ────────────────────────────────────────────────
@@ -136,7 +137,7 @@ const tokenFrom = (html) => {
     console.log('\n3) Cadastro público não concede papel');
     {
       const page = await viewer('/auth/register');
-      const email = `voluntario${Date.now()}@teste.local`;
+      email = `voluntario${Date.now()}@teste.local`;
       const r = await viewer('/auth/register', {
         method: 'POST',
         form: {
@@ -161,6 +162,10 @@ const tokenFrom = (html) => {
     {
       const r = await viewer('/vet/equipe');
       check('visualizador não acessa a Equipe', () => assert.strictEqual(r.status, 403));
+    }
+    {
+      const r = await vet('/vet/dashboard');
+      check('root vê o menu Administração', () => assert.match(r.text, /Administração/));
     }
 
     // ── 4. Ambientes (gatil) ─────────────────────────────────────────────
@@ -317,6 +322,55 @@ const tokenFrom = (html) => {
       check('visualizador vê a apresentação do animal', () => assert.match(userFicha.text, /Mingau/));
     }
 
+    // ── 6b. Exclusão do animal ───────────────────────────────────────────
+    console.log('\n6b) Excluir animal (com histórico junto)');
+    {
+      const page = await vet('/vet/cadastrar-animal');
+      const criar = await vet('/vet/cadastrar-animal', {
+        method: 'POST',
+        form: { _csrf: tokenFrom(page.text), name: 'AnimalDeTeste', species: 'gato', status: 'abrigo' }
+      });
+      const testeId = (criar.location || '').match(/(\d+)$/)?.[1];
+      check('animal de teste criado', () => assert.ok(testeId));
+
+      if (testeId) {
+        const f = await vet(`/vet/animal/${testeId}`);
+        check('ficha tem o botão de excluir animal', () =>
+          assert.match(f.text, new RegExp(`/vet/animal/${testeId}/excluir`))
+        );
+
+        // Pendura um registro clínico para checar que ele some junto
+        await vet(`/vet/animal/${testeId}/vaccine`, {
+          method: 'POST',
+          form: { _csrf: tokenFrom(f.text), name: 'VacinaDoTeste', application_date: '2026-01-05' }
+        });
+
+        const f2 = await vet(`/vet/animal/${testeId}`);
+        const del = await vet(`/vet/animal/${testeId}/excluir`, {
+          method: 'POST',
+          form: { _csrf: tokenFrom(f2.text) }
+        });
+        check('exclusão redireciona para a lista', () =>
+          assert.match(del.location || '', /\/vet\/animais/, `foi para ${del.location}`)
+        );
+
+        const sumiu = await vet(`/vet/animal/${testeId}`);
+        check('animal deixa de existir (404)', () => assert.strictEqual(sumiu.status, 404));
+
+        const lista = await vet('/vet/animais');
+        check('animal some da listagem', () => assert.ok(!/AnimalDeTeste/.test(lista.text)));
+
+        const registros = await vet('/vet/meus-registros');
+        check('registro clínico órfão não fica para trás', () =>
+          assert.ok(!/VacinaDoTeste/.test(registros.text), 'vacina ficou órfã no banco')
+        );
+      }
+    }
+    {
+      const f = await vet('/vet/animal/99999/excluir', { method: 'POST', form: { _csrf: 'x' } });
+      check('excluir animal inexistente não quebra', () => assert.ok(f.status === 403 || f.status === 404));
+    }
+
     // ── 7. Equipe ────────────────────────────────────────────────────────
     console.log('\n7) Promoção de veterinário');
     {
@@ -324,7 +378,12 @@ const tokenFrom = (html) => {
       check('root acessa a Equipe', () => assert.strictEqual(equipe.status, 200));
       check('lista mostra o voluntário como visualizador', () => assert.match(equipe.text, /Volunt/));
 
-      const alvo = equipe.text.match(/\/vet\/equipe\/(\d+)\/papel/)?.[1];
+      // Localiza a LINHA do voluntário criado neste teste. Pegar o primeiro
+      // match da página inteira falha quando o banco já tem outros usuários
+      // de execuções anteriores.
+      const linha = equipe.text.split('<tr>').find((tr) => tr.includes(email));
+      const alvo = linha && linha.match(/\/vet\/equipe\/(\d+)\/papel/)?.[1];
+      check('encontrou a linha do voluntário do teste', () => assert.ok(alvo, 'linha não localizada'));
       if (alvo) {
         const r = await vet(`/vet/equipe/${alvo}/papel`, {
           method: 'POST',
@@ -336,6 +395,40 @@ const tokenFrom = (html) => {
         const depois = await viewer('/user/dashboard');
         check('sessão do promovido é encerrada (força novo login)', () =>
           assert.ok(depois.status === 302, `esperava redirect ao login, veio ${depois.status}`)
+        );
+
+        // ── Veterinário comum NÃO administra a equipe ────────────────────
+        console.log('\n7b) Veterinário comum não acessa Administração');
+        const vet2 = makeClient(base);
+        const lp = await vet2('/auth/login');
+        const li = await vet2('/auth/login', {
+          method: 'POST',
+          form: { _csrf: tokenFrom(lp.text), email, password: 'senha-de-teste-123' }
+        });
+        check('promovido entra agora como veterinário', () =>
+          assert.match(li.location || '', /\/vet\/dashboard/, `foi para ${li.location}`)
+        );
+
+        const dash = await vet2('/vet/dashboard');
+        check('veterinário acessa o dashboard clínico', () => assert.strictEqual(dash.status, 200));
+        check('veterinário NÃO vê o menu Administração', () =>
+          assert.ok(!/Administração/.test(dash.text), 'menu de administração aparece para veterinário')
+        );
+        check('veterinário NÃO vê link para /vet/equipe', () =>
+          assert.ok(!/\/vet\/equipe/.test(dash.text), 'link da equipe aparece para veterinário')
+        );
+
+        const eq = await vet2('/vet/equipe');
+        check('veterinário recebe 403 ao digitar /vet/equipe na URL', () =>
+          assert.strictEqual(eq.status, 403, `veio ${eq.status}`)
+        );
+
+        const golpe = await vet2(`/vet/equipe/${alvo}/papel`, {
+          method: 'POST',
+          form: { _csrf: 'x', type: 'admin' }
+        });
+        check('veterinário não consegue se autopromover a admin', () =>
+          assert.strictEqual(golpe.status, 403, `veio ${golpe.status}`)
         );
       }
     }

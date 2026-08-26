@@ -451,6 +451,16 @@ router.get('/animal/:id', async (req, res, next) => {
       photos,
       medications,
       environments,
+      // Usado na confirmação de exclusão, para a pessoa ver o que vai junto.
+      totalRegistros:
+        healthRecords.length +
+        vaccines.length +
+        dewormings.length +
+        procedures.length +
+        hospitalizations.length +
+        medications.length +
+        documents.length +
+        photos.length,
       statuses: STATUSES,
       sexes: SEXES,
       sizes: SIZES,
@@ -835,6 +845,46 @@ router.post('/registro/:tipo/:id/excluir', async (req, res, next) => {
 
     await db.run(`DELETE FROM ${table} WHERE id = ?`, [req.params.id]);
     res.redirect(`/vet/animal/${row.animal_id}`);
+  } catch (err) {
+    next(err);
+  }
+});
+
+/*
+ * Excluir o animal inteiro.
+ *
+ * Só havia exclusão dos registros da ficha (vacina, exame, foto…) — não do
+ * animal, então um cadastro de teste ficava para sempre no sistema e ainda
+ * contava nos relatórios.
+ *
+ * Os filhos são apagados explicitamente em vez de confiar no ON DELETE CASCADE:
+ * o cascade do SQLite depende de PRAGMA foreign_keys estar ligado, e isso não é
+ * garantia que valha em todo ambiente. Assim o resultado é o mesmo em qualquer lugar.
+ */
+router.post('/animal/:id/excluir', async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const animal = await db.get('SELECT id, name FROM animals WHERE id = ?', [id]);
+    if (!animal) return notFound(res, '/vet/animais');
+
+    const filhos = [
+      'health_records',
+      'vaccines',
+      'dewormings',
+      'procedures',
+      'hospitalizations',
+      'animal_medications',
+      'animal_photos',
+      'animal_documents'
+    ];
+
+    // Tudo numa transação: ou some o animal e o histórico dele, ou não some nada.
+    await db.batch([
+      ...filhos.map((t) => ({ sql: `DELETE FROM ${t} WHERE animal_id = ?`, args: [id] })),
+      { sql: 'DELETE FROM animals WHERE id = ?', args: [id] }
+    ]);
+
+    return res.redirect(`/vet/animais?ok=${encodeURIComponent(`${animal.name} foi excluído.`)}`);
   } catch (err) {
     next(err);
   }
