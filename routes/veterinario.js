@@ -835,10 +835,17 @@ const DELETABLE = {
 
 router.post('/registro/:tipo/:id/excluir', async (req, res, next) => {
   try {
-    // O nome da tabela vem do mapa acima, nunca do parâmetro da URL — é o que
-    // impede um :tipo malicioso de virar SQL.
-    const table = DELETABLE[req.params.tipo];
-    if (!table) return notFound(res);
+    /*
+     * O nome da tabela vem do mapa acima, nunca do parâmetro da URL — é o que
+     * impede um :tipo malicioso de virar SQL.
+     *
+     * Object.hasOwn é obrigatório aqui: com acesso direto, :tipo = "constructor"
+     * ou "toString" devolve a função herdada de Object.prototype, que é truthy,
+     * passa pelo if e entra na query como texto — resultando em erro 500.
+     */
+    const tipo = String(req.params.tipo || '');
+    if (!Object.hasOwn(DELETABLE, tipo)) return notFound(res);
+    const table = DELETABLE[tipo];
 
     const row = await db.get(`SELECT animal_id FROM ${table} WHERE id = ?`, [req.params.id]);
     if (!row) return notFound(res);

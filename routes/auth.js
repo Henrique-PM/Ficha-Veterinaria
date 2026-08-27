@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const rateLimit = require('express-rate-limit');
 
 const db = require('../database');
+const { killSessionsForUser } = require('../lib/session-store');
 
 const router = express.Router();
 const SALT_ROUNDS = 10;
@@ -162,7 +163,31 @@ router.post('/senha', credentialLimiter, async (req, res, next) => {
 
     await db.run('UPDATE users SET password = ? WHERE id = ?', [await bcrypt.hash(nova, SALT_ROUNDS), user.id]);
 
-    res.render('auth/senha', { title: 'Alterar senha', sucesso: 'Senha alterada com sucesso.' });
+    /*
+     * Trocar a senha tem que expulsar quem estava logado com a senha antiga.
+     *
+     * Sem isto, alguém que tivesse obtido a senha continuava dentro do sistema
+     * por até 8 horas mesmo depois da vítima trocá-la — que é justamente a ação
+     * que a pessoa faz para se livrar do invasor. A redefinição feita pelo
+     * administrador já derrubava as sessões; a troca pelo próprio usuário não.
+     *
+     * Derrubamos todas e criamos uma nova para quem acabou de trocar, para a
+     * pessoa não ser deslogada da própria tela.
+     */
+    const { id, name, email, type } = req.session.user;
+    await killSessionsForUser(user.id);
+
+    req.session.regenerate((err) => {
+      if (err) return next(err);
+      req.session.user = { id, name, email, type };
+      req.session.save((saveErr) => {
+        if (saveErr) return next(saveErr);
+        return res.render('auth/senha', {
+          title: 'Alterar senha',
+          sucesso: 'Senha alterada. As outras sessões desta conta foram encerradas.'
+        });
+      });
+    });
   } catch (err) {
     next(err);
   }

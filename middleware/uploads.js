@@ -55,6 +55,29 @@ function safeFilename(name) {
   return cleaned || 'arquivo';
 }
 
+/*
+ * Caminho de volta seguro para as páginas de erro.
+ *
+ * Usar `req.get('referer')` direto colocava um endereço controlado por terceiro
+ * dentro do botão "Voltar": bastava uma página externa disparar um upload acima
+ * do limite para o usuário cair na nossa tela de erro com um link de volta para
+ * o site do atacante. Aqui só o caminho interno sobrevive — host externo é
+ * descartado.
+ */
+function safeBackUrl(req) {
+  const referer = req.get('referer');
+  if (referer) {
+    try {
+      const host = req.get('host');
+      const url = new URL(referer, `${req.protocol}://${host}`);
+      if (url.host === host) return url.pathname + url.search;
+    } catch {
+      /* referer malformado: cai no padrão */
+    }
+  }
+  return '/';
+}
+
 // Converte os erros do multer em mensagem legível em vez de estourar 500.
 function uploadErrorHandler(err, req, res, next) {
   if (!err) return next();
@@ -63,7 +86,7 @@ function uploadErrorHandler(err, req, res, next) {
       title: 'Arquivo grande demais',
       code: 413,
       message: 'O arquivo excede o limite permitido (5 MB para fotos, 10 MB para documentos).',
-      backUrl: req.get('referer') || '/'
+      backUrl: safeBackUrl(req)
     });
   }
   if (err.code === 'TIPO_NAO_PERMITIDO') {
@@ -71,7 +94,7 @@ function uploadErrorHandler(err, req, res, next) {
       title: 'Tipo de arquivo não permitido',
       code: 415,
       message: 'Envie imagens (JPG, PNG, WEBP, GIF) ou documentos (PDF, DOC, XLS, TXT, CSV).',
-      backUrl: req.get('referer') || '/'
+      backUrl: safeBackUrl(req)
     });
   }
   return next(err);
