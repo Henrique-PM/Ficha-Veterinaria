@@ -6,6 +6,7 @@ const rateLimit = require('express-rate-limit');
 const { engine } = require('express-handlebars');
 
 const helpers = require('./lib/helpers');
+const { assetVersion } = require('./lib/assets');
 const DbSessionStore = require('./lib/session-store');
 const { ensureSchema } = require('./db/schema');
 const { csrfToken, checkCsrf } = require('./middleware/csrf');
@@ -134,6 +135,8 @@ app.use((req, res, next) => {
   res.locals.isVet = Boolean(user && (user.type === 'veterinario' || user.type === 'admin'));
   res.locals.isRoot = Boolean(user && user.type === 'admin');
   res.locals.currentPath = req.path;
+  // Carimbo de versão do CSS/JS — ver lib/assets.js.
+  res.locals.assetVersion = assetVersion;
   // Mensagens simples via querystring (?erro=chip). Evita precisar de uma
   // dependência de flash messages só para isto.
   res.locals.erro = typeof req.query.erro === 'string' ? req.query.erro.slice(0, 40) : null;
