@@ -8,8 +8,14 @@ const path = require('path');
  * e de qualquer tipo (inclusive .html/.svg, que viram XSS se servidos inline).
  */
 
-const MAX_PHOTO_BYTES = 5 * 1024 * 1024;   // 5 MB
-const MAX_DOC_BYTES = 10 * 1024 * 1024;    // 10 MB
+/*
+ * 4 MB, não mais: a Vercel corta em 4,5 MB o corpo de request e de response
+ * de função. Acima disso o upload morre na plataforma, antes de chegar aqui,
+ * e o usuário vê um erro cru em vez do render abaixo. Fotos ainda maiores são
+ * reduzidas no navegador antes do envio (public/js/app.js).
+ */
+const MAX_PHOTO_BYTES = 4 * 1024 * 1024;
+const MAX_DOC_BYTES = 4 * 1024 * 1024;
 
 const ALLOWED_IMAGE = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
 
@@ -85,7 +91,8 @@ function uploadErrorHandler(err, req, res, next) {
     return res.status(413).render('error', {
       title: 'Arquivo grande demais',
       code: 413,
-      message: 'O arquivo excede o limite permitido (5 MB para fotos, 10 MB para documentos).',
+      message: 'O arquivo excede o limite de 4 MB. Se for uma imagem, tente reenviar: ' +
+        'ela é reduzida automaticamente. Se for PDF, envie uma versão mais leve.',
       backUrl: safeBackUrl(req)
     });
   }

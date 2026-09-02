@@ -61,7 +61,7 @@
         <form action="/vet/animal/{{animal.id}}/photo" method="POST" enctype="multipart/form-data" class="mt">
             <input type="hidden" name="_csrf" value="{{csrfToken}}">
             <input type="file" name="photo" accept="image/*" required data-preview="preview-foto"
-                   aria-label="Nova foto principal">
+                   data-compress="photo" aria-label="Nova foto principal">
             <button type="submit" class="btn btn-ghost btn-sm btn-block mt">{{icon "camera"}} Trocar foto</button>
         </form>
 
@@ -1008,8 +1008,8 @@
         <div class="modal-body">
             <div class="field">
                 <label for="document">Arquivo *</label>
-                <input type="file" id="document" name="document" required>
-                <span class="hint">PDF, imagem, DOC, XLS, TXT ou CSV. Até 10 MB.</span>
+                <input type="file" id="document" name="document" required data-compress="doc">
+                <span class="hint">PDF, imagem, DOC, XLS, TXT ou CSV. Até 4 MB — foto de documento é reduzida automaticamente; PDF vai como está.</span>
             </div>
             <div class="field">
                 <label for="doc-desc">Descrição</label>
@@ -1034,8 +1034,8 @@
         <div class="modal-body">
             <div class="field">
                 <label for="gal-foto">Imagem *</label>
-                <input type="file" id="gal-foto" name="photo" accept="image/*" required>
-                <span class="hint">JPG, PNG, WEBP ou GIF. Até 5 MB.</span>
+                <input type="file" id="gal-foto" name="photo" accept="image/*" required data-compress="photo">
+                <span class="hint">JPG, PNG, WEBP ou GIF. Até 4 MB — imagens maiores são reduzidas automaticamente antes do envio.</span>
             </div>
             <div class="field">
                 <label for="gal-desc">Descrição</label>
