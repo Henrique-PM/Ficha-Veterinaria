@@ -1,68 +1,78 @@
 <div class="topbar">
     <div class="row">
-        <button type="button" class="btn btn-ghost btn-icon menu-toggle" data-menu-toggle
-                aria-expanded="false" aria-label="Abrir menu">☰</button>
+        {{> menu-button}}
         <div class="titles">
             <h1>Ambientes</h1>
             <div class="subtitle">Gatis, canis e baias — onde cada animal está alojado</div>
         </div>
     </div>
     <div class="actions">
-        <button type="button" class="btn btn-primary" data-modal-open="novo-ambiente">+ Novo ambiente</button>
+        <button type="button" class="btn btn-primary" data-modal-open="novo-ambiente">
+            {{icon "plus"}} Novo ambiente
+        </button>
     </div>
 </div>
 
 {{#if semAmbiente}}
 <div class="alert alert-warning">
-    ⚠️ {{semAmbiente}} {{#if (eq semAmbiente 1)}}animal está{{else}}animais estão{{/if}}
-    sem ambiente definido. <a href="/vet/animais?ambiente=">Ver na lista de animais</a>
+    {{icon "alert"}}
+    <span class="alert-body">
+        <strong>{{semAmbiente}}</strong> {{#if (eq semAmbiente 1)}}animal está{{else}}animais estão{{/if}}
+        sem ambiente definido.
+    </span>
+    <a href="/vet/animais?ambiente=" class="btn btn-ghost btn-sm">Ver na lista</a>
 </div>
 {{/if}}
 
 <div class="env-grid">
     {{#each environments}}
     <a class="env-card" href="/vet/ambientes/{{this.id}}"
-       {{#if this.color}}style="border-left-color:{{this.color}}"{{/if}}>
+       {{#if this.color}}style="--env-color:{{this.color}}"{{/if}}>
         <div class="env-top">
-            <span class="env-icon" aria-hidden="true">{{kindIcon this.kind}}</span>
+            <span class="env-icon">{{kindIcon this.kind}}</span>
             <span>
-                <span class="env-name">{{this.name}}</span><br>
+                <span class="env-name">{{this.name}}</span>
                 <span class="env-sub">{{kindLabel this.kind}}</span>
             </span>
         </div>
 
-        <div>
-            <span class="env-count">{{this.ocupacao}}</span>
-            <span class="env-sub">
-                {{#if this.capacity}}/ {{this.capacity}} vagas{{else}}
-                {{#if (eq this.ocupacao 1)}}animal{{else}}animais{{/if}}{{/if}}
-            </span>
-        </div>
+        <div class="env-foot">
+            <div>
+                <span class="env-count">{{this.ocupacao}}</span>
+                <span class="env-sub">
+                    {{#if this.capacity}}de {{this.capacity}} vagas{{else}}
+                    {{#if (eq this.ocupacao 1)}}animal{{else}}animais{{/if}}{{/if}}
+                </span>
+            </div>
 
-        {{#if this.capacity}}
-        <div class="meter {{#if (gt this.ocupacao this.capacity)}}is-full{{/if}}">
-            <span style="width:{{percent this.ocupacao this.capacity}}%"></span>
-        </div>
-        {{#if (gt this.ocupacao this.capacity)}}
-        <small class="badge badge-danger">Acima da capacidade</small>
-        {{/if}}
-        {{/if}}
+            {{#if this.capacity}}
+            <div class="meter-row" style="margin-top:8px">
+                <div class="meter {{#if (gt this.ocupacao this.capacity)}}is-full{{/if}}">
+                    <span style="width:{{percent this.ocupacao this.capacity}}%"></span>
+                </div>
+                <span class="meter-label">{{percent this.ocupacao this.capacity}}%</span>
+            </div>
+            {{#if (gt this.ocupacao this.capacity)}}
+            <span class="badge badge-danger badge-dot" style="margin-top:9px">Acima da capacidade</span>
+            {{/if}}
+            {{/if}}
 
-        {{#if this.notes}}<small class="env-sub">{{truncate this.notes 60}}</small>{{/if}}
+            {{#if this.notes}}<div class="env-sub" style="margin-top:9px">{{truncate this.notes 60}}</div>{{/if}}
+        </div>
     </a>
     {{/each}}
 
     <button type="button" class="env-card env-add" data-modal-open="novo-ambiente">
-        <span class="plus" aria-hidden="true">+</span>
-        <span>Criar ambiente</span>
-        <small class="env-sub">Gatil, canil, baia ou quarentena</small>
+        {{icon "plus"}}
+        <strong>Criar ambiente</strong>
+        <span class="env-sub">Gatil, canil, baia ou quarentena</span>
     </button>
 </div>
 
 {{#if environments.length}}
 <div class="card mt">
     <div class="card-head">
-        <h2>⚙️ Editar ambientes</h2>
+        <h2>{{icon "settings"}} Editar ambientes</h2>
         <span class="section-note">Alterar nome, tipo e capacidade</span>
     </div>
     <div class="table-wrap">
@@ -73,17 +83,24 @@
             <tbody>
                 {{#each environments}}
                 <tr>
-                    <td><strong>{{this.name}}</strong></td>
-                    <td>{{kindIcon this.kind}} {{kindLabel this.kind}}</td>
-                    <td>{{this.ocupacao}}{{#if this.capacity}} / {{this.capacity}}{{/if}}</td>
+                    <td>
+                        <span class="cell-main">
+                            <strong>{{this.name}}</strong>
+                        </span>
+                        {{#if this.notes}}<small class="cell-sub">{{truncate this.notes 60}}</small>{{/if}}
+                    </td>
+                    <td><span class="badge badge-muted">{{kindLabel this.kind}}</span></td>
+                    <td class="nowrap">{{this.ocupacao}}{{#if this.capacity}} / {{this.capacity}}{{/if}}</td>
                     <td class="actions-cell">
                         <div class="row-tight" style="justify-content:flex-end">
                             <button type="button" class="btn btn-ghost btn-sm"
-                                    data-modal-open="editar-{{this.id}}">Editar</button>
+                                    data-modal-open="editar-{{this.id}}">{{icon "pencil"}} Editar</button>
                             <form method="POST" action="/vet/ambientes/{{this.id}}/excluir" class="inline-form"
                                   data-confirm="Excluir o ambiente &quot;{{this.name}}&quot;? Os {{this.ocupacao}} animais dele ficarão sem ambiente (nenhum animal é apagado).">
                                 <input type="hidden" name="_csrf" value="{{../csrfToken}}">
-                                <button type="submit" class="btn btn-danger btn-sm">Excluir</button>
+                                <button type="submit" class="btn btn-danger btn-sm btn-icon"
+                                        aria-label="Excluir ambiente {{this.name}}"
+                                        title="Excluir ambiente">{{icon "trash"}}</button>
                             </form>
                         </div>
                     </td>
@@ -99,12 +116,12 @@
     <form method="POST" action="/vet/ambientes">
         <input type="hidden" name="_csrf" value="{{csrfToken}}">
         <div class="modal-head">
-            <h2>Novo ambiente</h2>
-            <button type="button" class="modal-close" data-modal-close aria-label="Fechar">&times;</button>
+            <h2>{{icon "warehouse"}} Novo ambiente</h2>
+            <button type="button" class="modal-close" data-modal-close aria-label="Fechar">{{icon "close"}}</button>
         </div>
         <div class="modal-body">
             <div class="field">
-                <label for="nome-ambiente">Nome</label>
+                <label for="nome-ambiente">Nome <span class="req">*</span></label>
                 <input type="text" id="nome-ambiente" name="name" required maxlength="80"
                        placeholder="Ex.: Gatil 1, Canil dos filhotes, Quarentena">
             </div>
@@ -112,11 +129,11 @@
                 <div class="field">
                     <label for="tipo-ambiente">Tipo</label>
                     <select id="tipo-ambiente" name="kind">
-                        <option value="gatil">🐈 Gatil</option>
-                        <option value="canil">🐕 Canil</option>
-                        <option value="baia">🐴 Baia</option>
-                        <option value="quarentena">⚠️ Quarentena</option>
-                        <option value="outro">🏠 Outro</option>
+                        <option value="gatil">Gatil</option>
+                        <option value="canil">Canil</option>
+                        <option value="baia">Baia</option>
+                        <option value="quarentena">Quarentena</option>
+                        <option value="outro">Outro</option>
                     </select>
                 </div>
                 <div class="field">
@@ -128,7 +145,8 @@
             </div>
             <div class="field">
                 <label for="cor-ambiente">Cor de identificação</label>
-                <input type="text" id="cor-ambiente" name="color" maxlength="20" placeholder="#2f7a63">
+                <input type="text" id="cor-ambiente" name="color" maxlength="20" placeholder="#0f6a51">
+                <span class="hint">Aparece como faixa no topo do cartão do ambiente.</span>
             </div>
             <div class="field">
                 <label for="notas-ambiente">Observações</label>
@@ -148,23 +166,23 @@
     <form method="POST" action="/vet/ambientes/{{this.id}}">
         <input type="hidden" name="_csrf" value="{{../csrfToken}}">
         <div class="modal-head">
-            <h2>Editar {{this.name}}</h2>
-            <button type="button" class="modal-close" data-modal-close aria-label="Fechar">&times;</button>
+            <h2>{{icon "pencil"}} Editar {{this.name}}</h2>
+            <button type="button" class="modal-close" data-modal-close aria-label="Fechar">{{icon "close"}}</button>
         </div>
         <div class="modal-body">
             <div class="field">
-                <label for="nome-{{this.id}}">Nome</label>
+                <label for="nome-{{this.id}}">Nome <span class="req">*</span></label>
                 <input type="text" id="nome-{{this.id}}" name="name" value="{{this.name}}" required maxlength="80">
             </div>
             <div class="form-row">
                 <div class="field">
                     <label for="tipo-{{this.id}}">Tipo</label>
                     <select id="tipo-{{this.id}}" name="kind">
-                        <option value="gatil" {{selected this.kind 'gatil'}}>🐈 Gatil</option>
-                        <option value="canil" {{selected this.kind 'canil'}}>🐕 Canil</option>
-                        <option value="baia" {{selected this.kind 'baia'}}>🐴 Baia</option>
-                        <option value="quarentena" {{selected this.kind 'quarentena'}}>⚠️ Quarentena</option>
-                        <option value="outro" {{selected this.kind 'outro'}}>🏠 Outro</option>
+                        <option value="gatil" {{selected this.kind 'gatil'}}>Gatil</option>
+                        <option value="canil" {{selected this.kind 'canil'}}>Canil</option>
+                        <option value="baia" {{selected this.kind 'baia'}}>Baia</option>
+                        <option value="quarentena" {{selected this.kind 'quarentena'}}>Quarentena</option>
+                        <option value="outro" {{selected this.kind 'outro'}}>Outro</option>
                     </select>
                 </div>
                 <div class="field">

@@ -1,29 +1,32 @@
 <div class="topbar">
     <div class="row">
-        <button type="button" class="btn btn-ghost btn-icon menu-toggle" data-menu-toggle
-                aria-expanded="false" aria-label="Abrir menu">☰</button>
+        {{> menu-button}}
         <div class="titles">
             <h1>Medicamentos</h1>
             <div class="subtitle">
-                {{#if lowOnly}}Somente estoque baixo{{else}}Estoque da farmácia{{/if}}
+                {{#if lowOnly}}Somente itens com estoque baixo{{else}}Estoque da farmácia{{/if}}
             </div>
         </div>
     </div>
     <div class="actions">
         <a href="/vet/medicamentos" class="btn {{#unless lowOnly}}btn-primary{{else}}btn-ghost{{/unless}}">Todos</a>
         <a href="/vet/medicamentos?filtro=baixo" class="btn {{#if lowOnly}}btn-primary{{else}}btn-ghost{{/if}}">Estoque baixo</a>
-        <button type="button" class="btn btn-primary" data-modal-open="novo-medicamento">+ Adicionar</button>
+        <button type="button" class="btn btn-primary" data-modal-open="novo-medicamento">{{icon "plus"}} Adicionar</button>
     </div>
 </div>
 
 <div class="card">
+    <div class="card-head">
+        <h2>{{icon "package"}} Farmácia</h2>
+        <span class="section-note">{{medications.length}} {{#if (eq medications.length 1)}}item{{else}}itens{{/if}}</span>
+    </div>
     {{#if medications.length}}
     <div class="table-wrap">
         <table>
             <thead>
                 <tr>
-                    <th>Medicamento</th><th>Estoque</th><th>Mínimo</th>
-                    <th>Prescrições ativas</th><th class="actions-cell">Ajustar estoque</th>
+                    <th>Medicamento</th><th>Estoque</th><th class="num">Mínimo</th>
+                    <th class="num">Prescrições ativas</th><th class="actions-cell">Ajustar estoque</th>
                 </tr>
             </thead>
             <tbody>
@@ -31,17 +34,17 @@
                 <tr>
                     <td>
                         <strong>{{this.name}}</strong>
-                        {{#if this.description}}<br><small class="muted">{{truncate this.description 70}}</small>{{/if}}
+                        {{#if this.description}}<small class="cell-sub">{{truncate this.description 70}}</small>{{/if}}
                     </td>
                     <td>
                         {{#if (gt this.stock_quantity this.min_stock_level)}}
-                            <span class="badge badge-success">{{this.stock_quantity}} {{this.unit}}</span>
+                            <span class="badge badge-success badge-dot">{{this.stock_quantity}} {{this.unit}}</span>
                         {{else}}
-                            <span class="badge badge-danger">{{this.stock_quantity}} {{this.unit}}</span>
+                            <span class="badge badge-danger badge-dot">{{this.stock_quantity}} {{this.unit}}</span>
                         {{/if}}
                     </td>
-                    <td>{{this.min_stock_level}}</td>
-                    <td>
+                    <td class="num">{{this.min_stock_level}}</td>
+                    <td class="num">
                         {{#if this.prescricoes_ativas}}
                             <span class="badge badge-info">{{this.prescricoes_ativas}}</span>
                         {{else}}
@@ -54,20 +57,22 @@
                                 <input type="hidden" name="_csrf" value="{{../csrfToken}}">
                                 <input type="hidden" name="delta" value="-1">
                                 <input type="hidden" name="filtro" value="{{#if ../lowOnly}}baixo{{/if}}">
-                                <button type="submit" class="btn btn-ghost btn-sm" aria-label="Diminuir uma unidade">−</button>
+                                <button type="submit" class="btn btn-ghost btn-sm btn-icon"
+                                        aria-label="Diminuir uma unidade de {{this.name}}">{{icon "minus"}}</button>
                             </form>
                             <form method="POST" action="/vet/medicamentos/{{this.id}}/estoque" class="inline-form">
                                 <input type="hidden" name="_csrf" value="{{../csrfToken}}">
                                 <input type="hidden" name="delta" value="1">
                                 <input type="hidden" name="filtro" value="{{#if ../lowOnly}}baixo{{/if}}">
-                                <button type="submit" class="btn btn-ghost btn-sm" aria-label="Aumentar uma unidade">+</button>
+                                <button type="submit" class="btn btn-ghost btn-sm btn-icon"
+                                        aria-label="Aumentar uma unidade de {{this.name}}">{{icon "plus"}}</button>
                             </form>
                             <form method="POST" action="/vet/medicamentos/{{this.id}}/estoque" class="row-tight">
                                 <input type="hidden" name="_csrf" value="{{../csrfToken}}">
                                 <input type="hidden" name="filtro" value="{{#if ../lowOnly}}baixo{{/if}}">
                                 <input type="number" name="stock_quantity" min="0" max="99999"
-                                       placeholder="{{this.stock_quantity}}" style="width:86px"
-                                       aria-label="Definir quantidade exata">
+                                       placeholder="{{this.stock_quantity}}" style="width:82px"
+                                       aria-label="Definir quantidade exata de {{this.name}}">
                                 <button type="submit" class="btn btn-ghost btn-sm">Definir</button>
                             </form>
                         </div>
@@ -79,8 +84,17 @@
     </div>
     {{else}}
     <div class="empty">
-        <span class="emoji" aria-hidden="true">💊</span>
-        <p>{{#if lowOnly}}Nenhum medicamento com estoque baixo.{{else}}Nenhum medicamento cadastrado.{{/if}}</p>
+        <span class="empty-icon">{{icon "pill"}}</span>
+        <h2>{{#if lowOnly}}Estoque em ordem{{else}}Farmácia vazia{{/if}}</h2>
+        <p>
+            {{#if lowOnly}}Nenhum medicamento abaixo do estoque mínimo.
+            {{else}}Cadastre os medicamentos usados no abrigo para acompanhar o estoque e as prescrições.{{/if}}
+        </p>
+        {{#unless lowOnly}}
+        <p class="mt">
+            <button type="button" class="btn btn-primary" data-modal-open="novo-medicamento">{{icon "plus"}} Adicionar medicamento</button>
+        </p>
+        {{/unless}}
     </div>
     {{/if}}
 </div>
@@ -89,12 +103,12 @@
     <form method="POST" action="/vet/medicamentos">
         <input type="hidden" name="_csrf" value="{{csrfToken}}">
         <div class="modal-head">
-            <h2>Novo medicamento</h2>
-            <button type="button" class="modal-close" data-modal-close aria-label="Fechar">&times;</button>
+            <h2>{{icon "pill"}} Novo medicamento</h2>
+            <button type="button" class="modal-close" data-modal-close aria-label="Fechar">{{icon "close"}}</button>
         </div>
         <div class="modal-body">
             <div class="field">
-                <label for="med-nome">Nome *</label>
+                <label for="med-nome">Nome <span class="req">*</span></label>
                 <input type="text" id="med-nome" name="name" required maxlength="100">
             </div>
             <div class="field">

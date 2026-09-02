@@ -1,34 +1,40 @@
 <div class="topbar">
     <div class="row">
-        <button type="button" class="btn btn-ghost btn-icon menu-toggle" data-menu-toggle
-                aria-expanded="false" aria-label="Abrir menu">☰</button>
-        <a href="/vet/animais" class="btn btn-ghost btn-sm">← Voltar</a>
-        <div class="titles"><h1>Cadastrar animal</h1></div>
+        {{> menu-button}}
+        <a href="/vet/animais" class="btn btn-ghost btn-sm">{{icon "arrowLeft"}} Voltar</a>
+        <div class="titles">
+            <h1>Cadastrar animal</h1>
+            <div class="subtitle">Os campos com <span class="req">*</span> são obrigatórios</div>
+        </div>
     </div>
 </div>
 
-{{#if error}}<div class="alert alert-danger" role="alert">{{error}}</div>{{/if}}
+{{#if error}}
+<div class="alert alert-danger" role="alert">
+    {{icon "alert"}}<span class="alert-body">{{error}}</span>
+</div>
+{{/if}}
 
 <form action="/vet/cadastrar-animal" method="POST" enctype="multipart/form-data">
     <input type="hidden" name="_csrf" value="{{csrfToken}}">
 
     <div class="card">
-        <div class="card-head"><h2>🐾 Identificação</h2></div>
+        <div class="card-head"><h2>{{icon "paw"}} Identificação</h2></div>
 
         <div class="form-row">
             <div class="field">
-                <label for="name">Nome *</label>
+                <label for="name">Nome <span class="req">*</span></label>
                 <input type="text" id="name" name="name" value="{{form.name}}" required maxlength="80" autofocus>
             </div>
             <div class="field">
-                <label for="species">Espécie *</label>
+                <label for="species">Espécie <span class="req">*</span></label>
                 <select id="species" name="species" required>
                     <option value="">Selecione…</option>
-                    <option value="gato" {{selected form.species 'gato'}}>🐈 Gato</option>
-                    <option value="cachorro" {{selected form.species 'cachorro'}}>🐕 Cachorro</option>
-                    <option value="cavalo" {{selected form.species 'cavalo'}}>🐴 Cavalo</option>
-                    <option value="ave" {{selected form.species 'ave'}}>🦜 Ave</option>
-                    <option value="outro" {{selected form.species 'outro'}}>🐾 Outro</option>
+                    <option value="gato" {{selected form.species 'gato'}}>Gato</option>
+                    <option value="cachorro" {{selected form.species 'cachorro'}}>Cachorro</option>
+                    <option value="cavalo" {{selected form.species 'cavalo'}}>Cavalo</option>
+                    <option value="ave" {{selected form.species 'ave'}}>Ave</option>
+                    <option value="outro" {{selected form.species 'outro'}}>Outro</option>
                 </select>
             </div>
             <div class="field">
@@ -88,9 +94,7 @@
                 <select id="environment_id" name="environment_id">
                     <option value="">Sem ambiente</option>
                     {{#each environments}}
-                    <option value="{{this.id}}" {{selected this.id ../form.environment_id}}>
-                        {{kindIcon this.kind}} {{this.name}}
-                    </option>
+                    <option value="{{this.id}}" {{selected this.id ../form.environment_id}}>{{this.name}}</option>
                     {{/each}}
                 </select>
                 {{#unless environments.length}}
@@ -102,18 +106,17 @@
 
     <div class="card">
         <div class="card-head">
-            <h2>🩺 Situação sanitária</h2>
+            <h2>{{icon "stethoscope"}} Situação sanitária</h2>
             <span class="section-note">Controle essencial em alojamento coletivo</span>
         </div>
 
         <div class="form-row">
             <div class="field">
-                <label class="check">
-                    <input type="checkbox" name="neutered" value="1" {{checked form.neutered}}>
-                    Castrado
-                </label>
                 <label for="neutered_date">Data da castração</label>
                 <input type="date" id="neutered_date" name="neutered_date" value="{{form.neutered_date}}">
+                <label class="check check-under">
+                    <input type="checkbox" name="neutered" value="1" {{checked form.neutered}}> Castrado
+                </label>
             </div>
             <div class="field">
                 <label for="fiv_status">FIV</label>
@@ -141,15 +144,15 @@
     </div>
 
     <div class="card">
-        <div class="card-head"><h2>📷 Foto e descrição</h2></div>
+        <div class="card-head"><h2>{{icon "camera"}} Foto e descrição</h2></div>
 
         <div class="field">
             <label for="photo">Foto principal</label>
             <input type="file" id="photo" name="photo" accept="image/*" data-preview="preview-foto">
             <span class="hint">JPG, PNG, WEBP ou GIF. Até 5 MB.</span>
         </div>
-        <div class="profile-photo" id="preview-foto" style="max-width:180px;margin-bottom:14px">
-            <span aria-hidden="true">📷</span>
+        <div class="profile-photo" id="preview-foto" style="max-width:190px;margin-bottom:16px">
+            {{icon "camera"}}
         </div>
 
         <div class="field">
@@ -166,7 +169,7 @@
 
         <div class="form-actions">
             <a href="/vet/animais" class="btn btn-ghost">Cancelar</a>
-            <button type="submit" class="btn btn-primary">Cadastrar animal</button>
+            <button type="submit" class="btn btn-primary">{{icon "check"}} Cadastrar animal</button>
         </div>
     </div>
 </form>

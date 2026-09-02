@@ -1,31 +1,63 @@
-<div class="auth-wrap">
-    <div class="auth-card">
-        <div class="auth-head">
-            <div class="logo" aria-hidden="true">🐾</div>
-            <h1>Ficha Veterinária</h1>
-            <p>Entre para acessar o sistema</p>
+<div class="auth-shell">
+    <aside class="auth-aside">
+        <div class="brand">
+            <span class="brand-mark">{{icon "paw"}}</span>
+            <span class="brand-text">
+                <span class="brand-name">Ficha Veterinária</span>
+                <span class="brand-sub">Prontuário</span>
+            </span>
         </div>
 
-        {{#if error}}<div class="alert alert-danger" role="alert">{{error}}</div>{{/if}}
-
-        <form action="/auth/login" method="POST">
-            <input type="hidden" name="_csrf" value="{{csrfToken}}">
-
-            <div class="field">
-                <label for="email">E-mail</label>
-                <input type="email" id="email" name="email" required autofocus autocomplete="username">
-            </div>
-
-            <div class="field">
-                <label for="password">Senha</label>
-                <input type="password" id="password" name="password" required autocomplete="current-password">
-            </div>
-
-            <button type="submit" class="btn btn-primary btn-block">Entrar</button>
-        </form>
-
-        <div class="auth-foot">
-            Ainda não tem conta? <a href="/auth/register">Criar conta</a>
+        <div>
+            <h2>Prontuário clínico de abrigos, gatis e canis.</h2>
+            <p>
+                Histórico completo de cada animal em um só lugar — com controle de quem
+                registra e de quem apenas consulta.
+            </p>
+            <ul class="auth-points">
+                <li>{{icon "heartbeat"}} Saúde, vacinas, vermifugação e procedimentos</li>
+                <li>{{icon "hospital"}} Internações, prescrições e estoque de medicamentos</li>
+                <li>{{icon "warehouse"}} Ocupação por gatil, canil, baia e quarentena</li>
+                <li>{{icon "shieldCheck"}} Acesso ao prontuário liberado pela equipe</li>
+            </ul>
         </div>
-    </div>
+
+        <p class="auth-legal">Uso restrito à equipe autorizada.</p>
+    </aside>
+
+    <main class="auth-main">
+        <div class="auth-card">
+            <div class="auth-head">
+                <h1>Entrar</h1>
+                <p>Acesse com as credenciais cadastradas.</p>
+            </div>
+
+            {{#if error}}
+            <div class="alert alert-danger" role="alert">
+                {{icon "alert"}}<span class="alert-body">{{error}}</span>
+            </div>
+            {{/if}}
+
+            <form action="/auth/login" method="POST">
+                <input type="hidden" name="_csrf" value="{{csrfToken}}">
+
+                <div class="field">
+                    <label for="email">E-mail</label>
+                    <input type="email" id="email" name="email" required autofocus autocomplete="username"
+                           placeholder="voce@abrigo.org">
+                </div>
+
+                <div class="field">
+                    <label for="password">Senha</label>
+                    <input type="password" id="password" name="password" required autocomplete="current-password">
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">Entrar</button>
+            </form>
+
+            <div class="auth-foot">
+                Ainda não tem conta? <a href="/auth/register">Criar conta</a>
+            </div>
+        </div>
+    </main>
 </div>

@@ -1,50 +1,65 @@
 <div class="topbar">
     <div class="row">
-        <button type="button" class="btn btn-ghost btn-icon menu-toggle" data-menu-toggle
-                aria-expanded="false" aria-label="Abrir menu">☰</button>
+        {{> menu-button}}
         <div class="titles">
             <h1>Equipe</h1>
             <div class="subtitle">Quem acessa o quê no sistema</div>
         </div>
     </div>
     <div class="actions">
-        <form method="GET" action="/vet/equipe" class="row-tight">
-            <input type="search" name="q" value="{{search}}" placeholder="Buscar por nome ou e-mail"
-                   style="min-width:220px">
-            <button type="submit" class="btn btn-ghost">Buscar</button>
+        <form method="GET" action="/vet/equipe" class="search-field is-wide">
+            {{icon "search"}}
+            <input type="search" name="q" value="{{search}}" aria-label="Buscar pessoa"
+                   placeholder="Buscar por nome ou e-mail">
         </form>
     </div>
 </div>
 
-{{#if aviso}}<div class="alert alert-success" role="status">{{aviso}}</div>{{/if}}
+{{#if aviso}}
+<div class="alert alert-success" role="status">
+    {{icon "checkCircle"}}<span class="alert-body">{{aviso}}</span>
+</div>
+{{/if}}
 
 <div class="alert alert-info">
-    <strong>Como funciona:</strong> todo cadastro novo entra como <strong>visualizador</strong> —
-    ele só vê a apresentação dos animais, nunca o prontuário. Esta tela é exclusiva do
-    administrador: só você concede e remove o acesso de veterinário. Quem é veterinário
-    não enxerga esta área.
+    {{icon "info"}}
+    <span class="alert-body">
+        <strong>Como funciona:</strong> todo cadastro novo entra como <strong>visualizador</strong> —
+        ele só vê a apresentação dos animais, nunca o prontuário. Esta tela é exclusiva do
+        administrador: só você concede e remove o acesso de veterinário. Quem é veterinário
+        não enxerga esta área.
+    </span>
 </div>
 
 <div class="stats">
-    <div class="stat">
-        <div class="ico" aria-hidden="true">🔑</div>
-        <div class="label">Administradores</div>
-        <div class="value">{{totals.admins}}</div>
+    <div class="stat is-primary">
+        <span class="stat-icon">{{icon "key"}}</span>
+        <span class="stat-body">
+            <span class="label">Administradores</span>
+            <span class="value">{{totals.admins}}</span>
+        </span>
     </div>
     <div class="stat">
-        <div class="ico" aria-hidden="true">🩺</div>
-        <div class="label">Veterinários</div>
-        <div class="value">{{totals.vets}}</div>
+        <span class="stat-icon">{{icon "stethoscope"}}</span>
+        <span class="stat-body">
+            <span class="label">Veterinários</span>
+            <span class="value">{{totals.vets}}</span>
+        </span>
     </div>
     <div class="stat">
-        <div class="ico" aria-hidden="true">👀</div>
-        <div class="label">Visualizadores</div>
-        <div class="value">{{totals.viewers}}</div>
+        <span class="stat-icon">{{icon "eye"}}</span>
+        <span class="stat-body">
+            <span class="label">Visualizadores</span>
+            <span class="value">{{totals.viewers}}</span>
+        </span>
     </div>
 </div>
 
 <div class="card">
-    <div class="card-head"><h2>👥 Usuários cadastrados</h2></div>
+    <div class="card-head">
+        <h2>{{icon "users"}} Usuários cadastrados</h2>
+        <span class="section-note">{{users.length}} {{#if (eq users.length 1)}}pessoa{{else}}pessoas{{/if}}</span>
+    </div>
 
     {{#if users.length}}
     <div class="table-wrap">
@@ -62,31 +77,31 @@
                 {{#each users}}
                 <tr>
                     <td>
-                        <div class="row-tight">
+                        <div class="cell-main">
                             <span class="avatar" aria-hidden="true">{{initials this.name}}</span>
                             <span>
                                 <strong>{{this.name}}</strong>
                                 {{#if (eq this.id ../currentUser.id)}}
                                     <span class="badge badge-primary">você</span>
                                 {{/if}}
-                                <br><small class="muted">{{this.email}}</small>
+                                <small class="cell-sub">{{this.email}}</small>
                             </span>
                         </div>
                     </td>
                     <td>
                         {{#if (eq this.type 'admin')}}
-                            <span class="badge badge-primary">🔑 Administrador</span>
+                            <span class="badge badge-primary">{{icon "key"}} Administrador</span>
                         {{else if (eq this.type 'veterinario')}}
-                            <span class="badge badge-success">🩺 Veterinário</span>
+                            <span class="badge badge-success">{{icon "stethoscope"}} Veterinário</span>
                         {{else}}
-                            <span class="badge badge-muted">👀 Visualizador</span>
+                            <span class="badge badge-muted">{{icon "eye"}} Visualizador</span>
                         {{/if}}
                     </td>
                     <td>
                         {{#if this.active}}
-                            <span class="badge badge-success">Ativo</span>
+                            <span class="badge badge-success badge-dot">Ativo</span>
                         {{else}}
-                            <span class="badge badge-danger">Desativado</span>
+                            <span class="badge badge-danger badge-dot">Desativado</span>
                         {{/if}}
                     </td>
                     <td class="nowrap"><small class="muted">{{formatDate this.created_at}}</small></td>
@@ -116,7 +131,7 @@
                                               data-confirm="Tornar {{this.name}} administrador? Ela poderá gerenciar toda a equipe.">
                                             <input type="hidden" name="_csrf" value="{{../csrfToken}}">
                                             <input type="hidden" name="type" value="admin">
-                                            <button type="submit" class="btn btn-ghost btn-sm">↑ Admin</button>
+                                            <button type="submit" class="btn btn-ghost btn-sm">{{icon "arrowUp"}} Admin</button>
                                         </form>
                                     {{/if}}
                                 {{/if}}
@@ -126,13 +141,13 @@
                                           data-confirm="Remover o papel de administrador de {{this.name}}?">
                                         <input type="hidden" name="_csrf" value="{{../csrfToken}}">
                                         <input type="hidden" name="type" value="veterinario">
-                                        <button type="submit" class="btn btn-ghost btn-sm">↓ Veterinário</button>
+                                        <button type="submit" class="btn btn-ghost btn-sm">{{icon "arrowDown"}} Veterinário</button>
                                     </form>
                                 {{/if}}
 
                                 {{#if ../viewerIsAdmin}}
                                     <button type="button" class="btn btn-ghost btn-sm"
-                                            data-modal-open="senha-{{this.id}}">Senha</button>
+                                            data-modal-open="senha-{{this.id}}">{{icon "lock"}} Senha</button>
                                     <form method="POST" action="/vet/equipe/{{this.id}}/ativo" class="inline-form"
                                           data-confirm="Confirmar alteração de acesso de {{this.name}}?">
                                         <input type="hidden" name="_csrf" value="{{../csrfToken}}">
@@ -151,14 +166,18 @@
         </table>
     </div>
     {{else}}
-    <div class="empty"><span class="emoji" aria-hidden="true">👥</span><p>Nenhum usuário encontrado.</p></div>
+    <div class="empty">
+        <span class="empty-icon">{{icon "users"}}</span>
+        <h2>Nenhum usuário encontrado</h2>
+        <p>Nenhuma pessoa corresponde a essa busca.</p>
+    </div>
     {{/if}}
 </div>
 
 {{#if history.length}}
 <div class="card">
     <div class="card-head">
-        <h2>🕘 Histórico de alterações</h2>
+        <h2>{{icon "history"}} Histórico de alterações</h2>
         <span class="section-note">Últimas 15 mudanças de acesso</span>
     </div>
     <div class="table-wrap">
@@ -195,11 +214,11 @@
             <form method="POST" action="/vet/equipe/{{this.id}}/senha">
                 <input type="hidden" name="_csrf" value="{{../csrfToken}}">
                 <div class="modal-head">
-                    <h2>Redefinir senha</h2>
-                    <button type="button" class="modal-close" data-modal-close aria-label="Fechar">&times;</button>
+                    <h2>{{icon "lock"}} Redefinir senha</h2>
+                    <button type="button" class="modal-close" data-modal-close aria-label="Fechar">{{icon "close"}}</button>
                 </div>
                 <div class="modal-body">
-                    <p class="muted" style="margin-bottom:14px">
+                    <p class="modal-note">
                         Definir uma nova senha para <strong>{{this.name}}</strong>.
                         Todas as sessões dessa pessoa serão encerradas.
                     </p>

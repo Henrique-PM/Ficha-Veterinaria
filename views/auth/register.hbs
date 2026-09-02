@@ -1,43 +1,76 @@
-<div class="auth-wrap">
-    <div class="auth-card">
-        <div class="auth-head">
-            <div class="logo" aria-hidden="true">🐾</div>
-            <h1>Criar conta</h1>
-            <p>Ficha Veterinária</p>
+<div class="auth-shell">
+    <aside class="auth-aside">
+        <div class="brand">
+            <span class="brand-mark">{{icon "paw"}}</span>
+            <span class="brand-text">
+                <span class="brand-name">Ficha Veterinária</span>
+                <span class="brand-sub">Prontuário</span>
+            </span>
         </div>
 
-        {{#if error}}<div class="alert alert-danger" role="alert">{{error}}</div>{{/if}}
-
-        <form action="/auth/register" method="POST">
-            <input type="hidden" name="_csrf" value="{{csrfToken}}">
-
-            <div class="field">
-                <label for="name">Nome completo</label>
-                <input type="text" id="name" name="name" value="{{form.name}}" required autofocus autocomplete="name">
-            </div>
-
-            <div class="field">
-                <label for="email">E-mail</label>
-                <input type="email" id="email" name="email" value="{{form.email}}" required autocomplete="email">
-            </div>
-
-            <div class="field">
-                <label for="password">Senha</label>
-                <input type="password" id="password" name="password" required minlength="8" autocomplete="new-password">
-                <span class="hint">Mínimo de 8 caracteres.</span>
-            </div>
-
-            <div class="alert alert-info">
-                Toda conta nova entra como <strong>visualizador</strong>, com acesso apenas à
-                apresentação dos animais. O acesso a prontuários é liberado pela equipe
-                veterinária depois do cadastro.
-            </div>
-
-            <button type="submit" class="btn btn-primary btn-block">Criar conta</button>
-        </form>
-
-        <div class="auth-foot">
-            Já tem conta? <a href="/auth/login">Fazer login</a>
+        <div>
+            <h2>Crie sua conta para acompanhar os animais.</h2>
+            <p>
+                O cadastro dá acesso imediato à apresentação dos animais do abrigo.
+                O prontuário clínico é liberado depois, pela equipe veterinária.
+            </p>
+            <ul class="auth-points">
+                <li>{{icon "eye"}} Visualizador: conhece os animais disponíveis</li>
+                <li>{{icon "stethoscope"}} Veterinário: registra e consulta prontuários</li>
+                <li>{{icon "key"}} Administrador: gerencia os acessos da equipe</li>
+            </ul>
         </div>
-    </div>
+
+        <p class="auth-legal">Uso restrito à equipe autorizada.</p>
+    </aside>
+
+    <main class="auth-main">
+        <div class="auth-card">
+            <div class="auth-head">
+                <h1>Criar conta</h1>
+                <p>Leva menos de um minuto.</p>
+            </div>
+
+            {{#if error}}
+            <div class="alert alert-danger" role="alert">
+                {{icon "alert"}}<span class="alert-body">{{error}}</span>
+            </div>
+            {{/if}}
+
+            <form action="/auth/register" method="POST">
+                <input type="hidden" name="_csrf" value="{{csrfToken}}">
+
+                <div class="field">
+                    <label for="name">Nome completo</label>
+                    <input type="text" id="name" name="name" value="{{form.name}}" required autofocus autocomplete="name">
+                </div>
+
+                <div class="field">
+                    <label for="email">E-mail</label>
+                    <input type="email" id="email" name="email" value="{{form.email}}" required autocomplete="email">
+                </div>
+
+                <div class="field">
+                    <label for="password">Senha</label>
+                    <input type="password" id="password" name="password" required minlength="8" autocomplete="new-password">
+                    <span class="hint">Mínimo de 8 caracteres.</span>
+                </div>
+
+                <div class="alert alert-info">
+                    {{icon "info"}}
+                    <span class="alert-body">
+                        Toda conta nova entra como <strong>visualizador</strong>, com acesso apenas à
+                        apresentação dos animais. O acesso a prontuários é liberado pela equipe
+                        veterinária depois do cadastro.
+                    </span>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">Criar conta</button>
+            </form>
+
+            <div class="auth-foot">
+                Já tem conta? <a href="/auth/login">Fazer login</a>
+            </div>
+        </div>
+    </main>
 </div>

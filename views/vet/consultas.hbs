@@ -1,7 +1,6 @@
 <div class="topbar">
     <div class="row">
-        <button type="button" class="btn btn-ghost btn-icon menu-toggle" data-menu-toggle
-                aria-expanded="false" aria-label="Abrir menu">☰</button>
+        {{> menu-button}}
         <div class="titles">
             <h1>Internações</h1>
             <div class="subtitle">
@@ -17,29 +16,38 @@
 </div>
 
 <div class="card">
+    <div class="card-head">
+        <h2>{{icon "hospital"}} Registro de internações</h2>
+        <span class="section-note">
+            {{#if (eq filtro 'abertas')}}Somente sem alta{{else}}{{#if (eq filtro 'hoje')}}Entradas de hoje{{else}}Todo o histórico{{/if}}{{/if}}
+        </span>
+    </div>
     {{#if hospitalizations.length}}
     <div class="table-wrap">
         <table>
             <thead>
                 <tr>
                     <th>Animal</th><th>Entrada</th><th>Saída</th><th>Motivo</th>
-                    <th>Diagnóstico</th><th>Responsável</th><th></th>
+                    <th>Diagnóstico</th><th>Responsável</th><th class="actions-cell"></th>
                 </tr>
             </thead>
             <tbody>
                 {{#each hospitalizations}}
                 <tr>
                     <td>
-                        <a href="/vet/animal/{{this.animal_id}}"><strong>{{this.animal_name}}</strong></a>
-                        <br><small class="muted">{{speciesIcon this.species}} {{this.species}}</small>
+                        <span class="cell-main">
+                            {{speciesIcon this.species}}
+                            <a href="/vet/animal/{{this.animal_id}}"><strong>{{this.animal_name}}</strong></a>
+                        </span>
+                        <small class="cell-sub">{{this.species}}</small>
                     </td>
                     <td class="nowrap">{{formatDate this.entry_date}}</td>
                     <td class="nowrap">
                         {{#if this.exit_date}}
                             {{formatDate this.exit_date}}
-                            {{#if this.exit_status}}<br><small class="muted">{{this.exit_status}}</small>{{/if}}
+                            {{#if this.exit_status}}<small class="cell-sub">{{this.exit_status}}</small>{{/if}}
                         {{else}}
-                            <span class="badge badge-warning">Em aberto</span>
+                            <span class="badge badge-warning badge-dot">Em aberto</span>
                         {{/if}}
                     </td>
                     <td>{{this.reason}}</td>
@@ -59,8 +67,12 @@
     </div>
     {{else}}
     <div class="empty">
-        <span class="emoji" aria-hidden="true">🏥</span>
-        <p>Nenhuma internação{{#unless (eq filtro 'todas')}} com esse filtro{{/unless}}.</p>
+        <span class="empty-icon">{{icon "hospital"}}</span>
+        <h2>Nenhuma internação</h2>
+        <p>
+            {{#if (eq filtro 'todas')}}Nada registrado até agora.
+            {{else}}Nenhum registro com esse filtro. <a href="/vet/consultas">Ver todas</a>.{{/if}}
+        </p>
     </div>
     {{/if}}
 </div>
@@ -71,11 +83,11 @@
         <form method="POST" action="/vet/internacao/{{this.id}}/alta">
             <input type="hidden" name="_csrf" value="{{../csrfToken}}">
             <div class="modal-head">
-                <h2>Dar alta — {{this.animal_name}}</h2>
-                <button type="button" class="modal-close" data-modal-close aria-label="Fechar">&times;</button>
+                <h2>{{icon "hospital"}} Dar alta — {{this.animal_name}}</h2>
+                <button type="button" class="modal-close" data-modal-close aria-label="Fechar">{{icon "close"}}</button>
             </div>
             <div class="modal-body">
-                <p class="muted" style="margin-bottom:14px">
+                <p class="modal-note">
                     Internado em {{formatDate this.entry_date}} — {{this.reason}}
                 </p>
                 <div class="form-row">

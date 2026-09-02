@@ -1,20 +1,19 @@
 <div class="topbar">
     <div class="row">
-        <button type="button" class="btn btn-ghost btn-icon menu-toggle" data-menu-toggle
-                aria-expanded="false" aria-label="Abrir menu">☰</button>
+        {{> menu-button}}
         <div class="titles"><h1>{{title}}</h1></div>
     </div>
 </div>
 
 <div class="card">
     <div class="empty">
-        <span class="emoji" aria-hidden="true">
-            {{#if (eq code 403)}}🔒{{else}}{{#if (eq code 404)}}🔍{{else}}⚠️{{/if}}{{/if}}
+        <span class="empty-icon">
+            {{#if (eq code 403)}}{{icon "lock"}}{{else}}{{#if (eq code 404)}}{{icon "search"}}{{else}}{{icon "alert"}}{{/if}}{{/if}}
         </span>
         <h2>Erro {{code}}</h2>
-        <p class="mt">{{message}}</p>
+        <p>{{message}}</p>
         <p class="mt">
-            <a href="{{#if backUrl}}{{backUrl}}{{else}}/{{/if}}" class="btn btn-primary">Voltar</a>
+            <a href="{{#if backUrl}}{{backUrl}}{{else}}/{{/if}}" class="btn btn-primary">{{icon "arrowLeft"}} Voltar</a>
         </p>
     </div>
 </div>

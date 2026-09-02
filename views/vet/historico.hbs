@@ -1,24 +1,29 @@
 <div class="topbar">
     <div class="row">
-        <button type="button" class="btn btn-ghost btn-icon menu-toggle" data-menu-toggle
-                aria-expanded="false" aria-label="Abrir menu">☰</button>
-        <a href="/vet/animal/{{animal.id}}" class="btn btn-ghost btn-sm">← Ficha</a>
+        {{> menu-button}}
+        <a href="/vet/animal/{{animal.id}}" class="btn btn-ghost btn-sm">{{icon "arrowLeft"}} Ficha</a>
         <div class="titles">
             <h1>Histórico de {{animal.name}}</h1>
             <div class="subtitle">
-                {{speciesIcon animal.species}} {{animal.species}} ·
-                {{timeline.length}} {{#if (eq timeline.length 1)}}evento{{else}}eventos{{/if}}
+                {{speciesIcon animal.species}}
+                <span>{{animal.species}}</span>
+                <span>·</span>
+                <span>{{timeline.length}} {{#if (eq timeline.length 1)}}evento{{else}}eventos{{/if}}</span>
             </div>
         </div>
     </div>
 </div>
 
 <div class="card">
+    <div class="card-head">
+        <h2>{{icon "history"}} Linha do tempo</h2>
+        <span class="section-note">Do mais recente para o mais antigo</span>
+    </div>
     {{#if timeline.length}}
     <div class="timeline">
         {{#each timeline}}
         <div class="tl-item">
-            <div class="tl-icon" aria-hidden="true">{{this.icon}}</div>
+            <div class="tl-icon">{{icon this.icon}}</div>
             <div>
                 <div class="tl-head">
                     <span class="badge badge-muted">{{this.tipo}}</span>
@@ -32,8 +37,9 @@
     </div>
     {{else}}
     <div class="empty">
-        <span class="emoji" aria-hidden="true">🕘</span>
-        <p>Nenhum evento registrado para {{animal.name}} ainda.</p>
+        <span class="empty-icon">{{icon "history"}}</span>
+        <h2>Sem eventos registrados</h2>
+        <p>Nada foi lançado para {{animal.name}} ainda. Registros de saúde, vacinas e procedimentos aparecem aqui.</p>
         <p class="mt"><a href="/vet/animal/{{animal.id}}" class="btn btn-primary">Abrir ficha</a></p>
     </div>
     {{/if}}

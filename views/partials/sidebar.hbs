@@ -1,47 +1,52 @@
 <nav class="sidebar" aria-label="Menu principal">
     <a class="brand" href="/">
-        <span>🐾</span>
-        <span>Ficha Veterinária</span>
+        <span class="brand-mark">{{icon "paw"}}</span>
+        <span class="brand-text">
+            <span class="brand-name">Ficha Veterinária</span>
+            <span class="brand-sub">Prontuário</span>
+        </span>
     </a>
 
     {{#if isVet}}
+        <div class="nav-group-label">Operação</div>
         <a class="nav-link {{navActive currentPath '/vet/dashboard'}}" href="/vet/dashboard">
-            <span class="ico" aria-hidden="true">📊</span> Dashboard
+            {{icon "dashboard"}} Painel
         </a>
         <a class="nav-link {{navActive currentPath '/vet/animais'}}" href="/vet/animais">
-            <span class="ico" aria-hidden="true">🐾</span> Animais
+            {{icon "paw"}} Animais
         </a>
         <a class="nav-link {{navActive currentPath '/vet/ambientes'}}" href="/vet/ambientes">
-            <span class="ico" aria-hidden="true">🏠</span> Ambientes
+            {{icon "warehouse"}} Ambientes
         </a>
         <a class="nav-link {{navActive currentPath '/vet/alertas'}}" href="/vet/alertas">
-            <span class="ico" aria-hidden="true">🔔</span> Alertas
+            {{icon "bell"}} Alertas
         </a>
 
         <div class="nav-group-label">Clínica</div>
         <a class="nav-link {{navActive currentPath '/vet/consultas'}}" href="/vet/consultas">
-            <span class="ico" aria-hidden="true">🏥</span> Internações
+            {{icon "hospital"}} Internações
         </a>
         <a class="nav-link {{navActive currentPath '/vet/medicamentos'}}" href="/vet/medicamentos">
-            <span class="ico" aria-hidden="true">💊</span> Medicamentos
+            {{icon "pill"}} Medicamentos
         </a>
         <a class="nav-link {{navActive currentPath '/vet/relatorios'}}" href="/vet/relatorios">
-            <span class="ico" aria-hidden="true">📈</span> Relatórios
+            {{icon "chart"}} Relatórios
         </a>
         <a class="nav-link {{navActive currentPath '/vet/meus-registros'}}" href="/vet/meus-registros">
-            <span class="ico" aria-hidden="true">📋</span> Meus registros
+            {{icon "clipboard"}} Meus registros
         </a>
 
         {{#if isRoot}}
         <div class="nav-group-label">Administração</div>
         <a class="nav-link {{navActive currentPath '/vet/equipe'}}" href="/vet/equipe">
-            <span class="ico" aria-hidden="true">👥</span> Equipe
-            <span class="count" style="background:var(--primary)">root</span>
+            {{icon "users"}} Equipe
+            <span class="count count-soft">root</span>
         </a>
         {{/if}}
     {{else}}
+        <div class="nav-group-label">Abrigo</div>
         <a class="nav-link {{navActive currentPath '/user/dashboard'}}" href="/user/dashboard">
-            <span class="ico" aria-hidden="true">🐾</span> Animais
+            {{icon "paw"}} Animais
         </a>
     {{/if}}
 
@@ -54,10 +59,10 @@
             </div>
         </div>
         <div class="row-tight">
-            <a href="/auth/senha" class="btn btn-ghost btn-sm" style="flex:1">Senha</a>
-            <form method="POST" action="/auth/logout" style="flex:1">
+            <a href="/auth/senha" class="btn btn-ghost btn-sm grow">{{icon "lock"}} Senha</a>
+            <form method="POST" action="/auth/logout" class="grow">
                 <input type="hidden" name="_csrf" value="{{csrfToken}}">
-                <button type="submit" class="btn btn-ghost btn-sm btn-block">Sair</button>
+                <button type="submit" class="btn btn-ghost btn-sm btn-block">{{icon "logout"}} Sair</button>
             </form>
         </div>
     </div>

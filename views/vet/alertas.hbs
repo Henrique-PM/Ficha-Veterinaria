@@ -1,7 +1,6 @@
 <div class="topbar">
     <div class="row">
-        <button type="button" class="btn btn-ghost btn-icon menu-toggle" data-menu-toggle
-                aria-expanded="false" aria-label="Abrir menu">☰</button>
+        {{> menu-button}}
         <div class="titles">
             <h1>Alertas</h1>
             <div class="subtitle">O que precisa de atenção agora</div>
@@ -12,9 +11,11 @@
 {{#unless totalAlertas}}
 <div class="card">
     <div class="empty">
-        <span class="emoji" aria-hidden="true">✅</span>
+        <span class="empty-icon" style="background:var(--success-soft);border-color:var(--success-line);color:var(--success)">
+            {{icon "shieldCheck"}}
+        </span>
         <h2>Tudo em dia</h2>
-        <p class="mt">Nenhuma vacina vencida, vermifugação atrasada, internação em aberto ou estoque baixo.</p>
+        <p>Nenhuma vacina vencida, vermifugação atrasada, internação em aberto ou estoque baixo.</p>
     </div>
 </div>
 {{/unless}}
@@ -22,16 +23,16 @@
 {{#if internados.length}}
 <div class="card">
     <div class="card-head">
-        <h2>🏥 Internações em aberto <span class="badge badge-warning">{{internados.length}}</span></h2>
+        <h2>{{icon "hospital"}} Internações em aberto <span class="badge badge-warning">{{internados.length}}</span></h2>
         <span class="section-note">Animais que entraram e ainda não receberam alta</span>
     </div>
     <div class="table-wrap">
         <table>
-            <thead><tr><th>Animal</th><th>Motivo</th><th>Entrada</th><th></th></tr></thead>
+            <thead><tr><th>Animal</th><th>Motivo</th><th>Entrada</th><th class="actions-cell"></th></tr></thead>
             <tbody>
                 {{#each internados}}
                 <tr>
-                    <td><strong>{{this.animal_name}}</strong></td>
+                    <td><a href="/vet/animal/{{this.animal_id}}"><strong>{{this.animal_name}}</strong></a></td>
                     <td>{{this.reason}}</td>
                     <td class="nowrap">{{formatDate this.entry_date}}</td>
                     <td class="actions-cell">
@@ -48,19 +49,24 @@
 {{#if vacinas.length}}
 <div class="card">
     <div class="card-head">
-        <h2>💉 Vacinas vencidas ou a vencer <span class="badge badge-danger">{{vacinas.length}}</span></h2>
+        <h2>{{icon "syringe"}} Vacinas vencidas ou a vencer <span class="badge badge-danger">{{vacinas.length}}</span></h2>
         <span class="section-note">Próximos 30 dias e atrasadas</span>
     </div>
     <div class="table-wrap">
         <table>
-            <thead><tr><th>Animal</th><th>Vacina</th><th>Vencimento</th><th>Situação</th><th></th></tr></thead>
+            <thead><tr><th>Animal</th><th>Vacina</th><th>Vencimento</th><th>Situação</th><th class="actions-cell"></th></tr></thead>
             <tbody>
                 {{#each vacinas}}
                 <tr>
-                    <td><strong>{{this.animal_name}}</strong> <small class="muted">{{speciesIcon this.species}}</small></td>
+                    <td>
+                        <span class="cell-main">
+                            {{speciesIcon this.species}}
+                            <a href="/vet/animal/{{this.animal_id}}"><strong>{{this.animal_name}}</strong></a>
+                        </span>
+                    </td>
                     <td>{{this.name}}</td>
                     <td class="nowrap">{{formatDate this.next_dose}}</td>
-                    <td><span class="badge badge-{{dueVariant this.next_dose}}">{{dueLabel this.next_dose}}</span></td>
+                    <td><span class="badge badge-dot badge-{{dueVariant this.next_dose}}">{{dueLabel this.next_dose}}</span></td>
                     <td class="actions-cell">
                         <a href="/vet/animal/{{this.animal_id}}#vacinas" class="btn btn-ghost btn-sm">Abrir</a>
                     </td>
@@ -75,18 +81,18 @@
 {{#if vermifugos.length}}
 <div class="card">
     <div class="card-head">
-        <h2>🪱 Vermifugação a renovar <span class="badge badge-warning">{{vermifugos.length}}</span></h2>
+        <h2>{{icon "worm"}} Vermifugação a renovar <span class="badge badge-warning">{{vermifugos.length}}</span></h2>
     </div>
     <div class="table-wrap">
         <table>
-            <thead><tr><th>Animal</th><th>Produto</th><th>Próxima</th><th>Situação</th><th></th></tr></thead>
+            <thead><tr><th>Animal</th><th>Produto</th><th>Próxima</th><th>Situação</th><th class="actions-cell"></th></tr></thead>
             <tbody>
                 {{#each vermifugos}}
                 <tr>
-                    <td><strong>{{this.animal_name}}</strong></td>
+                    <td><a href="/vet/animal/{{this.animal_id}}"><strong>{{this.animal_name}}</strong></a></td>
                     <td>{{this.product}}</td>
                     <td class="nowrap">{{formatDate this.next_application}}</td>
-                    <td><span class="badge badge-{{dueVariant this.next_application}}">{{dueLabel this.next_application}}</span></td>
+                    <td><span class="badge badge-dot badge-{{dueVariant this.next_application}}">{{dueLabel this.next_application}}</span></td>
                     <td class="actions-cell">
                         <a href="/vet/animal/{{this.animal_id}}#vermifugacao" class="btn btn-ghost btn-sm">Abrir</a>
                     </td>
@@ -101,18 +107,18 @@
 {{#if estoque.length}}
 <div class="card">
     <div class="card-head">
-        <h2>💊 Estoque baixo <span class="badge badge-warning">{{estoque.length}}</span></h2>
+        <h2>{{icon "pill"}} Estoque baixo <span class="badge badge-warning">{{estoque.length}}</span></h2>
         <a href="/vet/medicamentos" class="btn btn-ghost btn-sm">Gerenciar estoque</a>
     </div>
     <div class="table-wrap">
         <table>
-            <thead><tr><th>Medicamento</th><th>Em estoque</th><th>Mínimo</th></tr></thead>
+            <thead><tr><th>Medicamento</th><th>Em estoque</th><th class="num">Mínimo</th></tr></thead>
             <tbody>
                 {{#each estoque}}
                 <tr>
                     <td><strong>{{this.name}}</strong></td>
-                    <td><span class="badge badge-danger">{{this.stock_quantity}} {{this.unit}}</span></td>
-                    <td>{{this.min_stock_level}}</td>
+                    <td><span class="badge badge-danger badge-dot">{{this.stock_quantity}} {{this.unit}}</span></td>
+                    <td class="num">{{this.min_stock_level}}</td>
                 </tr>
                 {{/each}}
             </tbody>
@@ -124,8 +130,8 @@
 {{#if semAmbiente.length}}
 <div class="card">
     <div class="card-head">
-        <h2>🏠 Sem ambiente definido <span class="badge badge-muted">{{semAmbiente.length}}</span></h2>
-        <span class="section-note">Animais no abrigo que ainda não foram alocados a um gatil/canil</span>
+        <h2>{{icon "warehouse"}} Sem ambiente definido <span class="badge badge-muted">{{semAmbiente.length}}</span></h2>
+        <span class="section-note">Animais no abrigo ainda não alocados a um gatil ou canil</span>
     </div>
     <div class="tags">
         {{#each semAmbiente}}

@@ -1,7 +1,7 @@
 const express = require('express');
 
 const db = require('../database');
-const { ensureVet } = require('../middleware/auth');
+const { ensureVet, ensureAdmin } = require('../middleware/auth');
 const { uploadPhoto, uploadDocument } = require('../middleware/uploads');
 const { verifyCsrf } = require('../middleware/csrf');
 
@@ -437,6 +437,14 @@ router.get('/animal/:id', async (req, res, next) => {
       db.all('SELECT id, name, kind FROM environments WHERE active = 1 ORDER BY name')
     ]);
 
+    /*
+     * Destinos possíveis para mover uma foto de galeria. Só o root move foto,
+     * então só para ele vale pagar a consulta — o veterinário nem vê o botão.
+     */
+    const outrosAnimais = res.locals.isRoot
+      ? await db.all('SELECT id, name, species FROM animals WHERE id != ? ORDER BY name', [id])
+      : [];
+
     res.render('vet/ficha', {
       title: animal.name,
       animal,
@@ -451,6 +459,7 @@ router.get('/animal/:id', async (req, res, next) => {
       photos,
       medications,
       environments,
+      outrosAnimais,
       // Usado na confirmação de exclusão, para a pessoa ver o que vai junto.
       totalRegistros:
         healthRecords.length +
@@ -858,6 +867,41 @@ router.post('/registro/:tipo/:id/excluir', async (req, res, next) => {
 });
 
 /*
+ * Mover uma foto da galeria para outro animal.
+ *
+ * Num abrigo com muito animal parecido — três gatos pretos no mesmo gatil — a
+ * foto enviada por um voluntário acaba na ficha errada. Até aqui o único
+ * conserto era excluir e pedir para reenviar, e a imagem se perdia junto:
+ * ela só existe como BLOB nesta linha, não há arquivo em lugar nenhum. Mover
+ * mantém a mesma linha (e a mesma imagem, data e autoria); muda só de quem ela é.
+ *
+ * Exclusivo do administrador: ensureAdmin em cima do ensureVet do router.
+ */
+router.post('/registro/foto/mover', ensureAdmin, async (req, res, next) => {
+  try {
+    const foto = await db.get('SELECT id, animal_id FROM animal_photos WHERE id = ?', [
+      req.body.photo_id
+    ]);
+    if (!foto) return notFound(res);
+
+    const origem = foto.animal_id;
+    const destino = await db.get('SELECT id, name FROM animals WHERE id = ?', [req.body.animal_id]);
+    if (!destino) return res.redirect(`/vet/animal/${origem}?erro=destino#fotos`);
+    if (destino.id === origem) return res.redirect(`/vet/animal/${origem}#fotos`);
+
+    await db.run('UPDATE animal_photos SET animal_id = ? WHERE id = ?', [destino.id, foto.id]);
+    // As duas fichas mudaram: a que perdeu e a que ganhou a foto.
+    await touchAnimal(origem);
+    await touchAnimal(destino.id);
+
+    const aviso = `Foto movida para ${destino.name}.`;
+    return res.redirect(`/vet/animal/${origem}?ok=${encodeURIComponent(aviso)}#fotos`);
+  } catch (err) {
+    next(err);
+  }
+});
+
+/*
  * Excluir o animal inteiro.
  *
  * Só havia exclusão dos registros da ficha (vacina, exame, foto…) — não do
@@ -924,42 +968,42 @@ router.get('/animal/:id/historico', async (req, res, next) => {
       ...healthRecords.map((r) => ({
         date: r.created_at,
         tipo: 'Saúde',
-        icon: '❤️',
+        icon: 'heartbeat',
         titulo: `Peso ${r.weight ?? '—'} kg · ${r.body_condition || 'sem condição corporal'}`,
         detalhe: r.observations
       })),
       ...vaccines.map((r) => ({
         date: r.application_date,
         tipo: 'Vacina',
-        icon: '💉',
+        icon: 'syringe',
         titulo: r.name,
         detalhe: r.batch ? `Lote ${r.batch}` : null
       })),
       ...dewormings.map((r) => ({
         date: r.application_date,
         tipo: 'Vermifugação',
-        icon: '🪱',
+        icon: 'worm',
         titulo: r.product,
         detalhe: r.dosage
       })),
       ...procedures.map((r) => ({
         date: r.procedure_date,
         tipo: 'Procedimento',
-        icon: '🔬',
+        icon: 'microscope',
         titulo: r.name,
         detalhe: r.description
       })),
       ...hospitalizations.map((r) => ({
         date: r.entry_date,
         tipo: 'Internação',
-        icon: '🏥',
+        icon: 'hospital',
         titulo: r.reason,
         detalhe: r.diagnosis
       })),
       ...medications.map((r) => ({
         date: r.start_date,
         tipo: 'Medicamento',
-        icon: '💊',
+        icon: 'pill',
         titulo: r.medication_name,
         detalhe: `${r.dosage} · ${r.frequency}`
       }))

@@ -1,7 +1,6 @@
 <div class="topbar">
     <div class="row">
-        <button type="button" class="btn btn-ghost btn-icon menu-toggle" data-menu-toggle
-                aria-expanded="false" aria-label="Abrir menu">☰</button>
+        {{> menu-button}}
         <div class="titles">
             <h1>Alterar senha</h1>
             <div class="subtitle">{{currentUser.email}}</div>
@@ -9,9 +8,19 @@
     </div>
 </div>
 
-<div class="card" style="max-width:480px">
-    {{#if error}}<div class="alert alert-danger" role="alert">{{error}}</div>{{/if}}
-    {{#if sucesso}}<div class="alert alert-success" role="status">{{sucesso}}</div>{{/if}}
+<div class="card" style="max-width:520px">
+    <div class="card-head"><h2>{{icon "lock"}} Nova senha</h2></div>
+
+    {{#if error}}
+    <div class="alert alert-danger" role="alert">
+        {{icon "alert"}}<span class="alert-body">{{error}}</span>
+    </div>
+    {{/if}}
+    {{#if sucesso}}
+    <div class="alert alert-success" role="status">
+        {{icon "checkCircle"}}<span class="alert-body">{{sucesso}}</span>
+    </div>
+    {{/if}}
 
     <form method="POST" action="/auth/senha">
         <input type="hidden" name="_csrf" value="{{csrfToken}}">

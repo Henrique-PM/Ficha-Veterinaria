@@ -1,36 +1,53 @@
 <div class="topbar">
     <div class="row">
-        <button type="button" class="btn btn-ghost btn-icon menu-toggle" data-menu-toggle
-                aria-expanded="false" aria-label="Abrir menu">☰</button>
-        <a href="/vet/animais" class="btn btn-ghost btn-sm">← Voltar</a>
+        {{> menu-button}}
+        <a href="/vet/animais" class="btn btn-ghost btn-sm">{{icon "arrowLeft"}} Voltar</a>
         <div class="titles">
             <h1>{{animal.name}}</h1>
             <div class="subtitle">
-                {{speciesIcon animal.species}} {{animal.species}}
-                {{#if animal.breed}} · {{animal.breed}}{{/if}}
-                {{#if animal.environment_name}} · {{kindIcon animal.environment_kind}} {{animal.environment_name}}{{/if}}
+                {{speciesIcon animal.species}}
+                <span>{{animal.species}}{{#if animal.breed}} · {{animal.breed}}{{/if}}</span>
+                {{#if animal.environment_name}}
+                    <span>·</span>
+                    {{kindIcon animal.environment_kind}}
+                    <span>{{animal.environment_name}}</span>
+                {{/if}}
             </div>
         </div>
     </div>
     <div class="actions">
-        <span class="badge badge-{{statusVariant animal.status}}">{{statusLabel animal.status}}</span>
-        <a href="/vet/animal/{{animal.id}}/historico" class="btn btn-ghost">🕘 Histórico</a>
-        <button type="button" class="btn btn-ghost" data-modal-open="status">Alterar status</button>
+        <span class="badge badge-dot badge-{{statusVariant animal.status}}">{{statusLabel animal.status}}</span>
+        <a href="/vet/animal/{{animal.id}}/historico" class="btn btn-ghost">{{icon "history"}} Histórico</a>
+        <button type="button" class="btn btn-ghost" data-modal-open="status">{{icon "pencil"}} Alterar status</button>
     </div>
 </div>
 
+{{#if ok}}
+<div class="alert alert-success" role="status">
+    {{icon "checkCircle"}}<span class="alert-body">{{ok}}</span>
+</div>
+{{/if}}
+
 {{#if erro}}
 <div class="alert alert-danger" role="alert">
-    {{#if (eq erro 'chip')}}Já existe outro animal com esse número de chip.
-    {{else if (eq erro 'obrigatorios')}}Nome e espécie são obrigatórios.
-    {{else}}Não foi possível salvar. Confira os campos obrigatórios e tente de novo.{{/if}}
+    {{icon "alert"}}
+    <span class="alert-body">
+        {{#if (eq erro 'chip')}}Já existe outro animal com esse número de chip.
+        {{else if (eq erro 'obrigatorios')}}Nome e espécie são obrigatórios.
+        {{else if (eq erro 'foto')}}Selecione uma imagem antes de enviar.
+        {{else if (eq erro 'destino')}}Escolha um animal de destino válido para a foto.
+        {{else}}Não foi possível salvar. Confira os campos obrigatórios e tente de novo.{{/if}}
+    </span>
 </div>
 {{/if}}
 
 {{#if internacaoAberta}}
 <div class="alert alert-warning">
-    🏥 <strong>Internação em aberto</strong> desde {{formatDate internacaoAberta.entry_date}} —
-    {{internacaoAberta.reason}}.
+    {{icon "hospital"}}
+    <span class="alert-body">
+        <strong>Internação em aberto</strong> desde {{formatDate internacaoAberta.entry_date}} —
+        {{internacaoAberta.reason}}.
+    </span>
     <button type="button" class="btn btn-primary btn-sm" data-modal-open="alta">Dar alta</button>
 </div>
 {{/if}}
@@ -39,43 +56,44 @@
     <div>
         <div class="profile-photo" id="preview-foto"
              {{#if animal.has_photo}}style="background-image:url('/media/animal/{{animal.id}}/photo')"{{/if}}>
-            {{#unless animal.has_photo}}<span aria-hidden="true">{{speciesIcon animal.species}}</span>{{/unless}}
+            {{#unless animal.has_photo}}{{speciesIcon animal.species}}{{/unless}}
         </div>
         <form action="/vet/animal/{{animal.id}}/photo" method="POST" enctype="multipart/form-data" class="mt">
             <input type="hidden" name="_csrf" value="{{csrfToken}}">
-            <input type="file" name="photo" accept="image/*" required data-preview="preview-foto">
-            <button type="submit" class="btn btn-ghost btn-sm btn-block mt">Trocar foto</button>
+            <input type="file" name="photo" accept="image/*" required data-preview="preview-foto"
+                   aria-label="Nova foto principal">
+            <button type="submit" class="btn btn-ghost btn-sm btn-block mt">{{icon "camera"}} Trocar foto</button>
         </form>
 
         <div class="card mt">
-            <h3>Resumo sanitário</h3>
-            <div class="stack" style="margin-top:12px">
-                <div class="row between">
-                    <span class="muted">Castrado</span>
+            <div class="card-head"><h3>{{icon "shieldCheck"}} Resumo sanitário</h3></div>
+            <div class="summary-list">
+                <div class="summary-row">
+                    <span class="k">{{icon "scissors"}} Castrado</span>
                     {{#if animal.neutered}}
-                        <span class="badge badge-success">Sim</span>
+                        <span class="badge badge-success badge-dot">Sim</span>
                     {{else}}
-                        <span class="badge badge-warning">Não</span>
+                        <span class="badge badge-warning badge-dot">Não</span>
                     {{/if}}
                 </div>
-                <div class="row between">
-                    <span class="muted">FIV</span>
-                    <span class="badge badge-{{retroVariant animal.fiv_status}}">{{retroLabel animal.fiv_status}}</span>
+                <div class="summary-row">
+                    <span class="k">{{icon "dna"}} FIV</span>
+                    <span class="badge badge-dot badge-{{retroVariant animal.fiv_status}}">{{retroLabel animal.fiv_status}}</span>
                 </div>
-                <div class="row between">
-                    <span class="muted">FeLV</span>
-                    <span class="badge badge-{{retroVariant animal.felv_status}}">{{retroLabel animal.felv_status}}</span>
+                <div class="summary-row">
+                    <span class="k">{{icon "dna"}} FeLV</span>
+                    <span class="badge badge-dot badge-{{retroVariant animal.felv_status}}">{{retroLabel animal.felv_status}}</span>
                 </div>
                 {{#if healthRecord}}
-                <div class="row between">
-                    <span class="muted">Último peso</span>
+                <div class="summary-row">
+                    <span class="k">{{icon "heartbeat"}} Último peso</span>
                     <strong>{{#if healthRecord.weight}}{{healthRecord.weight}} kg{{else}}—{{/if}}</strong>
                 </div>
                 {{/if}}
                 {{#if animal.chip_number}}
-                <div class="row between">
-                    <span class="muted">Chip</span>
-                    <small>{{animal.chip_number}}</small>
+                <div class="summary-row">
+                    <span class="k">{{icon "file"}} Chip</span>
+                    <span class="mono">{{animal.chip_number}}</span>
                 </div>
                 {{/if}}
             </div>
@@ -83,18 +101,21 @@
     </div>
 
     <div class="card" style="margin:0">
-        <div class="card-head"><h2>📋 Dados do animal</h2></div>
+        <div class="card-head">
+            <h2>{{icon "clipboard"}} Dados do animal</h2>
+            <span class="section-note">Campos com <span class="req">*</span> são obrigatórios</span>
+        </div>
 
         <form method="POST" action="/vet/animal/{{animal.id}}/info">
             <input type="hidden" name="_csrf" value="{{csrfToken}}">
 
             <div class="form-row">
                 <div class="field">
-                    <label for="name">Nome *</label>
+                    <label for="name">Nome <span class="req">*</span></label>
                     <input type="text" id="name" name="name" value="{{animal.name}}" required maxlength="80">
                 </div>
                 <div class="field">
-                    <label for="species">Espécie *</label>
+                    <label for="species">Espécie <span class="req">*</span></label>
                     <input type="text" id="species" name="species" value="{{animal.species}}" required maxlength="40">
                 </div>
                 <div class="field">
@@ -142,9 +163,7 @@
                     <select id="environment_id" name="environment_id">
                         <option value="">Sem ambiente</option>
                         {{#each environments}}
-                        <option value="{{this.id}}" {{selected this.id ../animal.environment_id}}>
-                            {{kindIcon this.kind}} {{this.name}}
-                        </option>
+                        <option value="{{this.id}}" {{selected this.id ../animal.environment_id}}>{{this.name}}</option>
                         {{/each}}
                     </select>
                 </div>
@@ -152,11 +171,11 @@
 
             <div class="form-row">
                 <div class="field">
-                    <label class="check">
-                        <input type="checkbox" name="neutered" value="1" {{checked animal.neutered}}> Castrado
-                    </label>
                     <label for="neutered_date">Data da castração</label>
                     <input type="date" id="neutered_date" name="neutered_date" value="{{dateInput animal.neutered_date}}">
+                    <label class="check check-under">
+                        <input type="checkbox" name="neutered" value="1" {{checked animal.neutered}}> Castrado
+                    </label>
                 </div>
                 <div class="field">
                     <label for="fiv_status">FIV</label>
@@ -203,7 +222,7 @@
             </div>
 
             <div class="form-actions">
-                <button type="submit" class="btn btn-primary">Salvar alterações</button>
+                <button type="submit" class="btn btn-primary">{{icon "check"}} Salvar alterações</button>
             </div>
         </form>
     </div>
@@ -211,28 +230,28 @@
 
 <div class="tabs" role="tablist" data-tabs="ficha">
     <button type="button" class="tab" role="tab" data-tab="saude">
-        ❤️ Saúde <span class="pill">{{healthRecords.length}}</span>
+        {{icon "heartbeat"}} Saúde <span class="pill">{{healthRecords.length}}</span>
     </button>
     <button type="button" class="tab" role="tab" data-tab="vacinas">
-        💉 Vacinas <span class="pill">{{vaccines.length}}</span>
+        {{icon "syringe"}} Vacinas <span class="pill">{{vaccines.length}}</span>
     </button>
     <button type="button" class="tab" role="tab" data-tab="vermifugacao">
-        🪱 Vermifugação <span class="pill">{{dewormings.length}}</span>
+        {{icon "worm"}} Vermifugação <span class="pill">{{dewormings.length}}</span>
     </button>
     <button type="button" class="tab" role="tab" data-tab="procedimentos">
-        🔬 Procedimentos <span class="pill">{{procedures.length}}</span>
+        {{icon "microscope"}} Procedimentos <span class="pill">{{procedures.length}}</span>
     </button>
     <button type="button" class="tab" role="tab" data-tab="internacoes">
-        🏥 Internações <span class="pill">{{hospitalizations.length}}</span>
+        {{icon "hospital"}} Internações <span class="pill">{{hospitalizations.length}}</span>
     </button>
     <button type="button" class="tab" role="tab" data-tab="medicamentos">
-        💊 Medicamentos <span class="pill">{{medications.length}}</span>
+        {{icon "pill"}} Medicamentos <span class="pill">{{medications.length}}</span>
     </button>
     <button type="button" class="tab" role="tab" data-tab="documentos">
-        📎 Documentos <span class="pill">{{documents.length}}</span>
+        {{icon "paperclip"}} Documentos <span class="pill">{{documents.length}}</span>
     </button>
     <button type="button" class="tab" role="tab" data-tab="fotos">
-        📷 Fotos <span class="pill">{{photos.length}}</span>
+        {{icon "camera"}} Fotos <span class="pill">{{photos.length}}</span>
     </button>
 </div>
 
@@ -240,8 +259,8 @@
 <section class="tab-panel" data-panel="saude" data-tabs-for="ficha" role="tabpanel">
     <div class="card">
         <div class="card-head">
-            <h2>Registros de saúde</h2>
-            <button type="button" class="btn btn-primary btn-sm" data-modal-open="saude">+ Novo registro</button>
+            <h2>{{icon "heartbeat"}} Registros de saúde</h2>
+            <button type="button" class="btn btn-primary btn-sm" data-modal-open="saude">{{icon "plus"}} Novo registro</button>
         </div>
         {{#if healthRecords.length}}
         <div class="table-wrap">
@@ -261,7 +280,8 @@
                             <form method="POST" action="/vet/registro/saude/{{this.id}}/excluir" class="inline-form"
                                   data-confirm="Excluir este registro de saúde?">
                                 <input type="hidden" name="_csrf" value="{{../csrfToken}}">
-                                <button type="submit" class="btn btn-ghost btn-sm" title="Excluir">🗑</button>
+                                <button type="submit" class="btn btn-danger btn-sm btn-icon"
+                                        title="Excluir" aria-label="Excluir registro">{{icon "trash"}}</button>
                             </form>
                         </td>
                     </tr>
@@ -270,7 +290,11 @@
             </table>
         </div>
         {{else}}
-        <div class="empty"><span class="emoji" aria-hidden="true">❤️</span><p>Nenhum registro de saúde.</p></div>
+        <div class="empty">
+            <span class="empty-icon">{{icon "heartbeat"}}</span>
+            <h2>Nenhum registro de saúde</h2>
+            <p>Peso, condição corporal e alergias aparecem aqui.</p>
+        </div>
         {{/if}}
     </div>
 </section>
@@ -279,8 +303,8 @@
 <section class="tab-panel" data-panel="vacinas" data-tabs-for="ficha" role="tabpanel" hidden>
     <div class="card">
         <div class="card-head">
-            <h2>Carteira de vacinação</h2>
-            <button type="button" class="btn btn-primary btn-sm" data-modal-open="vacina">+ Registrar vacina</button>
+            <h2>{{icon "syringe"}} Carteira de vacinação</h2>
+            <button type="button" class="btn btn-primary btn-sm" data-modal-open="vacina">{{icon "plus"}} Registrar vacina</button>
         </div>
         {{#if vaccines.length}}
         <div class="table-wrap">
@@ -304,7 +328,8 @@
                             <form method="POST" action="/vet/registro/vacina/{{this.id}}/excluir" class="inline-form"
                                   data-confirm="Excluir o registro da vacina {{this.name}}?">
                                 <input type="hidden" name="_csrf" value="{{../csrfToken}}">
-                                <button type="submit" class="btn btn-ghost btn-sm" title="Excluir">🗑</button>
+                                <button type="submit" class="btn btn-danger btn-sm btn-icon"
+                                        title="Excluir" aria-label="Excluir registro">{{icon "trash"}}</button>
                             </form>
                         </td>
                     </tr>
@@ -313,7 +338,11 @@
             </table>
         </div>
         {{else}}
-        <div class="empty"><span class="emoji" aria-hidden="true">💉</span><p>Nenhuma vacina registrada.</p></div>
+        <div class="empty">
+            <span class="empty-icon">{{icon "syringe"}}</span>
+            <h2>Carteira vazia</h2>
+            <p>Nenhuma vacina registrada para este animal.</p>
+        </div>
         {{/if}}
     </div>
 </section>
@@ -322,8 +351,8 @@
 <section class="tab-panel" data-panel="vermifugacao" data-tabs-for="ficha" role="tabpanel" hidden>
     <div class="card">
         <div class="card-head">
-            <h2>Vermifugação e antiparasitários</h2>
-            <button type="button" class="btn btn-primary btn-sm" data-modal-open="vermifugo">+ Registrar aplicação</button>
+            <h2>{{icon "worm"}} Vermifugação e antiparasitários</h2>
+            <button type="button" class="btn btn-primary btn-sm" data-modal-open="vermifugo">{{icon "plus"}} Registrar aplicação</button>
         </div>
         {{#if dewormings.length}}
         <div class="table-wrap">
@@ -347,7 +376,8 @@
                             <form method="POST" action="/vet/registro/vermifugacao/{{this.id}}/excluir" class="inline-form"
                                   data-confirm="Excluir este registro?">
                                 <input type="hidden" name="_csrf" value="{{../csrfToken}}">
-                                <button type="submit" class="btn btn-ghost btn-sm" title="Excluir">🗑</button>
+                                <button type="submit" class="btn btn-danger btn-sm btn-icon"
+                                        title="Excluir" aria-label="Excluir registro">{{icon "trash"}}</button>
                             </form>
                         </td>
                     </tr>
@@ -356,7 +386,11 @@
             </table>
         </div>
         {{else}}
-        <div class="empty"><span class="emoji" aria-hidden="true">🪱</span><p>Nenhuma aplicação registrada.</p></div>
+        <div class="empty">
+            <span class="empty-icon">{{icon "worm"}}</span>
+            <h2>Nenhuma aplicação</h2>
+            <p>Nenhum vermífugo ou antiparasitário registrado.</p>
+        </div>
         {{/if}}
     </div>
 </section>
@@ -365,8 +399,8 @@
 <section class="tab-panel" data-panel="procedimentos" data-tabs-for="ficha" role="tabpanel" hidden>
     <div class="card">
         <div class="card-head">
-            <h2>Exames e procedimentos</h2>
-            <button type="button" class="btn btn-primary btn-sm" data-modal-open="procedimento">+ Registrar</button>
+            <h2>{{icon "microscope"}} Exames e procedimentos</h2>
+            <button type="button" class="btn btn-primary btn-sm" data-modal-open="procedimento">{{icon "plus"}} Registrar</button>
         </div>
         {{#if procedures.length}}
         <div class="table-wrap">
@@ -383,7 +417,8 @@
                             <form method="POST" action="/vet/registro/procedimento/{{this.id}}/excluir" class="inline-form"
                                   data-confirm="Excluir o procedimento {{this.name}}?">
                                 <input type="hidden" name="_csrf" value="{{../csrfToken}}">
-                                <button type="submit" class="btn btn-ghost btn-sm" title="Excluir">🗑</button>
+                                <button type="submit" class="btn btn-danger btn-sm btn-icon"
+                                        title="Excluir" aria-label="Excluir registro">{{icon "trash"}}</button>
                             </form>
                         </td>
                     </tr>
@@ -392,7 +427,11 @@
             </table>
         </div>
         {{else}}
-        <div class="empty"><span class="emoji" aria-hidden="true">🔬</span><p>Nenhum procedimento registrado.</p></div>
+        <div class="empty">
+            <span class="empty-icon">{{icon "microscope"}}</span>
+            <h2>Nenhum procedimento</h2>
+            <p>Exames e procedimentos cirúrgicos aparecem aqui.</p>
+        </div>
         {{/if}}
     </div>
 </section>
@@ -401,8 +440,8 @@
 <section class="tab-panel" data-panel="internacoes" data-tabs-for="ficha" role="tabpanel" hidden>
     <div class="card">
         <div class="card-head">
-            <h2>Internações</h2>
-            <button type="button" class="btn btn-primary btn-sm" data-modal-open="internacao">+ Registrar internação</button>
+            <h2>{{icon "hospital"}} Internações</h2>
+            <button type="button" class="btn btn-primary btn-sm" data-modal-open="internacao">{{icon "plus"}} Registrar internação</button>
         </div>
         {{#if hospitalizations.length}}
         <div class="table-wrap">
@@ -429,7 +468,8 @@
                             <form method="POST" action="/vet/registro/internacao/{{this.id}}/excluir" class="inline-form"
                                   data-confirm="Excluir esta internação?">
                                 <input type="hidden" name="_csrf" value="{{../csrfToken}}">
-                                <button type="submit" class="btn btn-ghost btn-sm" title="Excluir">🗑</button>
+                                <button type="submit" class="btn btn-danger btn-sm btn-icon"
+                                        title="Excluir" aria-label="Excluir registro">{{icon "trash"}}</button>
                             </form>
                         </td>
                     </tr>
@@ -438,7 +478,11 @@
             </table>
         </div>
         {{else}}
-        <div class="empty"><span class="emoji" aria-hidden="true">🏥</span><p>Nenhuma internação registrada.</p></div>
+        <div class="empty">
+            <span class="empty-icon">{{icon "hospital"}}</span>
+            <h2>Nenhuma internação</h2>
+            <p>Nenhuma entrada em internação registrada.</p>
+        </div>
         {{/if}}
     </div>
 </section>
@@ -447,8 +491,8 @@
 <section class="tab-panel" data-panel="medicamentos" data-tabs-for="ficha" role="tabpanel" hidden>
     <div class="card">
         <div class="card-head">
-            <h2>Prescrições</h2>
-            <button type="button" class="btn btn-primary btn-sm" data-modal-open="receita">+ Prescrever</button>
+            <h2>{{icon "pill"}} Prescrições</h2>
+            <button type="button" class="btn btn-primary btn-sm" data-modal-open="receita">{{icon "plus"}} Prescrever</button>
         </div>
         {{#if medications.length}}
         <div class="table-wrap">
@@ -488,7 +532,11 @@
             </table>
         </div>
         {{else}}
-        <div class="empty"><span class="emoji" aria-hidden="true">💊</span><p>Nenhum medicamento prescrito.</p></div>
+        <div class="empty">
+            <span class="empty-icon">{{icon "pill"}}</span>
+            <h2>Nenhuma prescrição</h2>
+            <p>Nenhum medicamento prescrito para este animal.</p>
+        </div>
         {{/if}}
     </div>
 </section>
@@ -497,30 +545,38 @@
 <section class="tab-panel" data-panel="documentos" data-tabs-for="ficha" role="tabpanel" hidden>
     <div class="card">
         <div class="card-head">
-            <h2>Documentos e laudos</h2>
-            <button type="button" class="btn btn-primary btn-sm" data-modal-open="documento">+ Anexar</button>
+            <h2>{{icon "paperclip"}} Documentos e laudos</h2>
+            <button type="button" class="btn btn-primary btn-sm" data-modal-open="documento">{{icon "plus"}} Anexar</button>
         </div>
         {{#if documents.length}}
         <div class="stack">
             {{#each documents}}
-            <div class="row between" style="padding:12px;background:var(--surface-2);border-radius:var(--radius-sm)">
-                <div>
-                    📎 <strong>{{#if this.description}}{{this.description}}{{else}}{{this.filename}}{{/if}}</strong>
-                    <br><small class="muted">{{this.filename}} · {{formatDate this.upload_date}}</small>
+            <div class="file-row">
+                <div class="file-info">
+                    <span class="file-icon">{{icon "file"}}</span>
+                    <span>
+                        <strong>{{#if this.description}}{{this.description}}{{else}}{{this.filename}}{{/if}}</strong>
+                        <small class="cell-sub">{{this.filename}} · {{formatDate this.upload_date}}</small>
+                    </span>
                 </div>
                 <div class="row-tight">
-                    <a href="/media/document/{{this.id}}" class="btn btn-ghost btn-sm">Baixar</a>
+                    <a href="/media/document/{{this.id}}" class="btn btn-ghost btn-sm">{{icon "download"}} Baixar</a>
                     <form method="POST" action="/vet/registro/documento/{{this.id}}/excluir" class="inline-form"
                           data-confirm="Excluir o documento {{this.filename}}?">
                         <input type="hidden" name="_csrf" value="{{../csrfToken}}">
-                        <button type="submit" class="btn btn-ghost btn-sm" title="Excluir">🗑</button>
+                        <button type="submit" class="btn btn-danger btn-sm btn-icon"
+                                        title="Excluir" aria-label="Excluir registro">{{icon "trash"}}</button>
                     </form>
                 </div>
             </div>
             {{/each}}
         </div>
         {{else}}
-        <div class="empty"><span class="emoji" aria-hidden="true">📎</span><p>Nenhum documento anexado.</p></div>
+        <div class="empty">
+            <span class="empty-icon">{{icon "paperclip"}}</span>
+            <h2>Nenhum documento</h2>
+            <p>Laudos, exames e termos anexados aparecem aqui.</p>
+        </div>
         {{/if}}
     </div>
 </section>
@@ -529,35 +585,51 @@
 <section class="tab-panel" data-panel="fotos" data-tabs-for="ficha" role="tabpanel" hidden>
     <div class="card">
         <div class="card-head">
-            <h2>Galeria</h2>
-            <button type="button" class="btn btn-primary btn-sm" data-modal-open="galeria">+ Adicionar foto</button>
+            <h2>{{icon "camera"}} Galeria</h2>
+            <button type="button" class="btn btn-primary btn-sm" data-modal-open="galeria">{{icon "plus"}} Adicionar foto</button>
         </div>
         {{#if photos.length}}
         <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(160px,1fr))">
             {{#each photos}}
             <figure class="animal-card">
                 <div class="animal-photo" style="background-image:url('/media/photo/{{this.id}}');aspect-ratio:1"></div>
-                <figcaption class="animal-body" style="padding:10px;gap:6px">
+                <figcaption class="animal-body" style="padding:11px;gap:6px">
                     <small>{{#if this.description}}{{this.description}}{{else}}Sem descrição{{/if}}</small>
                     <small class="muted">{{formatDate this.upload_date}}</small>
-                    <form method="POST" action="/vet/registro/foto/{{this.id}}/excluir"
-                          data-confirm="Excluir esta foto?">
-                        <input type="hidden" name="_csrf" value="{{../csrfToken}}">
-                        <button type="submit" class="btn btn-ghost btn-sm btn-block">Excluir</button>
-                    </form>
+                    <div class="row-tight" style="margin-top:auto">
+                        {{#if @root.isRoot}}
+                        {{!-- Um único modal para todas as fotos: quem diz de qual
+                              se trata é o botão, via data-photo-*. --}}
+                        <button type="button" class="btn btn-ghost btn-sm grow"
+                                data-modal-open="mover-foto"
+                                data-photo-id="{{this.id}}"
+                                data-photo-label="{{#if this.description}}{{this.description}}{{else}}Foto de {{formatDate this.upload_date}}{{/if}}">
+                            Mover
+                        </button>
+                        {{/if}}
+                        <form method="POST" action="/vet/registro/foto/{{this.id}}/excluir"
+                              class="inline-form grow" data-confirm="Excluir esta foto?">
+                            <input type="hidden" name="_csrf" value="{{../csrfToken}}">
+                            <button type="submit" class="btn btn-danger btn-sm btn-block">Excluir</button>
+                        </form>
+                    </div>
                 </figcaption>
             </figure>
             {{/each}}
         </div>
         {{else}}
-        <div class="empty"><span class="emoji" aria-hidden="true">📷</span><p>Nenhuma foto na galeria.</p></div>
+        <div class="empty">
+            <span class="empty-icon">{{icon "camera"}}</span>
+            <h2>Galeria vazia</h2>
+            <p>Nenhuma foto além da principal.</p>
+        </div>
         {{/if}}
     </div>
 </section>
 
 <div class="card danger-zone">
     <div class="card-head">
-        <h2>⚠️ Excluir animal</h2>
+        <h2>{{icon "alert"}} Excluir animal</h2>
     </div>
     <div class="row between">
         <p class="muted" style="max-width:60ch">
@@ -573,7 +645,7 @@
         <form method="POST" action="/vet/animal/{{animal.id}}/excluir"
               data-confirm="Excluir {{animal.name}} definitivamente? {{#if totalRegistros}}Os {{totalRegistros}} registros clínicos dele serão apagados junto. {{/if}}Esta ação não pode ser desfeita.">
             <input type="hidden" name="_csrf" value="{{csrfToken}}">
-            <button type="submit" class="btn btn-danger">🗑 Excluir animal</button>
+            <button type="submit" class="btn btn-danger">{{icon "trash"}} Excluir animal</button>
         </form>
     </div>
 </div>
@@ -584,8 +656,8 @@
     <form method="POST" action="/vet/animal/{{animal.id}}/status">
         <input type="hidden" name="_csrf" value="{{csrfToken}}">
         <div class="modal-head">
-            <h2>Alterar status</h2>
-            <button type="button" class="modal-close" data-modal-close aria-label="Fechar">&times;</button>
+            <h2>{{icon "pencil"}} Alterar status</h2>
+            <button type="button" class="modal-close" data-modal-close aria-label="Fechar">{{icon "close"}}</button>
         </div>
         <div class="modal-body">
             <div class="field">
@@ -633,11 +705,11 @@
     <form method="POST" action="/vet/internacao/{{internacaoAberta.id}}/alta">
         <input type="hidden" name="_csrf" value="{{csrfToken}}">
         <div class="modal-head">
-            <h2>Dar alta</h2>
-            <button type="button" class="modal-close" data-modal-close aria-label="Fechar">&times;</button>
+            <h2>{{icon "hospital"}} Dar alta</h2>
+            <button type="button" class="modal-close" data-modal-close aria-label="Fechar">{{icon "close"}}</button>
         </div>
         <div class="modal-body">
-            <p class="muted" style="margin-bottom:14px">
+            <p class="modal-note">
                 Internação de {{formatDate internacaoAberta.entry_date}} — {{internacaoAberta.reason}}
             </p>
             <div class="form-row">
@@ -677,8 +749,8 @@
     <form method="POST" action="/vet/animal/{{animal.id}}/health-record">
         <input type="hidden" name="_csrf" value="{{csrfToken}}">
         <div class="modal-head">
-            <h2>Registro de saúde</h2>
-            <button type="button" class="modal-close" data-modal-close aria-label="Fechar">&times;</button>
+            <h2>{{icon "heartbeat"}} Registro de saúde</h2>
+            <button type="button" class="modal-close" data-modal-close aria-label="Fechar">{{icon "close"}}</button>
         </div>
         <div class="modal-body">
             <div class="form-row">
@@ -718,8 +790,8 @@
     <form method="POST" action="/vet/animal/{{animal.id}}/vaccine">
         <input type="hidden" name="_csrf" value="{{csrfToken}}">
         <div class="modal-head">
-            <h2>Registrar vacina</h2>
-            <button type="button" class="modal-close" data-modal-close aria-label="Fechar">&times;</button>
+            <h2>{{icon "syringe"}} Registrar vacina</h2>
+            <button type="button" class="modal-close" data-modal-close aria-label="Fechar">{{icon "close"}}</button>
         </div>
         <div class="modal-body">
             <div class="field">
@@ -757,8 +829,8 @@
     <form method="POST" action="/vet/animal/{{animal.id}}/vermifugacao">
         <input type="hidden" name="_csrf" value="{{csrfToken}}">
         <div class="modal-head">
-            <h2>Vermifugação / antiparasitário</h2>
-            <button type="button" class="modal-close" data-modal-close aria-label="Fechar">&times;</button>
+            <h2>{{icon "worm"}} Vermifugação / antiparasitário</h2>
+            <button type="button" class="modal-close" data-modal-close aria-label="Fechar">{{icon "close"}}</button>
         </div>
         <div class="modal-body">
             <div class="form-row">
@@ -807,8 +879,8 @@
     <form method="POST" action="/vet/animal/{{animal.id}}/procedure">
         <input type="hidden" name="_csrf" value="{{csrfToken}}">
         <div class="modal-head">
-            <h2>Exame ou procedimento</h2>
-            <button type="button" class="modal-close" data-modal-close aria-label="Fechar">&times;</button>
+            <h2>{{icon "microscope"}} Exame ou procedimento</h2>
+            <button type="button" class="modal-close" data-modal-close aria-label="Fechar">{{icon "close"}}</button>
         </div>
         <div class="modal-body">
             <div class="form-row">
@@ -842,8 +914,8 @@
     <form method="POST" action="/vet/animal/{{animal.id}}/hospitalization">
         <input type="hidden" name="_csrf" value="{{csrfToken}}">
         <div class="modal-head">
-            <h2>Registrar internação</h2>
-            <button type="button" class="modal-close" data-modal-close aria-label="Fechar">&times;</button>
+            <h2>{{icon "hospital"}} Registrar internação</h2>
+            <button type="button" class="modal-close" data-modal-close aria-label="Fechar">{{icon "close"}}</button>
         </div>
         <div class="modal-body">
             <div class="form-row">
@@ -885,8 +957,8 @@
     <form method="POST" action="/vet/animal/{{animal.id}}/receita">
         <input type="hidden" name="_csrf" value="{{csrfToken}}">
         <div class="modal-head">
-            <h2>Prescrever medicamento</h2>
-            <button type="button" class="modal-close" data-modal-close aria-label="Fechar">&times;</button>
+            <h2>{{icon "pill"}} Prescrever medicamento</h2>
+            <button type="button" class="modal-close" data-modal-close aria-label="Fechar">{{icon "close"}}</button>
         </div>
         <div class="modal-body">
             <div class="field">
@@ -930,8 +1002,8 @@
     <form method="POST" action="/vet/animal/{{animal.id}}/document" enctype="multipart/form-data">
         <input type="hidden" name="_csrf" value="{{csrfToken}}">
         <div class="modal-head">
-            <h2>Anexar documento</h2>
-            <button type="button" class="modal-close" data-modal-close aria-label="Fechar">&times;</button>
+            <h2>{{icon "paperclip"}} Anexar documento</h2>
+            <button type="button" class="modal-close" data-modal-close aria-label="Fechar">{{icon "close"}}</button>
         </div>
         <div class="modal-body">
             <div class="field">
@@ -956,8 +1028,8 @@
     <form method="POST" action="/vet/animal/{{animal.id}}/galeria" enctype="multipart/form-data">
         <input type="hidden" name="_csrf" value="{{csrfToken}}">
         <div class="modal-head">
-            <h2>Adicionar foto</h2>
-            <button type="button" class="modal-close" data-modal-close aria-label="Fechar">&times;</button>
+            <h2>{{icon "camera"}} Adicionar foto</h2>
+            <button type="button" class="modal-close" data-modal-close aria-label="Fechar">{{icon "close"}}</button>
         </div>
         <div class="modal-body">
             <div class="field">
@@ -976,3 +1048,48 @@
         </div>
     </form>
 </dialog>
+
+{{#if isRoot}}
+<dialog id="modal-mover-foto">
+    <form method="POST" action="/vet/registro/foto/mover">
+        <input type="hidden" name="_csrf" value="{{csrfToken}}">
+        <input type="hidden" name="photo_id" value="" data-photo-id-field>
+        <div class="modal-head">
+            <h2>{{icon "camera"}} Mover foto</h2>
+            <button type="button" class="modal-close" data-modal-close aria-label="Fechar">{{icon "close"}}</button>
+        </div>
+        <div class="modal-body">
+            <div class="photo-move">
+                <img class="photo-move-thumb" data-photo-preview alt="">
+                <div>
+                    <strong data-photo-label></strong>
+                    <p class="hint">Hoje na galeria de {{animal.name}}.</p>
+                </div>
+            </div>
+
+            {{#if outrosAnimais.length}}
+            <div class="field">
+                <label for="mover-destino">Passar para</label>
+                <select id="mover-destino" name="animal_id" required>
+                    <option value="">Selecione o animal…</option>
+                    {{#each outrosAnimais}}
+                    <option value="{{this.id}}">{{this.name}} — {{this.species}}</option>
+                    {{/each}}
+                </select>
+                <span class="hint">
+                    A imagem sai desta ficha e passa a aparecer na galeria do animal escolhido.
+                    Nada é reenviado: é a mesma foto, com a mesma data e o mesmo autor.
+                </span>
+            </div>
+            {{else}}
+            <p class="muted">Não há outro animal cadastrado para receber a foto.</p>
+            {{/if}}
+        </div>
+        <div class="modal-foot">
+            <button type="button" class="btn btn-ghost" data-modal-close>Cancelar</button>
+            <button type="submit" class="btn btn-primary"
+                    {{#unless outrosAnimais.length}}disabled{{/unless}}>Mover foto</button>
+        </div>
+    </form>
+</dialog>
+{{/if}}

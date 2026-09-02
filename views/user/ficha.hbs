@@ -1,60 +1,59 @@
 <div class="topbar">
     <div class="row">
-        <button type="button" class="btn btn-ghost btn-icon menu-toggle" data-menu-toggle
-                aria-expanded="false" aria-label="Abrir menu">☰</button>
-        <a href="/user/dashboard" class="btn btn-ghost btn-sm">← Voltar</a>
+        {{> menu-button}}
+        <a href="/user/dashboard" class="btn btn-ghost btn-sm">{{icon "arrowLeft"}} Voltar</a>
         <div class="titles">
             <h1>{{animal.name}}</h1>
             <div class="subtitle">
-                {{speciesIcon animal.species}} {{animal.species}}
-                {{#if animal.breed}} · {{animal.breed}}{{/if}}
+                {{speciesIcon animal.species}}
+                <span>{{animal.species}}{{#if animal.breed}} · {{animal.breed}}{{/if}}</span>
             </div>
         </div>
     </div>
     <div class="actions">
-        <span class="badge badge-{{statusVariant animal.status}}">{{statusLabel animal.status}}</span>
+        <span class="badge badge-dot badge-{{statusVariant animal.status}}">{{statusLabel animal.status}}</span>
     </div>
 </div>
 
 <div class="profile">
     <div class="profile-photo" id="foto-principal"
          {{#if animal.has_photo}}style="background-image:url('/media/animal/{{animal.id}}/photo')"{{/if}}>
-        {{#unless animal.has_photo}}<span aria-hidden="true">{{speciesIcon animal.species}}</span>{{/unless}}
+        {{#unless animal.has_photo}}{{speciesIcon animal.species}}{{/unless}}
     </div>
 
     <div class="card" style="margin:0">
-        <div class="card-head"><h2>Sobre o {{animal.name}}</h2></div>
+        <div class="card-head"><h2>{{icon "paw"}} Sobre o {{animal.name}}</h2></div>
 
         <div class="data-list">
-            <div class="data-item"><div class="k">Espécie</div><div class="v">{{animal.species}}</div></div>
-            <div class="data-item"><div class="k">Raça</div><div class="v">{{#if animal.breed}}{{animal.breed}}{{else}}SRD{{/if}}</div></div>
-            <div class="data-item"><div class="k">Idade</div><div class="v">{{displayAge animal}}</div></div>
-            <div class="data-item"><div class="k">Sexo</div><div class="v">{{#if animal.sex}}{{animal.sex}}{{else}}—{{/if}}</div></div>
-            <div class="data-item"><div class="k">Porte</div><div class="v">{{#if animal.size}}{{animal.size}}{{else}}—{{/if}}</div></div>
+            <div class="data-item"><span class="k">Espécie</span><div class="v">{{animal.species}}</div></div>
+            <div class="data-item"><span class="k">Raça</span><div class="v">{{#if animal.breed}}{{animal.breed}}{{else}}SRD{{/if}}</div></div>
+            <div class="data-item"><span class="k">Idade</span><div class="v">{{displayAge animal}}</div></div>
+            <div class="data-item"><span class="k">Sexo</span><div class="v">{{#if animal.sex}}{{animal.sex}}{{else}}—{{/if}}</div></div>
+            <div class="data-item"><span class="k">Porte</span><div class="v">{{#if animal.size}}{{animal.size}}{{else}}—{{/if}}</div></div>
             <div class="data-item">
-                <div class="k">Castrado</div>
+                <span class="k">Castrado</span>
                 <div class="v">{{#if animal.neutered}}Sim{{else}}Não{{/if}}</div>
             </div>
             {{#if animal.environment_name}}
             <div class="data-item">
-                <div class="k">Onde está</div>
+                <span class="k">Onde está</span>
                 <div class="v">{{kindIcon animal.environment_kind}} {{animal.environment_name}}</div>
             </div>
             {{/if}}
-            <div class="data-item"><div class="k">Aqui desde</div><div class="v">{{formatDate animal.entry_date}}</div></div>
+            <div class="data-item"><span class="k">Aqui desde</span><div class="v">{{formatDate animal.entry_date}}</div></div>
         </div>
 
         {{#if animal.characteristics}}
         <div class="mt">
-            <div class="k form-label">Características</div>
-            <p>{{animal.characteristics}}</p>
+            <span class="form-label">Características</span>
+            <p class="mt" style="margin-top:4px">{{animal.characteristics}}</p>
         </div>
         {{/if}}
 
         {{#if animal.description}}
         <div class="mt">
-            <div class="k form-label">Histórico e personalidade</div>
-            <p>{{animal.description}}</p>
+            <span class="form-label">Histórico e personalidade</span>
+            <p class="mt" style="margin-top:4px">{{animal.description}}</p>
         </div>
         {{/if}}
     </div>
@@ -66,14 +65,17 @@
     dados de tutor. Nada disso é sequer carregado do banco em routes/user.js.
 --}}
 <div class="alert alert-info">
-    ℹ️ As informações clínicas do {{animal.name}} (vacinas, exames, tratamentos e prontuário)
-    ficam disponíveis apenas para a equipe veterinária.
+    {{icon "lock"}}
+    <span class="alert-body">
+        As informações clínicas do {{animal.name}} (vacinas, exames, tratamentos e prontuário)
+        ficam disponíveis apenas para a equipe veterinária.
+    </span>
 </div>
 
 <div class="card">
     <div class="card-head">
-        <h2>📷 Galeria</h2>
-        <button type="button" class="btn btn-primary btn-sm" data-modal-open="foto">+ Enviar foto</button>
+        <h2>{{icon "camera"}} Galeria</h2>
+        <button type="button" class="btn btn-primary btn-sm" data-modal-open="foto">{{icon "plus"}} Enviar foto</button>
     </div>
 
     {{#if photos.length}}
@@ -81,7 +83,7 @@
         {{#each photos}}
         <figure class="animal-card">
             <div class="animal-photo" style="background-image:url('/media/photo/{{this.id}}');aspect-ratio:1"></div>
-            <figcaption class="animal-body" style="padding:10px">
+            <figcaption class="animal-body" style="padding:11px;gap:3px">
                 <small>{{#if this.description}}{{this.description}}{{else}}Sem descrição{{/if}}</small>
                 <small class="muted">{{formatDate this.upload_date}}</small>
             </figcaption>
@@ -90,8 +92,12 @@
     </div>
     {{else}}
     <div class="empty">
-        <span class="emoji" aria-hidden="true">📷</span>
+        <span class="empty-icon">{{icon "camera"}}</span>
+        <h2>Galeria vazia</h2>
         <p>Nenhuma foto ainda. Que tal enviar a primeira?</p>
+        <p class="mt">
+            <button type="button" class="btn btn-primary" data-modal-open="foto">{{icon "plus"}} Enviar foto</button>
+        </p>
     </div>
     {{/if}}
 </div>
@@ -100,8 +106,8 @@
     <form method="POST" action="/user/animal/{{animal.id}}/photo" enctype="multipart/form-data">
         <input type="hidden" name="_csrf" value="{{csrfToken}}">
         <div class="modal-head">
-            <h2>Enviar foto</h2>
-            <button type="button" class="modal-close" data-modal-close aria-label="Fechar">&times;</button>
+            <h2>{{icon "camera"}} Enviar foto</h2>
+            <button type="button" class="modal-close" data-modal-close aria-label="Fechar">{{icon "close"}}</button>
         </div>
         <div class="modal-body">
             <div class="field">

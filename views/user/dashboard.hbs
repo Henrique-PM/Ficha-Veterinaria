@@ -1,7 +1,6 @@
 <div class="topbar">
     <div class="row">
-        <button type="button" class="btn btn-ghost btn-icon menu-toggle" data-menu-toggle
-                aria-expanded="false" aria-label="Abrir menu">☰</button>
+        {{> menu-button}}
         <div class="titles">
             <h1>Nossos animais</h1>
             <div class="subtitle">{{total}} {{#if (eq total 1)}}animal{{else}}animais{{/if}} para conhecer</div>
@@ -10,10 +9,17 @@
 </div>
 
 <div class="card">
+    <div class="card-head">
+        <h2>{{icon "filter"}} Filtros</h2>
+        <a href="/user/dashboard" class="btn btn-quiet btn-sm">Limpar</a>
+    </div>
     <form method="GET" action="/user/dashboard" class="filters">
         <div class="field">
             <label for="q">Buscar</label>
-            <input type="search" id="q" name="q" value="{{search}}" placeholder="Nome ou raça">
+            <div class="search-field">
+                {{icon "search"}}
+                <input type="search" id="q" name="q" value="{{search}}" placeholder="Nome ou raça">
+            </div>
         </div>
         <div class="field">
             <label for="especie">Espécie</label>
@@ -25,11 +31,8 @@
             </select>
         </div>
         <div class="field">
-            <label>&nbsp;</label>
-            <div class="row-tight">
-                <button type="submit" class="btn btn-primary">Filtrar</button>
-                <a href="/user/dashboard" class="btn btn-ghost">Limpar</a>
-            </div>
+            <label for="filtrar" class="muted">&nbsp;</label>
+            <button type="submit" id="filtrar" class="btn btn-primary">{{icon "filter"}} Filtrar</button>
         </div>
     </form>
 </div>
@@ -43,8 +46,10 @@
 {{else}}
 <div class="card">
     <div class="empty">
-        <span class="emoji" aria-hidden="true">🐾</span>
-        <p>Nenhum animal encontrado com esses filtros.</p>
+        <span class="empty-icon">{{icon "search"}}</span>
+        <h2>Nenhum animal encontrado</h2>
+        <p>Nenhum animal corresponde a esses filtros.</p>
+        <p class="mt"><a href="/user/dashboard" class="btn btn-ghost">Limpar filtros</a></p>
     </div>
 </div>
 {{/if}}

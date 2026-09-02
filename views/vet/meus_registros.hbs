@@ -1,26 +1,25 @@
 <div class="topbar">
     <div class="row">
-        <button type="button" class="btn btn-ghost btn-icon menu-toggle" data-menu-toggle
-                aria-expanded="false" aria-label="Abrir menu">☰</button>
+        {{> menu-button}}
         <div class="titles">
             <h1>Meus registros</h1>
-            <div class="subtitle">Lançamentos feitos por {{currentUser.name}}</div>
+            <div class="subtitle">Tudo o que foi lançado por {{currentUser.name}}</div>
         </div>
     </div>
 </div>
 
 <div class="tabs" role="tablist" data-tabs="registros">
     <button type="button" class="tab" role="tab" data-tab="vacinas">
-        💉 Vacinas <span class="pill">{{vacinas.length}}</span>
+        {{icon "syringe"}} Vacinas <span class="pill">{{vacinas.length}}</span>
     </button>
     <button type="button" class="tab" role="tab" data-tab="procedimentos">
-        🔬 Procedimentos <span class="pill">{{procedimentos.length}}</span>
+        {{icon "microscope"}} Procedimentos <span class="pill">{{procedimentos.length}}</span>
     </button>
     <button type="button" class="tab" role="tab" data-tab="receitas">
-        💊 Prescrições <span class="pill">{{receitas.length}}</span>
+        {{icon "pill"}} Prescrições <span class="pill">{{receitas.length}}</span>
     </button>
     <button type="button" class="tab" role="tab" data-tab="internacoes">
-        🏥 Internações <span class="pill">{{internacoes.length}}</span>
+        {{icon "hospital"}} Internações <span class="pill">{{internacoes.length}}</span>
     </button>
 </div>
 
@@ -43,7 +42,11 @@
             </table>
         </div>
         {{else}}
-        <div class="empty"><span class="emoji" aria-hidden="true">💉</span><p>Você ainda não aplicou vacinas.</p></div>
+        <div class="empty">
+            <span class="empty-icon">{{icon "syringe"}}</span>
+            <h2>Nenhuma vacina aplicada</h2>
+            <p>Você ainda não registrou aplicação de vacina.</p>
+        </div>
         {{/if}}
     </div>
 </section>
@@ -67,7 +70,11 @@
             </table>
         </div>
         {{else}}
-        <div class="empty"><span class="emoji" aria-hidden="true">🔬</span><p>Nenhum procedimento registrado por você.</p></div>
+        <div class="empty">
+            <span class="empty-icon">{{icon "microscope"}}</span>
+            <h2>Nenhum procedimento</h2>
+            <p>Nenhum exame ou procedimento registrado por você.</p>
+        </div>
         {{/if}}
     </div>
 </section>
@@ -98,7 +105,11 @@
             </table>
         </div>
         {{else}}
-        <div class="empty"><span class="emoji" aria-hidden="true">💊</span><p>Nenhuma prescrição feita por você.</p></div>
+        <div class="empty">
+            <span class="empty-icon">{{icon "pill"}}</span>
+            <h2>Nenhuma prescrição</h2>
+            <p>Nenhum medicamento prescrito por você.</p>
+        </div>
         {{/if}}
     </div>
 </section>
@@ -125,7 +136,11 @@
             </table>
         </div>
         {{else}}
-        <div class="empty"><span class="emoji" aria-hidden="true">🏥</span><p>Nenhuma internação registrada por você.</p></div>
+        <div class="empty">
+            <span class="empty-icon">{{icon "hospital"}}</span>
+            <h2>Nenhuma internação</h2>
+            <p>Nenhuma internação registrada por você.</p>
+        </div>
         {{/if}}
     </div>
 </section>

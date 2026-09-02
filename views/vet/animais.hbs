@@ -1,7 +1,6 @@
 <div class="topbar">
     <div class="row">
-        <button type="button" class="btn btn-ghost btn-icon menu-toggle" data-menu-toggle
-                aria-expanded="false" aria-label="Abrir menu">☰</button>
+        {{> menu-button}}
         <div class="titles">
             <h1>Animais</h1>
             <div class="subtitle">
@@ -10,17 +9,28 @@
         </div>
     </div>
     <div class="actions">
-        <a href="/vet/cadastrar-animal" class="btn btn-primary">+ Cadastrar animal</a>
+        <a href="/vet/cadastrar-animal" class="btn btn-primary">{{icon "plus"}} Cadastrar animal</a>
     </div>
 </div>
 
-{{#if ok}}<div class="alert alert-success" role="status">{{ok}}</div>{{/if}}
+{{#if ok}}
+<div class="alert alert-success" role="status">
+    {{icon "checkCircle"}}<span class="alert-body">{{ok}}</span>
+</div>
+{{/if}}
 
 <div class="card">
+    <div class="card-head">
+        <h2>{{icon "filter"}} Filtros</h2>
+        <a href="/vet/animais" class="btn btn-quiet btn-sm">Limpar</a>
+    </div>
     <form method="GET" action="/vet/animais" class="filters">
         <div class="field">
             <label for="q">Buscar</label>
-            <input type="search" id="q" name="q" value="{{filtros.search}}" placeholder="Nome, raça ou chip">
+            <div class="search-field">
+                {{icon "search"}}
+                <input type="search" id="q" name="q" value="{{filtros.search}}" placeholder="Nome, raça ou chip">
+            </div>
         </div>
         <div class="field">
             <label for="status">Status</label>
@@ -45,18 +55,13 @@
             <select id="ambiente" name="ambiente" data-autosubmit>
                 <option value="">Todos</option>
                 {{#each environments}}
-                <option value="{{this.id}}" {{selected this.id ../filtros.ambiente}}>
-                    {{kindIcon this.kind}} {{this.name}}
-                </option>
+                <option value="{{this.id}}" {{selected this.id ../filtros.ambiente}}>{{this.name}}</option>
                 {{/each}}
             </select>
         </div>
         <div class="field">
-            <label>&nbsp;</label>
-            <div class="row-tight">
-                <button type="submit" class="btn btn-primary">Filtrar</button>
-                <a href="/vet/animais" class="btn btn-ghost">Limpar</a>
-            </div>
+            <label for="filtrar" class="muted">&nbsp;</label>
+            <button type="submit" id="filtrar" class="btn btn-primary">{{icon "filter"}} Filtrar</button>
         </div>
     </form>
 </div>
@@ -70,8 +75,9 @@
 {{else}}
 <div class="card">
     <div class="empty">
-        <span class="emoji" aria-hidden="true">🔍</span>
-        <p>Nenhum animal encontrado com esses filtros.</p>
+        <span class="empty-icon">{{icon "search"}}</span>
+        <h2>Nenhum animal encontrado</h2>
+        <p>Nenhum registro corresponde a esses filtros. Tente uma busca mais ampla.</p>
         <p class="mt"><a href="/vet/animais" class="btn btn-ghost">Limpar filtros</a></p>
     </div>
 </div>

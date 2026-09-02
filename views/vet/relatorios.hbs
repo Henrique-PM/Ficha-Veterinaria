@@ -1,7 +1,6 @@
 <div class="topbar">
     <div class="row">
-        <button type="button" class="btn btn-ghost btn-icon menu-toggle" data-menu-toggle
-                aria-expanded="false" aria-label="Abrir menu">☰</button>
+        {{> menu-button}}
         <div class="titles">
             <h1>Relatórios</h1>
             <div class="subtitle">Panorama do abrigo</div>
@@ -10,106 +9,128 @@
 </div>
 
 <div class="stats">
-    <div class="stat">
-        <div class="ico" aria-hidden="true">🐾</div>
-        <div class="label">Total de animais</div>
-        <div class="value">{{total_animais}}</div>
+    <div class="stat is-primary">
+        <span class="stat-icon">{{icon "paw"}}</span>
+        <span class="stat-body">
+            <span class="label">Total de animais</span>
+            <span class="value">{{total_animais}}</span>
+        </span>
     </div>
     <div class="stat">
-        <div class="ico" aria-hidden="true">❤️</div>
-        <div class="label">Adotados</div>
-        <div class="value">{{adotados}}</div>
+        <span class="stat-icon">{{icon "heart"}}</span>
+        <span class="stat-body">
+            <span class="label">Adotados</span>
+            <span class="value">{{adotados}}</span>
+        </span>
     </div>
     <div class="stat">
-        <div class="ico" aria-hidden="true">✂️</div>
-        <div class="label">Castrados</div>
-        <div class="value">{{castrados}}</div>
+        <span class="stat-icon">{{icon "scissors"}}</span>
+        <span class="stat-body">
+            <span class="label">Castrados</span>
+            <span class="value">{{castrados}}</span>
+        </span>
     </div>
     <div class="stat">
-        <div class="ico" aria-hidden="true">💉</div>
-        <div class="label">Vacinas no mês</div>
-        <div class="value">{{vacinas_mes}}</div>
+        <span class="stat-icon">{{icon "syringe"}}</span>
+        <span class="stat-body">
+            <span class="label">Vacinas no mês</span>
+            <span class="value">{{vacinas_mes}}</span>
+        </span>
     </div>
     <div class="stat">
-        <div class="ico" aria-hidden="true">🏥</div>
-        <div class="label">Internações no mês</div>
-        <div class="value">{{internacoes_mes}}</div>
+        <span class="stat-icon">{{icon "hospital"}}</span>
+        <span class="stat-body">
+            <span class="label">Internações no mês</span>
+            <span class="value">{{internacoes_mes}}</span>
+        </span>
     </div>
     <div class="stat">
-        <div class="ico" aria-hidden="true">🔬</div>
-        <div class="label">Procedimentos no mês</div>
-        <div class="value">{{procedimentos_mes}}</div>
+        <span class="stat-icon">{{icon "microscope"}}</span>
+        <span class="stat-body">
+            <span class="label">Procedimentos no mês</span>
+            <span class="value">{{procedimentos_mes}}</span>
+        </span>
     </div>
     <div class="stat {{#if fiv_positivos}}is-warn{{/if}}">
-        <div class="ico" aria-hidden="true">🧬</div>
-        <div class="label">Gatos FIV+</div>
-        <div class="value">{{fiv_positivos}}</div>
+        <span class="stat-icon">{{icon "dna"}}</span>
+        <span class="stat-body">
+            <span class="label">Gatos FIV+</span>
+            <span class="value">{{fiv_positivos}}</span>
+        </span>
     </div>
     <div class="stat {{#if felv_positivos}}is-warn{{/if}}">
-        <div class="ico" aria-hidden="true">🧬</div>
-        <div class="label">Gatos FeLV+</div>
-        <div class="value">{{felv_positivos}}</div>
+        <span class="stat-icon">{{icon "dna"}}</span>
+        <span class="stat-body">
+            <span class="label">Gatos FeLV+</span>
+            <span class="value">{{felv_positivos}}</span>
+        </span>
     </div>
 </div>
 
 <div class="card">
-    <div class="card-head">
-        <h2>🐾 Animais por espécie</h2>
-    </div>
+    <div class="card-head"><h2>{{icon "paw"}} Animais por espécie</h2></div>
     {{#if porEspecie.length}}
     <div class="bars">
         {{#each porEspecie}}
         <div class="bar-row">
-            <span>{{speciesIcon this.species}} {{this.species}}</span>
+            <span class="bar-label">{{speciesIcon this.species}} <span>{{this.species}}</span></span>
             <span class="bar-track"><span class="bar-fill" style="width:{{percent this.count ../maxEspecie}}%"></span></span>
             <span class="bar-value">{{this.count}}</span>
         </div>
         {{/each}}
     </div>
     {{else}}
-    <p class="empty">Sem dados.</p>
+    <div class="empty"><span class="empty-icon">{{icon "chart"}}</span><p>Sem dados.</p></div>
     {{/if}}
 </div>
 
 <div class="card">
-    <div class="card-head"><h2>📍 Animais por status</h2></div>
+    <div class="card-head"><h2>{{icon "mapPin"}} Animais por status</h2></div>
     {{#if porStatus.length}}
     <div class="bars">
         {{#each porStatus}}
         <div class="bar-row">
-            <span><span class="badge badge-{{statusVariant this.status}}">{{statusLabel this.status}}</span></span>
+            <span class="bar-label">
+                <span class="badge badge-dot badge-{{statusVariant this.status}}">{{statusLabel this.status}}</span>
+            </span>
             <span class="bar-track"><span class="bar-fill" style="width:{{percent this.count ../maxStatus}}%"></span></span>
             <span class="bar-value">{{this.count}}</span>
         </div>
         {{/each}}
     </div>
     {{else}}
-    <p class="empty">Sem dados.</p>
+    <div class="empty"><span class="empty-icon">{{icon "chart"}}</span><p>Sem dados.</p></div>
     {{/if}}
 </div>
 
 <div class="card">
     <div class="card-head">
-        <h2>🏘️ Ocupação por ambiente</h2>
-        <a href="/vet/ambientes" class="btn btn-ghost btn-sm">Gerenciar</a>
+        <h2>{{icon "warehouse"}} Ocupação por ambiente</h2>
+        <a href="/vet/ambientes" class="btn btn-ghost btn-sm">{{icon "settings"}} Gerenciar</a>
     </div>
     {{#if porAmbiente.length}}
     <div class="table-wrap">
         <table>
-            <thead><tr><th>Ambiente</th><th>Tipo</th><th>Animais</th><th>Capacidade</th><th>Ocupação</th></tr></thead>
+            <thead>
+                <tr><th>Ambiente</th><th>Tipo</th><th class="num">Animais</th><th class="num">Capacidade</th><th>Ocupação</th></tr>
+            </thead>
             <tbody>
                 {{#each porAmbiente}}
                 <tr>
                     <td><strong>{{this.name}}</strong></td>
-                    <td>{{kindIcon this.kind}} {{kindLabel this.kind}}</td>
-                    <td>{{this.count}}</td>
-                    <td>{{#if this.capacity}}{{this.capacity}}{{else}}—{{/if}}</td>
-                    <td style="min-width:140px">
+                    <td>
+                        <span class="cell-main">{{kindIcon this.kind}} <span>{{kindLabel this.kind}}</span></span>
+                    </td>
+                    <td class="num">{{this.count}}</td>
+                    <td class="num">{{#if this.capacity}}{{this.capacity}}{{else}}—{{/if}}</td>
+                    <td style="min-width:160px">
                         {{#if this.capacity}}
-                        <div class="meter {{#if (gt this.count this.capacity)}}is-full{{/if}}">
-                            <span style="width:{{percent this.count this.capacity}}%"></span>
+                        <div class="meter-row">
+                            <div class="meter {{#if (gt this.count this.capacity)}}is-full{{/if}}">
+                                <span style="width:{{percent this.count this.capacity}}%"></span>
+                            </div>
+                            <span class="meter-label">{{percent this.count this.capacity}}%</span>
                         </div>
-                        <small class="muted">{{percent this.count this.capacity}}%</small>
                         {{else}}
                         <span class="muted">—</span>
                         {{/if}}
@@ -121,7 +142,7 @@
     </div>
     {{else}}
     <div class="empty">
-        <span class="emoji" aria-hidden="true">🏘️</span>
+        <span class="empty-icon">{{icon "warehouse"}}</span>
         <p>Nenhum ambiente cadastrado.</p>
     </div>
     {{/if}}
@@ -130,18 +151,18 @@
 {{#if estoqueBaixo.length}}
 <div class="card">
     <div class="card-head">
-        <h2>💊 Medicamentos com estoque baixo</h2>
+        <h2>{{icon "pill"}} Medicamentos com estoque baixo</h2>
         <a href="/vet/medicamentos?filtro=baixo" class="btn btn-ghost btn-sm">Repor</a>
     </div>
     <div class="table-wrap">
         <table>
-            <thead><tr><th>Medicamento</th><th>Estoque</th><th>Mínimo</th></tr></thead>
+            <thead><tr><th>Medicamento</th><th>Estoque</th><th class="num">Mínimo</th></tr></thead>
             <tbody>
                 {{#each estoqueBaixo}}
                 <tr>
                     <td><strong>{{this.name}}</strong></td>
-                    <td><span class="badge badge-danger">{{this.stock_quantity}} {{this.unit}}</span></td>
-                    <td>{{this.min_stock_level}}</td>
+                    <td><span class="badge badge-danger badge-dot">{{this.stock_quantity}} {{this.unit}}</span></td>
+                    <td class="num">{{this.min_stock_level}}</td>
                 </tr>
                 {{/each}}
             </tbody>

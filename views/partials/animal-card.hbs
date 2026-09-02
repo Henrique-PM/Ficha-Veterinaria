@@ -1,20 +1,22 @@
 <article class="animal-card">
     <div class="animal-photo"
          {{#if animal.has_photo}}style="background-image:url('/media/animal/{{animal.id}}/photo')"{{/if}}>
-        {{#unless animal.has_photo}}<span aria-hidden="true">{{speciesIcon animal.species}}</span>{{/unless}}
-        <span class="corner badge badge-{{statusVariant animal.status}}">{{statusLabel animal.status}}</span>
+        {{#unless animal.has_photo}}{{speciesIcon animal.species}}{{/unless}}
+        <span class="corner badge badge-dot badge-{{statusVariant animal.status}}">{{statusLabel animal.status}}</span>
     </div>
 
     <div class="animal-body">
         <div>
             <div class="animal-name">{{animal.name}}</div>
-            <div class="animal-meta">{{#if animal.breed}}{{animal.breed}}{{else}}SRD{{/if}}</div>
+            <div class="animal-meta">
+                {{speciesIcon animal.species}}
+                <span>{{animal.species}} · {{#if animal.breed}}{{animal.breed}}{{else}}SRD{{/if}}</span>
+            </div>
         </div>
 
         <div class="tags">
-            <span class="tag">{{speciesIcon animal.species}} {{animal.species}}</span>
-            {{#if animal.sex}}<span class="tag">{{animal.sex}}</span>{{/if}}
             <span class="tag">{{displayAge animal}}</span>
+            {{#if animal.sex}}<span class="tag">{{animal.sex}}</span>{{/if}}
             {{#if animal.environment_name}}
                 <span class="tag">{{kindIcon animal.environment_kind}} {{animal.environment_name}}</span>
             {{/if}}
@@ -24,7 +26,7 @@
         </div>
 
         <a href="{{href}}" class="btn btn-ghost btn-sm btn-block" style="margin-top:auto">
-            {{#if isVet}}Abrir ficha{{else}}Ver detalhes{{/if}}
+            {{#if @root.isVet}}Abrir ficha{{else}}Ver detalhes{{/if}}
         </a>
     </div>
 </article>

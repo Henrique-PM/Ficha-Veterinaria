@@ -66,6 +66,22 @@
         if (!input.value) input.value = new Date().toISOString().slice(0, 10);
       });
 
+      /*
+       * Modal compartilhado por várias fotos (mover foto para outro animal).
+       * Quem diz de qual foto se trata é o botão que abriu — assim a galeria
+       * não precisa de um <dialog> repetido por imagem.
+       */
+      if (trigger.dataset.photoId) {
+        var idField = dialog.querySelector('[data-photo-id-field]');
+        if (idField) idField.value = trigger.dataset.photoId;
+
+        var preview = dialog.querySelector('[data-photo-preview]');
+        if (preview) preview.src = '/media/photo/' + encodeURIComponent(trigger.dataset.photoId);
+
+        var label = dialog.querySelector('[data-photo-label]');
+        if (label) label.textContent = trigger.dataset.photoLabel || '';
+      }
+
       if (typeof dialog.showModal === 'function') dialog.showModal();
       else dialog.setAttribute('open', '');
 
