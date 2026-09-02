@@ -25,78 +25,102 @@
   color-scheme: light;
 
   /* ── Neutros ──────────────────────────────────────────────────────────────
-     Escala de cinza levemente fria (azulada), que é o que dá o ar de
-     instrumento de trabalho. Nenhum tingimento verde: ele deixava a página
-     com aspecto encardido e o verde ficou reservado para destaque. */
-  --bg: #f1f4f6;
+     Escala quente, puxada para o creme. O cinza azulado de antes é o que dava
+     o ar de sistema hospitalar; aqui a base lê como papel, não como
+     formulário. Um abrigo não é um centro cirúrgico. */
+  --bg: #fdf6ee;
   --surface: #ffffff;
-  --surface-2: #f8fafb;
-  --surface-3: #f1f4f6;
-  --border: #e1e6ea;
-  --border-strong: #cbd3da;
+  --surface-2: #fffaf3;
+  --surface-3: #f8ede0;
+  --border: #f0e0cf;
+  --border-strong: #e0c9b1;
 
-  --text: #101820;
-  --text-soft: #39434e;
-  --muted: #64707d;
-  --faint: #8a95a1;
+  /* Marrom quente no lugar do quase-preto: o texto para de "cortar" a página. */
+  --text: #3b2d24;
+  --text-soft: #5c4a3d;
+  --muted: #8b7666;
+  --faint: #a9927f;
 
   /* ── Marca ────────────────────────────────────────────────────────────────
-     Verde clínico fechado. Escuro o bastante para texto branco em cima
-     (contraste 6.6:1) e sóbrio o bastante para não virar decoração. */
-  --primary: #0f6a51;
-  --primary-hover: #0b5240;
-  --primary-active: #093f31;
-  --primary-soft: #e5f1ed;
-  --primary-line: #b9dbd0;
+     O verde continua (é ficha de saúde, afinal), mas puxado para eucalipto em
+     vez de jaleco. Mantém 4.9:1 com texto branco, então segue servindo de
+     botão primário sem depender de peso da fonte. */
+  --primary: #1f7d63;
+  --primary-hover: #19664f;
+  --primary-active: #134f3d;
+  --primary-soft: #e3f3ec;
+  --primary-line: #b4ddcb;
   --primary-contrast: #ffffff;
 
+  /* ── Coral ────────────────────────────────────────────────────────────────
+     O toque afetivo da interface. Estritamente decorativo — ícone, realce,
+     indicador de item ativo. Nunca texto pequeno sobre fundo claro: não tem
+     contraste para isso, e usá-lo assim quebraria a leitura. */
+  --accent: #e8896b;
+  --accent-soft: #ffeee6;
+  --accent-line: #f8cdbb;
+
   /* ── Semânticas ───────────────────────────────────────────────────────────
-     Cada estado tem três tons: texto/ícone, fundo suave e linha. */
-  --success: #16653f;
-  --success-soft: #e4f2ea;
-  --success-line: #b6ddc7;
-  --warning: #7c5106;
-  --warning-soft: #fbefd8;
-  --warning-line: #ecd29a;
-  --danger: #a11f1f;
-  --danger-soft: #fbe6e4;
-  --danger-line: #f0bdb8;
-  --info: #1d5480;
-  --info-soft: #e4eef7;
-  --info-line: #b6d2e8;
-  --neutral-soft: #eceff2;
-  --neutral-line: #dde2e7;
+     Mesma estrutura de três tons, reaquecida para conviver com o creme. */
+  --success: #1f7a4d;
+  --success-soft: #e3f4e9;
+  --success-line: #b3ddc4;
+  --warning: #9a5b08;
+  --warning-soft: #fdf0da;
+  --warning-line: #f2d19b;
+  --danger: #b03636;
+  --danger-soft: #fde9e5;
+  --danger-line: #f6c4b9;
+  --info: #2b6b74;
+  --info-soft: #e4f1f2;
+  --info-line: #b7dade;
+  --neutral-soft: #f6ebdf;
+  --neutral-line: #ecdcc9;
 
   /* ── Barra lateral ────────────────────────────────────────────────────────
-     Grafite azulado: separa a moldura do aplicativo da área de conteúdo sem
-     precisar de sombra pesada, e é o que faz a tela ler como sistema. */
-  --nav-bg: #101a21;
-  --nav-bg-soft: #16232c;
-  --nav-text: #a7b4bf;
-  --nav-text-strong: #ffffff;
-  --nav-line: #22313c;
-  --nav-accent: #4bbf95;
+     Clara e quente. A barra grafite era o que fazia a tela ler como painel de
+     controle; em creme ela vira moldura e o app inteiro fica mais leve. */
+  --nav-bg: #fff3e7;
+  --nav-bg-soft: #ffe4cd;
+  --nav-text: #7c6656;
+  --nav-text-strong: #3b2d24;
+  --nav-line: #f4e0cd;
+  --nav-accent: #e8896b;
+
+  /* ── Tela de entrada ──────────────────────────────────────────────────────
+     Aqui sim vale um bloco de cor cheia: é a única tela sem conteúdo clínico
+     competindo por atenção. Tokens próprios porque a barra lateral agora é
+     clara e os dois não podem mais compartilhar a mesma cor. */
+  --auth-bg: #1f7d63;
+  --auth-text: #ffffff;
+  --auth-text-soft: rgba(255, 255, 255, .84);
+  --auth-text-faint: rgba(255, 255, 255, .58);
 
   /* ── Forma ────────────────────────────────────────────────────────────────
-     Raio contido: cantos muito arredondados são o que dava o ar de aplicativo
-     de recado. Aqui a curva existe, mas discreta. */
-  --radius-lg: 10px;
-  --radius: 8px;
-  --radius-sm: 6px;
-  --radius-xs: 4px;
+     Curva generosa. É o que mais empurra a interface para o lado afetivo —
+     mais até do que a cor. O raio contido de antes era metade do ar de
+     sistema corporativo. */
+  --radius-lg: 20px;
+  --radius: 14px;
+  --radius-sm: 10px;
+  --radius-xs: 8px;
   --radius-pill: 999px;
 
-  /* Elevação quase toda feita por borda; a sombra só reforça. */
-  --shadow-xs: 0 1px 2px rgba(16, 24, 32, .05);
-  --shadow-sm: 0 1px 3px rgba(16, 24, 32, .07), 0 1px 2px rgba(16, 24, 32, .04);
-  --shadow-lg: 0 24px 48px -12px rgba(16, 24, 32, .28);
-  --ring: 0 0 0 3px rgba(15, 106, 81, .18);
+  /* Sombra morna e difusa; a cinza dura endurecia todos os cartões. */
+  --shadow-xs: 0 1px 2px rgba(93, 62, 40, .06);
+  --shadow-sm: 0 2px 6px rgba(93, 62, 40, .07), 0 1px 2px rgba(93, 62, 40, .05);
+  --shadow-lg: 0 24px 48px -12px rgba(93, 62, 40, .24);
+  --ring: 0 0 0 3px rgba(31, 125, 99, .2);
 
   --sidebar-w: 252px;
   --topbar-h: 60px;
 
   --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
           Arial, "Noto Sans", sans-serif;
+  /* Arredondada de sistema: no Apple resolve para SF Pro Rounded, e onde não
+     existir cai na pilha de sempre. Zero download, zero mudança de CSP. */
+  --font-display: ui-rounded, "SF Pro Rounded", "Hiragino Maru Gothic ProN",
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
 }
 
@@ -116,12 +140,16 @@ a { color: var(--primary); text-underline-offset: 2px; }
 a:hover { color: var(--primary-hover); }
 
 h1, h2, h3, h4 {
+  font-family: var(--font-display);
   line-height: 1.28;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: -.014em;
   color: var(--text);
 }
 h1 { font-size: 1.375rem; }
+/* A arredondada também nos dois lugares onde o olho pousa primeiro:
+   a marca e os números do painel. */
+.brand-name, .stat .value { font-family: var(--font-display); }
 h2 { font-size: 1.0625rem; }
 h3 { font-size: .9375rem; }
 small { font-size: .8125rem; }
@@ -152,7 +180,7 @@ strong { font-weight: 600; }
   inset: 0 auto 0 0;
   width: var(--sidebar-w);
   background: var(--nav-bg);
-  border-right: 1px solid var(--nav-bg);
+  border-right: 1px solid var(--nav-line);
   display: flex;
   flex-direction: column;
   padding: 0 12px 14px;
@@ -179,7 +207,7 @@ strong { font-weight: 600; }
   flex: none;
   display: grid;
   place-items: center;
-  border-radius: var(--radius-sm);
+  border-radius: 12px;
   background: var(--primary);
   color: #fff;
 }
@@ -200,7 +228,7 @@ strong { font-weight: 600; }
   font-weight: 600;
   letter-spacing: .1em;
   text-transform: uppercase;
-  color: #6b7b88;
+  color: var(--faint);
 }
 
 .nav-link {
@@ -217,7 +245,7 @@ strong { font-weight: 600; }
   font-weight: 500;
   transition: background .12s ease, color .12s ease;
 }
-.nav-link .icon { width: 17px; height: 17px; color: #7f8f9c; transition: color .12s ease; }
+.nav-link .icon { width: 17px; height: 17px; color: var(--faint); transition: color .12s ease; }
 .nav-link:hover { background: var(--nav-bg-soft); color: var(--nav-text-strong); }
 .nav-link:hover .icon { color: var(--nav-text-strong); }
 .nav-link.active { background: var(--nav-bg-soft); color: var(--nav-text-strong); font-weight: 600; }
@@ -267,7 +295,8 @@ strong { font-weight: 600; }
 .avatar {
   width: 30px; height: 30px;
   flex: none;
-  border-radius: var(--radius-sm);
+  /* Redondo: iniciais em quadrado leem como crachá corporativo. */
+  border-radius: 50%;
   background: var(--primary);
   color: var(--primary-contrast);
   display: grid;
@@ -445,7 +474,7 @@ a.stat:hover .stat-label { color: var(--primary); }
   border-bottom: 1px solid var(--border);
   display: grid;
   place-items: center;
-  color: #b3bec8;
+  color: var(--faint);
 }
 .animal-photo .icon { width: 38px; height: 38px; stroke-width: 1.4; }
 .animal-photo .corner { position: absolute; top: 8px; right: 8px; }
@@ -511,9 +540,10 @@ a.tag:hover { border-color: var(--border-strong); color: var(--text); }
   justify-content: center;
   gap: 6px;
   height: 36px;
-  padding: 0 14px;
+  padding: 0 16px;
   border: 1px solid transparent;
-  border-radius: var(--radius-sm);
+  /* Pílula: junto com o creme, é o que tira o ar de formulário corporativo. */
+  border-radius: var(--radius-pill);
   font: inherit;
   font-size: .875rem;
   font-weight: 550;
@@ -820,7 +850,7 @@ dialog::backdrop { background: rgba(16, 24, 32, .5); backdrop-filter: blur(2px);
   border: 1px solid var(--border);
   display: grid;
   place-items: center;
-  color: #b3bec8;
+  color: var(--faint);
   overflow: hidden;
 }
 .profile-photo .icon { width: 64px; height: 64px; stroke-width: 1.2; }
@@ -1065,8 +1095,8 @@ dialog::backdrop { background: rgba(16, 24, 32, .5); backdrop-filter: blur(2px);
 .auth-shell { min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr; }
 
 .auth-aside {
-  background: var(--nav-bg);
-  color: #fff;
+  background: var(--auth-bg);
+  color: var(--auth-text);
   padding: 48px;
   display: flex;
   flex-direction: column;
@@ -1074,16 +1104,16 @@ dialog::backdrop { background: rgba(16, 24, 32, .5); backdrop-filter: blur(2px);
   gap: 40px;
   /* Textura discreta para o painel não ficar um bloco chapado. */
   background-image:
-    radial-gradient(900px 420px at 12% -10%, rgba(75, 191, 149, .16), transparent 60%),
-    radial-gradient(700px 380px at 90% 110%, rgba(29, 84, 128, .22), transparent 60%);
+    radial-gradient(900px 420px at 12% -10%, rgba(232, 137, 107, .30), transparent 62%),
+    radial-gradient(700px 380px at 90% 110%, rgba(255, 214, 170, .22), transparent 62%);
 }
-.auth-aside .brand { border-bottom: 0; height: auto; margin: 0; }
-.auth-aside h2 { color: #fff; font-size: 1.6rem; line-height: 1.28; max-width: 18ch; }
-.auth-aside p { color: var(--nav-text); font-size: .9375rem; margin-top: 12px; max-width: 42ch; }
+.auth-aside .brand { color: var(--auth-text); border-bottom: 0; height: auto; margin: 0; }
+.auth-aside h2 { color: var(--auth-text); font-size: 1.6rem; line-height: 1.28; max-width: 18ch; }
+.auth-aside p { color: var(--auth-text-soft); font-size: .9375rem; margin-top: 12px; max-width: 42ch; }
 .auth-points { list-style: none; display: flex; flex-direction: column; gap: 13px; margin-top: 26px; }
-.auth-points li { display: flex; align-items: center; gap: 11px; color: var(--nav-text); font-size: .875rem; }
+.auth-points li { display: flex; align-items: center; gap: 11px; color: var(--auth-text-soft); font-size: .875rem; }
 .auth-points .icon { width: 17px; height: 17px; color: var(--nav-accent); }
-.auth-legal { color: #6b7b88; font-size: .78125rem; }
+.auth-legal { color: var(--auth-text-faint); font-size: .78125rem; }
 
 .auth-main { display: grid; place-items: center; padding: 40px 24px; background: var(--surface); }
 .auth-card { width: min(392px, 100%); }
